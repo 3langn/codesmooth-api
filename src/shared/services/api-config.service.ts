@@ -50,10 +50,7 @@ export class ApiConfigService {
   }
 
   get postgresConfig(): TypeOrmModuleOptions {
-    let entities = [
-      __dirname + "/../../modules/**/*.entity{.ts,.js}",
-      __dirname + "/../../modules/**/*.view-entity{.ts,.js}",
-    ];
+    let entities = [__dirname + "/../../entities/*.entity{.ts,.js}"];
     let migrations = [__dirname + "/../../database/migrations/*{.ts,.js}"];
     return {
       entities,
@@ -64,9 +61,9 @@ export class ApiConfigService {
       type: "postgres",
       host: this.getString("DB_HOST"),
       port: this.getNumber("DB_PORT"),
-      username: this.getString("DB_USERNAME"),
+      username: this.getString("DB_USER"),
       password: this.getString("DB_PASSWORD"),
-      database: this.getString("DB_DATABASE"),
+      database: this.getString("DB_NAME"),
       // migrationsRun: true,
       logging: this.getBoolean("ENABLE_ORM_LOGS"),
     };

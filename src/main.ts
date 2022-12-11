@@ -1,7 +1,11 @@
-import { ClassSerializerInterceptor, ValidationPipe } from "@nestjs/common";
+import {
+  ClassSerializerInterceptor,
+  HttpStatus,
+  UnprocessableEntityException,
+  ValidationPipe,
+} from "@nestjs/common";
 import { NestFactory, Reflector } from "@nestjs/core";
 import helmet from "helmet";
-import * as morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import * as compression from "compression";
 
@@ -17,24 +21,37 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.use(helmet());
   app.setGlobalPrefix("/api");
-  // app.use(
-  //   rateLimit({
-  //     windowMs: 15 * 60 * 1000,
-  //     max: 100,
-  //   }),
-  // );
+
+  app.use(helmet());
+
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+    }),
+  );
 
   // app.useGlobalPipes(new ValidationPipe());
+
+  app.use(compression());
+
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector)),
     new HTTPLogger(),
   );
-  app.use(compression());
 
-  // const configService = app.select(SharedModule).get(ApiConfigService);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      transform: true,
+      dismissDefaultMessages: true,
+      exceptionFactory: errors => new UnprocessableEntityException(errors),
+    }),
+  );
 
-  const port = 3001;
-  // const port = configService.appConfig.port;
+  const configService = app.select(SharedModule).get(ApiConfigService);
+
+  const port = configService.appConfig.port;
 
   await app.listen(port);
   console.info(`Server running on port ${port} 👍`);

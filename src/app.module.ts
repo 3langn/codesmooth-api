@@ -11,6 +11,10 @@ import { ApiConfigService } from "./shared/services/api-config.service";
 import { ConfigModule } from "@nestjs/config";
 import { ExcuteController } from "./modules/excute.controller";
 import { ExcuteModule } from "./modules/excute.module";
+import { LessionModule } from "./modules/admin/lession/lession.module";
+import { CourseModule } from "./modules/admin/course/course.module";
+import { CourseCategoryModule } from "./modules/admin/course-category/course-category.module";
+import { SampleModule } from "./modules/admin/sample/sample.module";
 
 @Module({
   imports: [
@@ -25,18 +29,22 @@ import { ExcuteModule } from "./modules/excute.module";
     //     AcceptLanguageResolver,
     //   ],
     // }),
-    // ConfigModule.forRoot({
-    //   isGlobal: true,
-    //   envFilePath: ".env",
-    // }),
-    // TypeOrmModule.forRootAsync({
-    //   imports: [SharedModule],
-    //   useFactory: (configService: ApiConfigService) =>
-    //     configService.postgresConfig,
-    //   inject: [ApiConfigService],
-    // }),
-    // WinstonModule.forRoot(winstonConfig),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: process.env.NODE_ENV ? process.env.NODE_ENV : ".env.dev",
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [SharedModule],
+      useFactory: (configService: ApiConfigService) =>
+        configService.postgresConfig,
+      inject: [ApiConfigService],
+    }),
+    WinstonModule.forRoot(winstonConfig),
     ExcuteModule,
+    LessionModule,
+    CourseModule,
+    CourseCategoryModule,
+    SampleModule,
   ],
   // providers: [
   //   {
