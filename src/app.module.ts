@@ -15,20 +15,22 @@ import { LessionModule } from "./modules/admin/lession/lession.module";
 import { CourseModule } from "./modules/admin/course/course.module";
 import { CourseCategoryModule } from "./modules/admin/course-category/course-category.module";
 import { SampleModule } from "./modules/admin/sample/sample.module";
+import { AuthModule } from "./modules/auth/auth.module";
+import { UserModule } from "./modules/user/user.module";
 
 @Module({
   imports: [
-    // I18nModule.forRoot({
-    //   fallbackLanguage: "en",
-    //   loaderOptions: {
-    //     path: path.join(__dirname, "/i18n/"),
-    //     watch: true,
-    //   },
-    //   resolvers: [
-    //     { use: QueryResolver, options: ["lang"] },
-    //     AcceptLanguageResolver,
-    //   ],
-    // }),
+    I18nModule.forRoot({
+      fallbackLanguage: "en",
+      loaderOptions: {
+        path: path.join(__dirname, "/i18n/"),
+        watch: true,
+      },
+      resolvers: [
+        { use: QueryResolver, options: ["lang"] },
+        AcceptLanguageResolver,
+      ],
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: process.env.NODE_ENV ? process.env.NODE_ENV : ".env.dev",
@@ -45,6 +47,8 @@ import { SampleModule } from "./modules/admin/sample/sample.module";
     CourseModule,
     CourseCategoryModule,
     SampleModule,
+    AuthModule,
+    UserModule,
   ],
   // providers: [
   //   {

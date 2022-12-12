@@ -1,5 +1,5 @@
 export enum Platform {
-  CMS = 'CMS',
-  APP = 'APP',
-  WEB = 'WEB',
+  ADMIN = "ADMIN",
+  APP = "APP",
+  WEB = "WEB",
 }
