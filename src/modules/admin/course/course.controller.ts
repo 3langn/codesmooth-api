@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 import { PageDto } from "../../../common/dto/page.dto";
+import { ResponseDefault } from "../../../common/dto/response_default";
 import { CourseService } from "./course.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 
@@ -10,7 +11,8 @@ export class CourseController {
 
   @Post("/")
   async createCourse(@Body() body: CreateCourseDto) {
-    return await this.courseService.createCourse(body);
+    await this.courseService.createCourse(body);
+    return new ResponseDefault("Course created");
   }
 
   @Get("/")

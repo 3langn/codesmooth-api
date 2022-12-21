@@ -12,9 +12,8 @@ export class CourseService {
   ) {}
 
   async createCourse(data: CreateCourseDto) {
-    const course = this.courseRepository.create(data);
-    await this.courseRepository.save(course);
-    return course;
+    await this.courseRepository.upsert(data, { conflictPaths: ["id"] });
+    // const course = this.courseRepository.create(data);
   }
 
   async getCourses() {

@@ -7,15 +7,33 @@ export class CourseEntity extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
-  description: string;
+  @Column({ default: "" })
+  summary: string;
+
+  @Column({ default: "" })
+  course_objectives: string;
+
+  @Column({ default: "" })
+  detail: string;
+
+  @Column({ default: "" })
+  target_audience: string;
+
+  @Column({ type: "text", array: true, default: [] })
+  skills: string[];
+
+  @Column({ type: "text", array: true, default: [] })
+  tags: string[];
+
+  @Column({ default: "" })
+  thumbnail: string;
 
   @Column()
   price: number;
 
-  @OneToMany(() => CourseCategoryEntity, category => category.course)
+  @OneToMany(() => CourseCategoryEntity, (category) => category.course)
   category: CourseCategoryEntity;
 
   @Column({ default: false })
-  isPublished: boolean;
+  is_published: boolean;
 }
