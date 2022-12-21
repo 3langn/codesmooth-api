@@ -58,6 +58,7 @@ export class ApiConfigService {
       // migrations,
       // keepConnectionAlive: !this.isTest,
       // dropSchema: this.isTest,
+      ssl: true,
       type: "postgres",
       host: this.getString("DB_HOST"),
       port: this.getNumber("DB_PORT"),

@@ -32,7 +32,9 @@ export class UserRegisterDto {
   readonly email: string;
 
   @IsString()
-  @MinLength(6)
+  @MinLength(6, {
+    message: "Password is too short",
+  })
   readonly password: string;
 
   // @ApiProperty()

@@ -8,12 +8,16 @@ import { CreateCourseDto } from "./dto/create-course.dto";
 export class CourseService {
   constructor(
     @InjectRepository(CourseEntity)
-    private courseRepository: Repository<CourseEntity>,
+    private courseRepository: Repository<CourseEntity>
   ) {}
 
   async createCourse(data: CreateCourseDto) {
     const course = this.courseRepository.create(data);
     await this.courseRepository.save(course);
     return course;
+  }
+
+  async getCourses() {
+    return await this.courseRepository.find();
   }
 }
