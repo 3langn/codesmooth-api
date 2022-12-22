@@ -15,6 +15,8 @@ export class LessionService {
   ) {}
 
   async createLession(data: CreateLessionDto) {
+    console.log(data);
+
     return await this.lessionRepository.upsert(data, { conflictPaths: ["id"] });
   }
 

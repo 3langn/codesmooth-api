@@ -79,7 +79,7 @@ export class AuthService {
 
   async login(userLoginDto: UserLoginDto): Promise<UserEntity> {
     const role =
-      userLoginDto.requestFrom === Platform.ADMIN
+      userLoginDto.requestFrom === Platform.CMS
         ? UserRole.ADMINSTRATOR
         : UserRole.USER;
     try {

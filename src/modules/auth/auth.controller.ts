@@ -24,20 +24,17 @@ export class AuthController {
   ) {}
 
   @Post("login")
-  @HttpCode(HttpStatus.OK)
   @ApiOkResponse({
     type: LoginPayloadDto,
     description: "User info with access token",
   })
   async login(@Body() userLoginDto: UserLoginDto): Promise<LoginPayloadDto> {
     const userEntity = await this.authService.login(userLoginDto);
-
     const token = await this.authService.generateAuthToken(userEntity);
     return new LoginPayloadDto(userEntity.toDto(), token);
   }
 
   @Post("register")
-  @HttpCode(HttpStatus.OK)
   async register(@Body() userRegisterDto: UserRegisterDto): Promise<UserDto> {
     const createdUser = await this.userService.createUser(userRegisterDto);
     delete createdUser.password;

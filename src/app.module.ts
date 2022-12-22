@@ -14,6 +14,8 @@ import { SampleModule } from "./modules/admin/sample/sample.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UserModule } from "./modules/user/user.module";
 import { ExcuteModule } from "./modules/execute/execute.module";
+import { HealthModule } from "./modules/health/health.module";
+import { UploadModule } from "./modules/upload/upload.module";
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { ExcuteModule } from "./modules/execute/execute.module";
     SampleModule,
     AuthModule,
     UserModule,
+    HealthModule,
+    UploadModule,
   ],
   // providers: [
   //   {

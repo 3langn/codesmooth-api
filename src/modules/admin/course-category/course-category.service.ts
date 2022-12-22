@@ -8,12 +8,12 @@ import { CreateCourseCategoryDto } from "./dto/dto";
 export class CourseCategoryService {
   constructor(
     @InjectRepository(CourseCategoryEntity)
-    private courseCategoryRepository: Repository<CourseCategoryEntity>,
+    private courseCategoryRepository: Repository<CourseCategoryEntity>
   ) {}
 
   async createCourseCategory(data: CreateCourseCategoryDto) {
-    const cc = this.courseCategoryRepository.create(data);
-
-    return await this.courseCategoryRepository.save(cc);
+    return await this.courseCategoryRepository.upsert(data, {
+      conflictPaths: ["id"],
+    });
   }
 }
