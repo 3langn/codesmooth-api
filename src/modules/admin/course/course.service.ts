@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { ResponseDefault } from "../../../common/dto/response_default";
 import { CourseEntity } from "../../../entities/course.entity";
-import { CreateCourseDto } from "./dto/create-course.dto";
+import { SaveCourseDto } from "./dto/create-course.dto";
 
 @Injectable()
 export class CourseService {
@@ -11,9 +12,8 @@ export class CourseService {
     private courseRepository: Repository<CourseEntity>
   ) {}
 
-  async createCourse(data: CreateCourseDto) {
+  async saveCourse(data: SaveCourseDto) {
     await this.courseRepository.upsert(data, { conflictPaths: ["id"] });
-    // const course = this.courseRepository.create(data);
   }
 
   async getCourses() {
@@ -21,6 +21,19 @@ export class CourseService {
   }
 
   async getCourseById(id: number) {
-    return await this.courseRepository.findOne({ where: { id } });
+    // select id, title from lessions
+    return await this.courseRepository
+      .createQueryBuilder("course")
+      .select([
+        "course",
+        "category.id",
+        "category.title",
+        "lessions.id",
+        "lessions.title",
+      ])
+      .leftJoin("course.category", "category")
+      .leftJoin("category.lessions", "lessions")
+      .where("course.id = :id", { id })
+      .getOne();
   }
 }

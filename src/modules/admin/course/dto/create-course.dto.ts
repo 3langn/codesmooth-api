@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
-export class CreateCourseDto {
+export class SaveCourseDto {
   @IsNumber({ maxDecimalPlaces: 18 }, { message: "Id must be a number" })
   id: number;
 

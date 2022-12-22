@@ -9,6 +9,9 @@ import {
 import { LessonComponent } from "../../../entities/lession.entity";
 
 export class CreateLessionDto {
+  @IsNumber(undefined, { message: "Id phải là một số" })
+  id?: number;
+
   @IsNotEmpty({ message: "Tiêu đề không được để trống" })
   @IsString({ message: "Tiêu đề phải là một chuỗi" })
   title: string;

@@ -13,4 +13,5 @@ export const ExceptionTitleList = {
   InternalServerError: "InternalServerError",
   EmailOrPasswordIncorrect: "EmailOrPasswordIncorrect",
   EmailAlreadyExists: "EmailAlreadyExists",
+  LessionNotFound: "LessionNotFound",
 } as const;
