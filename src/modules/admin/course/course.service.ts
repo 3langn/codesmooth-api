@@ -19,4 +19,8 @@ export class CourseService {
   async getCourses() {
     return await this.courseRepository.find();
   }
+
+  async getCourseById(id: number) {
+    return await this.courseRepository.findOne({ where: { id } });
+  }
 }

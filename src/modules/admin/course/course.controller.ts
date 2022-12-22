@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 import { PageDto } from "../../../common/dto/page.dto";
 import { ResponseDefault } from "../../../common/dto/response_default";
@@ -19,5 +19,11 @@ export class CourseController {
   async getCourses() {
     const res = await this.courseService.getCourses();
     return new PageDto(res, new PageMetaDto({ itemCount: res.length }));
+  }
+
+  @Get("/:id")
+  async getCourseById(@Param("id") id: number) {
+    const data = await this.courseService.getCourseById(id);
+    return new ResponseDefault("Success", data);
   }
 }
