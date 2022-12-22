@@ -51,8 +51,7 @@
     "rxjs": "^7.2.0",
     "typeorm": "^0.3.10",
     "typeorm-transactional-cls-hooked": "^0.1.21",
-    "winston": "^3.8.2",
-    "ytdl-core": "^4.11.2"
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
