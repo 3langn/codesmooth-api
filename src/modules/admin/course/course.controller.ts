@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 import { PageDto } from "../../../common/dto/page.dto";
 import { ResponseDefault } from "../../../common/dto/response_default";
@@ -25,5 +25,11 @@ export class CourseController {
   async getCourseById(@Param("id") id: number) {
     const data = await this.courseService.getCourseById(id);
     return new ResponseDefault("Success", data);
+  }
+
+  @Delete("/:id")
+  async deleteCourseById(@Param("id") id: number) {
+    await this.courseService.deleteCourseById(id);
+    return new ResponseDefault("Course deleted successfully");
   }
 }

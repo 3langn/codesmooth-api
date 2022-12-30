@@ -54,7 +54,7 @@ export class ApiConfigService {
     let migrations = [__dirname + "/../../database/migrations/*{.ts,.js}"];
     return {
       entities,
-      // synchronize: true,
+      synchronize: true,
       // migrations,
       // keepConnectionAlive: !this.isTest,
       // dropSchema: this.isTest,

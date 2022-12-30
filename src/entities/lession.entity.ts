@@ -30,12 +30,15 @@ export class LessionEntity extends BaseEntity {
   @Column({ type: "jsonb" })
   components: LessonComponent[];
 
+  @Column({ default: "" })
+  summary: string;
+
   @Column()
   course_category_id: number;
 
   @ManyToOne(
     () => CourseCategoryEntity,
-    course_category => course_category.lessions,
+    (course_category) => course_category.lessions
   )
   @JoinColumn({ name: "course_category_id" })
   course_category: CourseCategoryEntity;

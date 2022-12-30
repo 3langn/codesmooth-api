@@ -1,6 +1,6 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Param, Patch, Post } from "@nestjs/common";
 import { CourseCategoryService } from "./course-category.service";
-import { CreateCourseCategoryDto } from "./dto/dto";
+import { CreateCourseCategoryDto, UpdateCourseCategoryDto } from "./dto/dto";
 
 @Controller("admin/category")
 export class CourseCatController {
@@ -9,5 +9,13 @@ export class CourseCatController {
   @Post("/")
   async createCatCourse(@Body() body: CreateCourseCategoryDto) {
     return await this.courseCatService.createCourseCategory(body);
+  }
+
+  @Patch("/:id")
+  async updateCatCourse(
+    @Body() body: UpdateCourseCategoryDto,
+    @Param("id") id: number
+  ) {
+    return await this.courseCatService.updateCourseCategory(body.title, id);
   }
 }

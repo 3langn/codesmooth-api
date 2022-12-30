@@ -36,4 +36,8 @@ export class CourseService {
       .where("course.id = :id", { id })
       .getOne();
   }
+
+  async deleteCourseById(id: number) {
+    await this.courseRepository.delete(id);
+  }
 }

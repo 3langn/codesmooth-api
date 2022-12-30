@@ -16,4 +16,8 @@ export class CourseCategoryService {
       conflictPaths: ["id"],
     });
   }
+
+  async updateCourseCategory(title: string, id: number) {
+    return await this.courseCategoryRepository.update(id, { title });
+  }
 }

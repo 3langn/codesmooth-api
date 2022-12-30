@@ -12,3 +12,9 @@ export class CreateCourseCategoryDto {
   @IsNumber(undefined, { message: "Id khóa học phải là một số" })
   courseId: number;
 }
+
+export class UpdateCourseCategoryDto {
+  @IsNotEmpty({ message: "Tên danh mục không được để trống" })
+  @IsString({ message: "Tên danh mục phải là một chuỗi" })
+  title: string;
+}

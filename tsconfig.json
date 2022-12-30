@@ -18,5 +18,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "lib": ["dom", "dom.iterable"]
-  }
+  },
+  "include": ["src", "dist"]
 }

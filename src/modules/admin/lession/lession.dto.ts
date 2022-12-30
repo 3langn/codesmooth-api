@@ -16,6 +16,9 @@ export class CreateLessionDto {
   @IsString({ message: "Tiêu đề phải là một chuỗi" })
   title: string;
 
+  @IsString({ message: "Tóm tắt phải là một chuỗi" })
+  summary?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => LessonComponent)
