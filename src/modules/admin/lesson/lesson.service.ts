@@ -1,36 +1,36 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { LessionEntity } from "../../../entities/lession.entity";
-import { CreateLessionDto } from "./lession.dto";
+import { LessonEntity } from "../../../entities/lesson.entity";
+import { CreateLessonDto } from "./lesson.dto";
 import { NotFoundException } from "src/common/exception/not-found.exception";
 import { ExceptionTitleList } from "src/common/constants/exception-title-list.constants";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 @Injectable()
-export class LessionService {
+export class LessonService {
   constructor(
-    @InjectRepository(LessionEntity)
-    private lessionRepository: Repository<LessionEntity>
+    @InjectRepository(LessonEntity)
+    private lessonRepository: Repository<LessonEntity>
   ) {}
 
-  async createLession(data: CreateLessionDto) {
+  async createLesson(data: CreateLessonDto) {
     console.log(data);
 
-    return await this.lessionRepository.upsert(data, { conflictPaths: ["id"] });
+    return await this.lessonRepository.upsert(data, { conflictPaths: ["id"] });
   }
 
-  async getLessions(lession_id: number) {
-    const lession = await this.lessionRepository.findOne({
-      where: { id: lession_id },
+  async getLessons(lesson_id: number) {
+    const lesson = await this.lessonRepository.findOne({
+      where: { id: lesson_id },
     });
-    if (!lession) {
+    if (!lesson) {
       throw new CustomHttpException({
         statusCode: HttpStatus.NOT_FOUND,
-        message: `Lession ${lession_id} not found`,
-        code: StatusCodesList.LessionNotFound,
+        message: `Lesson ${lesson_id} not found`,
+        code: StatusCodesList.LessonNotFound,
       });
     }
-    return lession;
+    return lesson;
   }
 }

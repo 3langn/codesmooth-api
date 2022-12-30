@@ -21,18 +21,18 @@ export class CourseService {
   }
 
   async getCourseById(id: number) {
-    // select id, title from lessions
+    // select id, title from lessons
     return await this.courseRepository
       .createQueryBuilder("course")
       .select([
         "course",
         "category.id",
         "category.title",
-        "lessions.id",
-        "lessions.title",
+        "lessons.id",
+        "lessons.title",
       ])
       .leftJoin("course.category", "category")
-      .leftJoin("category.lessions", "lessions")
+      .leftJoin("category.lessons", "lessons")
       .where("course.id = :id", { id })
       .getOne();
   }

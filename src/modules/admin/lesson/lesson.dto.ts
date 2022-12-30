@@ -6,9 +6,9 @@ import {
   IsString,
   ValidateNested,
 } from "class-validator";
-import { LessonComponent } from "../../../entities/lession.entity";
+import { LessonComponent } from "../../../entities/lesson.entity";
 
-export class CreateLessionDto {
+export class CreateLessonDto {
   @IsNumber(undefined, { message: "Id phải là một số" })
   id?: number;
 

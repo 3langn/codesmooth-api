@@ -7,7 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from "class-validator";
-import { LessonComponent } from "../../../entities/lession.entity";
+import { LessonComponent } from "../../../entities/lesson.entity";
 
 export class CreateSampleDto {
   @IsNotEmptyObject()

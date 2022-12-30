@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { LessonComponentType } from "../common/enum/lesson-component-type";
-import { LessonComponent } from "./lession.entity";
+import { LessonComponent } from "./lesson.entity";
 
 @Entity("sample")
 export class SampleEntity {

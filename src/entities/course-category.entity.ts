@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { CourseCategoryType } from "../common/enum/course-category-type";
 import { CourseEntity } from "./course.entity";
-import { LessionEntity } from "./lession.entity";
+import { LessonEntity } from "./lesson.entity";
 
 @Entity("course_categories")
 export class CourseCategoryEntity extends BaseEntity {
@@ -15,10 +15,10 @@ export class CourseCategoryEntity extends BaseEntity {
   @Column()
   courseId: number;
 
-  @ManyToOne(() => CourseEntity, course => course.category)
+  @ManyToOne(() => CourseEntity, (course) => course.category)
   @JoinColumn({ name: "courseId" })
   course: CourseEntity;
 
-  @OneToMany(() => LessionEntity, lession => lession.course_category)
-  lessions: LessionEntity[];
+  @OneToMany(() => LessonEntity, (lesson) => lesson.course_category)
+  lessons: LessonEntity[];
 }

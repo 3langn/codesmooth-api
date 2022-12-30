@@ -22,8 +22,8 @@ export class LessonComponent {
   type: LessonComponentType;
 }
 
-@Entity("lessions")
-export class LessionEntity extends BaseEntity {
+@Entity("lessons")
+export class LessonEntity extends BaseEntity {
   @Column()
   title: string;
 
@@ -38,7 +38,7 @@ export class LessionEntity extends BaseEntity {
 
   @ManyToOne(
     () => CourseCategoryEntity,
-    (course_category) => course_category.lessions
+    (course_category) => course_category.lessons
   )
   @JoinColumn({ name: "course_category_id" })
   course_category: CourseCategoryEntity;
