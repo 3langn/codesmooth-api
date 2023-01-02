@@ -27,8 +27,8 @@ async function bootstrap() {
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
-      max: 100,
-    }),
+      max: 10000,
+    })
   );
 
   // app.useGlobalPipes(new ValidationPipe());
@@ -37,7 +37,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector)),
-    new HTTPLogger(),
+    new HTTPLogger()
   );
 
   app.useGlobalPipes(
@@ -45,8 +45,8 @@ async function bootstrap() {
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       transform: true,
       dismissDefaultMessages: true,
-      exceptionFactory: errors => new UnprocessableEntityException(errors),
-    }),
+      exceptionFactory: (errors) => new UnprocessableEntityException(errors),
+    })
   );
 
   const configService = app.select(SharedModule).get(ApiConfigService);
