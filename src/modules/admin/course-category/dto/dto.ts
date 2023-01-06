@@ -18,3 +18,13 @@ export class UpdateCourseCategoryDto {
   @IsString({ message: "Tên danh mục phải là một chuỗi" })
   title: string;
 }
+
+export class SwapOrderRequestDto {
+  @IsNotEmpty({ message: "Id danh mục không được để trống" })
+  @IsNumber(undefined, { message: "Id danh mục phải là một số" })
+  categoryId1: number;
+
+  @IsNotEmpty({ message: "Id danh mục không được để trống" })
+  @IsNumber(undefined, { message: "Id danh mục phải là một số" })
+  categoryId2: number;
+}

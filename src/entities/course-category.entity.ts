@@ -12,6 +12,9 @@ export class CourseCategoryEntity extends BaseEntity {
   @Column({ type: "enum", enum: CourseCategoryType })
   type: CourseCategoryType;
 
+  @Column({ default: 0 })
+  order: number;
+
   @Column()
   courseId: number;
 
@@ -19,6 +22,8 @@ export class CourseCategoryEntity extends BaseEntity {
   @JoinColumn({ name: "courseId" })
   course: CourseEntity;
 
-  @OneToMany(() => LessonEntity, (lesson) => lesson.course_category)
+  @OneToMany(() => LessonEntity, (lesson) => lesson.course_category, {
+    cascade: true,
+  })
   lessons: LessonEntity[];
 }

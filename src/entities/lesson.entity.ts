@@ -27,6 +27,12 @@ export class LessonEntity extends BaseEntity {
   @Column()
   title: string;
 
+  @Column({ default: false })
+  isCompleted: boolean;
+
+  @Column({ default: 0 })
+  order: number;
+
   @Column({ type: "jsonb" })
   components: LessonComponent[];
 
@@ -36,10 +42,9 @@ export class LessonEntity extends BaseEntity {
   @Column()
   course_category_id: number;
 
-  @ManyToOne(
-    () => CourseCategoryEntity,
-    (course_category) => course_category.lessons
-  )
+  @ManyToOne(() => CourseCategoryEntity, (course_category) => course_category.lessons, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "course_category_id" })
   course_category: CourseCategoryEntity;
 }
