@@ -4,18 +4,15 @@ import { LessonComponentType } from "../common/enum/lesson-component-type";
 import { CourseCategoryEntity } from "./course-category.entity";
 
 export interface ContentCode {
-  content: {
-    code: string | undefined;
-    judgeContent: {
-      testCode: string | undefined;
-      executeCode: string | undefined;
-    };
-    language: string;
-    runable: boolean;
-    timeLimit: number;
-    allowDownload: false;
+  code: string | undefined;
+  judgeContent: {
+    testCode: string | undefined;
+    executeCode: string | undefined;
   };
-  type: string;
+  language: string;
+  runable: boolean;
+  timeLimit: number;
+  allowDownload: false;
 }
 export class LessonComponent {
   content: ContentCode | any;

@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { LessonComponentType } from "../common/enum/lesson-component-type";
-import { LessonComponent } from "./lesson.entity";
+import { ContentCode } from "./lesson.entity";
 
 @Entity("sample")
 export class SampleEntity {
@@ -12,5 +12,5 @@ export class SampleEntity {
   type: LessonComponentType;
 
   @Column({ type: "jsonb" })
-  content: LessonComponent;
+  content: ContentCode;
 }

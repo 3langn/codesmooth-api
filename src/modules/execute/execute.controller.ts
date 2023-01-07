@@ -22,25 +22,10 @@ export class ExcuteController {
   @Post("/")
   async excute(
     @Body()
-    {
-      code,
-      testCode,
-      executeCode,
-      language,
-    }: {
-      code: string;
-      testCode: string;
-      executeCode: string;
-      language: string;
-    }
+    { code, testCode, language }: { code: string; testCode: string; language: string },
   ) {
     return {
-      data: await this.executeService.execute(
-        code,
-        testCode,
-        executeCode,
-        language
-      ),
+      data: await this.executeService.execute(code, testCode, language),
     };
   }
 }

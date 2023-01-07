@@ -1,28 +1,34 @@
 import { Injectable } from "@nestjs/common";
-import * as ts from "typescript";
 import * as fs from "fs";
-import * as path from "path";
 import * as sh from "child_process";
 import { generateId } from "../../common/generate-nanoid";
 import { genPath } from "../../common/constants/path";
+import { SampleEntity } from "../../entities/sample.entity";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { ContentCode } from "../../entities/lesson.entity";
 
 @Injectable()
 export class ExecuteService {
-  async execute(
-    code: string,
-    testCode: string,
-    executeCode: string,
-    language: string
-  ) {
+  constructor(@InjectRepository(SampleEntity) private sampleRepo: Repository<SampleEntity>) {}
+
+  async execute(code: string, testCode: string, language: string) {
     const id = generateId(10);
+    const sampleRecord = await this.sampleRepo.findOne({
+      where: {
+        id: language,
+      },
+    });
+
+    const componentContent = sampleRecord.content as ContentCode;
+    const executeCode = componentContent.judgeContent.executeCode;
+    console.log(executeCode);
+
     const filePath = this.genFile(id, code, testCode, executeCode, language);
-    const output = sh.execSync(
-      this.getCMD(language, id, this.getExt(language)),
-      {
-        encoding: "utf-8",
-        shell: "/bin/bash",
-      }
-    );
+    const output = sh.execSync(this.getCMD(language, id, this.getExt(language)), {
+      encoding: "utf-8",
+      shell: "/bin/bash",
+    });
     fs.unlinkSync(filePath);
     return JSON.parse(output).test_results;
   }
@@ -32,7 +38,7 @@ export class ExecuteService {
     code: string,
     testCode: string,
     executeCode: string,
-    language: string
+    language: string,
   ): string {
     let r = code + "\n" + testCode + "\n" + executeCode;
     if (!fs.existsSync(genPath)) {
