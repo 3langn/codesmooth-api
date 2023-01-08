@@ -60,6 +60,11 @@ export class ExecuteService {
   ): string {
     let r = code + "\n" + testCode + "\n" + executeCode;
     const path = `${genPath}/${id}`;
+
+    if (!fs.existsSync(genPath)) {
+      fs.mkdirSync(genPath);
+    }
+
     if (!fs.existsSync(path)) {
       fs.mkdirSync(path);
     }
