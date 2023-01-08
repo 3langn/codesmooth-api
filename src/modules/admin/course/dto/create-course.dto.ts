@@ -15,6 +15,14 @@ export class SaveCourseDto {
   @IsNumber()
   price: number;
 
+  requirements: string[];
+
+  will_learns: string[];
+
+  skills: string[];
+
+  tags: string[];
+
   // @IsNumber()
   // discount: number;
   thumbnail: string;

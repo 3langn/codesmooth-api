@@ -13,8 +13,8 @@ export class CourseEntity extends BaseEntity {
   @Column({ default: "" })
   course_objectives: string;
 
-  @Column({ default: "" })
-  detail: string;
+  @Column({ type: "text", array: true, default: [] })
+  will_learns: string[];
 
   @Column({ default: "" })
   target_audience: string;
@@ -24,6 +24,9 @@ export class CourseEntity extends BaseEntity {
 
   @Column({ type: "text", array: true, default: [] })
   tags: string[];
+
+  @Column({ type: "text", array: true, default: [] })
+  requirements: string[];
 
   @Column({ default: "" })
   thumbnail: string;
