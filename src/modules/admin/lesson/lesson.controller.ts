@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { ResponseDefault } from "../../../common/dto/response_default";
 import {
   SaveLessonDto as SaveLessonDto,
   MarkLessonAsCompletedDto,
   SwapOrderRequestDto,
+  UpdateLessonsOrder,
 } from "./lesson.dto";
 import { LessonService } from "./lesson.service";
 
@@ -15,6 +16,12 @@ export class LessonController {
   async saveLesson(@Body() body: SaveLessonDto) {
     const res = await this.lessonService.saveLesson(body);
     return new ResponseDefault("Lesson saved successfully", res);
+  }
+
+  @Post("/add")
+  async addLesson(@Body() body: SaveLessonDto) {
+    const res = await this.lessonService.addLesson(body);
+    return new ResponseDefault("Lesson added successfully", res);
   }
 
   @Get("/:lesson_id")

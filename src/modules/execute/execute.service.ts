@@ -33,7 +33,6 @@ export class ExecuteService {
           encoding: "utf-8",
           shell: "/bin/bash",
         });
-        this.logger.debug(output);
       }
 
       fs.unlinkSync(filePath);

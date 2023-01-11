@@ -22,6 +22,32 @@ export class SaveLessonDto {
   @IsString({ message: "Tóm tắt phải là một chuỗi" })
   summary?: string;
 
+  order?: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => LessonComponent)
+  components?: LessonComponent[];
+
+  @IsNotEmpty({ message: "Id danh mục không được để trống" })
+  @IsNumber(undefined, { message: "Id danh mục phải là một số" })
+  course_category_id: number;
+}
+
+export class AddLessonDto {
+  @IsNumber(undefined, { message: "Id phải là một số" })
+  id?: number;
+
+  @IsNotEmpty({ message: "Tiêu đề không được để trống" })
+  @IsString({ message: "Tiêu đề phải là một chuỗi" })
+  title: string;
+
+  @IsString({ message: "Tóm tắt phải là một chuỗi" })
+  summary?: string;
+
+  @IsNumber(undefined, { message: "Thứ tự phải là một số" })
+  order?: number;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => LessonComponent)
@@ -42,7 +68,7 @@ export class MarkLessonAsCompletedDto {
   isCompleted: boolean;
 }
 
-export class SwapOrderRequestDto {
+class SwapOrderRequestDto {
   @IsNotEmpty({ message: "Id bài học không được để trống" })
   @IsNumber(undefined, { message: "Id bài học phải là một số" })
   lesson_id1: number;
@@ -51,3 +77,11 @@ export class SwapOrderRequestDto {
   @IsNumber(undefined, { message: "Id bài học phải là một số" })
   lesson_id2: number;
 }
+
+class UpdateLessonsOrder {
+  lessons: {
+    id: number;
+    order: number;
+  }[];
+}
+export { UpdateLessonsOrder, SwapOrderRequestDto };

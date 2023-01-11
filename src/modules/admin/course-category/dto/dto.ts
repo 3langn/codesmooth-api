@@ -9,6 +9,9 @@ export class CreateCourseCategoryDto {
   @IsEnum(CourseCategoryType)
   type: CourseCategoryType;
 
+  @IsNumber(undefined, { message: "Thứ tự phải là một số" })
+  order: number;
+
   @IsNumber(undefined, { message: "Id khóa học phải là một số" })
   courseId: number;
 }
@@ -28,3 +31,5 @@ export class SwapOrderRequestDto {
   @IsNumber(undefined, { message: "Id danh mục phải là một số" })
   categoryId2: number;
 }
+
+export class AddCourseCategoryDto {}

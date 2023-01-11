@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, MoreThanOrEqual, Repository } from "typeorm";
 import { LessonEntity } from "../../../entities/lesson.entity";
-import { SaveLessonDto } from "./lesson.dto";
+import { SaveLessonDto, UpdateLessonsOrder } from "./lesson.dto";
 import { NotFoundException } from "src/common/exception/not-found.exception";
 import { ExceptionTitleList } from "src/common/constants/exception-title-list.constants";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
@@ -15,7 +15,22 @@ export class LessonService {
   ) {}
 
   async saveLesson(data: SaveLessonDto) {
-    return await this.lessonRepository.upsert(data, { conflictPaths: ["id"] });
+    await this.lessonRepository.save(data);
+  }
+
+  async addLesson(data: SaveLessonDto) {
+    await this.lessonRepository.update(
+      {
+        order: MoreThanOrEqual(data.order),
+        course_category_id: data.course_category_id,
+      },
+      {
+        order: () => '"order" + 1',
+      },
+    );
+
+    const lesson = await this.lessonRepository.save(data);
+    return lesson;
   }
 
   async markLessonAsCompleted(lesson_id: number, isCompleted: boolean) {
@@ -74,6 +89,17 @@ export class LessonService {
   }
 
   async deleteLessonById(lesson_id: number) {
-    return await this.lessonRepository.delete(lesson_id);
+    const lesson = await this.lessonRepository.findOneOrFail({
+      where: { id: lesson_id },
+    });
+    await this.lessonRepository.update(
+      {
+        order: MoreThanOrEqual(lesson.order),
+      },
+      {
+        order: () => '"order" - 1',
+      },
+    );
+    await this.lessonRepository.delete(lesson_id);
   }
 }

@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { MoreThanOrEqual, Repository } from "typeorm";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { CourseCategoryEntity } from "../../../entities/course-category.entity";
@@ -14,9 +14,18 @@ export class CourseCategoryService {
   ) {}
 
   async createCourseCategory(data: CreateCourseCategoryDto) {
-    return await this.courseCategoryRepository.upsert(data, {
-      conflictPaths: ["id"],
-    });
+    await this.courseCategoryRepository.update(
+      {
+        order: MoreThanOrEqual(data.order),
+        courseId: data.courseId,
+      },
+      {
+        order: () => '"order" + 1',
+      },
+    );
+
+    const courseCategory = await this.courseCategoryRepository.save(data);
+    return courseCategory;
   }
 
   async updateCourseCategory(title: string, id: number) {
@@ -48,6 +57,18 @@ export class CourseCategoryService {
   }
 
   async deleteCourseCategory(id: number) {
+    const cat = await this.courseCategoryRepository.findOneOrFail({
+      where: { id },
+    });
+    await this.courseCategoryRepository.update(
+      {
+        order: MoreThanOrEqual(cat.order),
+        courseId: cat.courseId,
+      },
+      {
+        order: () => '"order" + 1',
+      },
+    );
     return await this.courseCategoryRepository.delete(id);
   }
 }
