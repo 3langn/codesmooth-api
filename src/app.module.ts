@@ -31,12 +31,11 @@ import { LessonModule } from "./modules/admin/lesson/lesson.module";
     // }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV ? process.env.NODE_ENV : ".env.dev",
+      envFilePath: [`.env.${process.env.NODE_ENV ? process.env.NODE_ENV : "local"}`],
     }),
     TypeOrmModule.forRootAsync({
       imports: [SharedModule],
-      useFactory: (configService: ApiConfigService) =>
-        configService.postgresConfig,
+      useFactory: (configService: ApiConfigService) => configService.postgresConfig,
       inject: [ApiConfigService],
     }),
     WinstonModule.forRoot(winstonConfig),

@@ -16,11 +16,11 @@ export class CourseCategoryEntity extends BaseEntity {
   order: number;
 
   @Column()
-  courseId: number;
+  course_id: number;
 
-  @ManyToOne(() => CourseEntity, (course) => course.category)
-  @JoinColumn({ name: "courseId" })
-  course: CourseEntity;
+  // @ManyToOne(() => CourseEntity, (course) => course.category)
+  // @JoinColumn({ name: "courseId" })
+  // course: CourseEntity;
 
   @OneToMany(() => LessonEntity, (lesson) => lesson.course_category, {
     cascade: true,

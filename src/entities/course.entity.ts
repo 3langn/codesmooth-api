@@ -8,22 +8,25 @@ export class CourseEntity extends BaseEntity {
   name: string;
 
   @Column({ default: "" })
-  summary: string;
+  description: string;
 
   @Column({ default: "" })
-  course_objectives: string;
+  short_description: string;
 
-  @Column({ type: "text", array: true, default: [] })
-  will_learns: string[];
+  @Column()
+  price: number;
 
-  @Column({ default: "" })
-  target_audience: string;
+  // @Column({ type: "text", array: true, default: [] })
+  // will_learns: string[];
 
   @Column({ type: "text", array: true, default: [] })
   skills: string[];
 
-  @Column({ type: "text", array: true, default: [] })
-  tags: string[];
+  @Column({ default: "" })
+  target_audience: string;
+
+  // @Column({ type: "text", array: true, default: [] })
+  // tags: string[];
 
   @Column({ type: "text", array: true, default: [] })
   requirements: string[];
@@ -31,11 +34,8 @@ export class CourseEntity extends BaseEntity {
   @Column({ default: "" })
   thumbnail: string;
 
-  @Column()
-  price: number;
-
-  @OneToMany(() => CourseCategoryEntity, (category) => category.course)
-  category: CourseCategoryEntity;
+  // @OneToMany(() => CourseCategoryEntity, (category) => category.course)
+  // category: CourseCategoryEntity;
 
   @Column({ default: false })
   is_published: boolean;

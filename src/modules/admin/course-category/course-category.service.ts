@@ -17,7 +17,7 @@ export class CourseCategoryService {
     await this.courseCategoryRepository.update(
       {
         order: MoreThanOrEqual(data.order),
-        courseId: data.courseId,
+        course_id: data.courseId,
       },
       {
         order: () => '"order" + 1',
@@ -63,7 +63,7 @@ export class CourseCategoryService {
     await this.courseCategoryRepository.update(
       {
         order: MoreThanOrEqual(cat.order),
-        courseId: cat.courseId,
+        course_id: cat.course_id,
       },
       {
         order: () => '"order" + 1',
