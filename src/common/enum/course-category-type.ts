@@ -1,4 +1,4 @@
-export enum CourseCategoryType {
+export enum SectionTypeEnum {
   ASSESMENT = "ASSESMENT",
   SECTION = "SECTION",
   PROJECT = "PROJECT",

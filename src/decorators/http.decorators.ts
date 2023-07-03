@@ -13,12 +13,16 @@ import { AuthGuard } from "../guards/auth.guard";
 import { RolesGuard } from "../guards/roles.guard";
 
 import { PublicRoute } from "./public-route.decorator";
+import { UserRole } from "../common/enum/user-role";
 
-export function Auth(options?: Partial<{ public: boolean }>): MethodDecorator {
+export function Auth(
+  roles: UserRole[] = [],
+  options?: Partial<{ public: boolean }>,
+): MethodDecorator {
   const isPublicRoute = options?.public;
 
   return applyDecorators(
-    // SetMetadata('roles', roles),
+    SetMetadata("roles", roles),
     UseGuards(AuthGuard({ public: isPublicRoute }), RolesGuard),
     ApiBearerAuth(),
     // UseInterceptors(AuthUserInterceptor),

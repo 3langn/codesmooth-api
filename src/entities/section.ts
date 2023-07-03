@@ -1,16 +1,16 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
-import { CourseCategoryType } from "../common/enum/course-category-type";
+import { SectionTypeEnum } from "../common/enum/course-category-type";
 import { CourseEntity } from "./course.entity";
 import { LessonEntity } from "./lesson.entity";
 
-@Entity("course_categories")
-export class CourseCategoryEntity extends BaseEntity {
+@Entity("sections")
+export class SectionEntity extends BaseEntity {
   @Column()
   title: string;
 
-  @Column({ type: "enum", enum: CourseCategoryType })
-  type: CourseCategoryType;
+  @Column({ type: "enum", enum: SectionTypeEnum })
+  type: SectionTypeEnum;
 
   @Column({ default: 0 })
   order: number;
@@ -22,7 +22,7 @@ export class CourseCategoryEntity extends BaseEntity {
   // @JoinColumn({ name: "courseId" })
   // course: CourseEntity;
 
-  @OneToMany(() => LessonEntity, (lesson) => lesson.course_category, {
+  @OneToMany(() => LessonEntity, (lesson) => lesson.sections, {
     cascade: true,
   })
   lessons: LessonEntity[];

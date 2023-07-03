@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { LessonComponentType } from "../common/enum/lesson-component-type";
-import { CourseCategoryEntity } from "./course-category.entity";
+import { SectionEntity } from "./section";
 
 export interface ContentCode {
   code: string | undefined;
@@ -37,11 +37,11 @@ export class LessonEntity extends BaseEntity {
   summary: string;
 
   @Column()
-  course_category_id: number;
+  section_id: number;
 
-  @ManyToOne(() => CourseCategoryEntity, (course_category) => course_category.lessons, {
+  @ManyToOne(() => SectionEntity, (section) => section.lessons, {
     onDelete: "CASCADE",
   })
-  @JoinColumn({ name: "course_category_id" })
-  course_category: CourseCategoryEntity;
+  @JoinColumn({ name: "section_id" })
+  sections: SectionEntity;
 }

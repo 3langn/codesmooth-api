@@ -1,10 +1,11 @@
-import { Column, Entity, OneToOne, BeforeInsert } from "typeorm";
+import { Column, Entity, OneToOne, BeforeInsert, OneToMany } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { UserRole } from "../common/enum/user-role";
 import { generateHash } from "../common/utils";
 import { VirtualColumn } from "../decorators";
 import { UserDto } from "../modules/user/dtos/user.dto";
 import { UserSettingsEntity } from "./user-settings.entity";
+import { CourseEntity } from "./course.entity";
 
 @Entity({ name: "users" })
 export class UserEntity extends BaseEntity {
@@ -48,4 +49,7 @@ export class UserEntity extends BaseEntity {
       fullName: this.fullName,
     };
   }
+
+  @OneToMany(() => CourseEntity, (course) => course.owner)
+  courses: CourseEntity[];
 }

@@ -55,6 +55,7 @@ export class ApiConfigService {
     return {
       entities,
       synchronize: true,
+      autoLoadEntities: true,
       // migrations,
       // keepConnectionAlive: !this.isTest,
       // dropSchema: this.isTest,

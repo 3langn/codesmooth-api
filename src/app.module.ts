@@ -7,7 +7,6 @@ import { SharedModule } from "./shared/services/shared.module";
 import { ApiConfigService } from "./shared/services/api-config.service";
 import { ConfigModule } from "@nestjs/config";
 import { CourseModule } from "./modules/admin/course/course.module";
-import { CourseCategoryModule } from "./modules/admin/course-category/course-category.module";
 import { SampleModule } from "./modules/admin/sample/sample.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UserModule } from "./modules/user/user.module";
@@ -15,6 +14,8 @@ import { ExcuteModule } from "./modules/execute/execute.module";
 import { HealthModule } from "./modules/health/health.module";
 import { UploadModule } from "./modules/upload/upload.module";
 import { LessonModule } from "./modules/admin/lesson/lesson.module";
+import { CategoryModule } from "./modules/admin/category/category.module";
+import { SectionModule } from "./modules/admin/section/section.module";
 
 @Module({
   imports: [
@@ -42,12 +43,13 @@ import { LessonModule } from "./modules/admin/lesson/lesson.module";
     ExcuteModule,
     LessonModule,
     CourseModule,
-    CourseCategoryModule,
+    SectionModule,
     SampleModule,
     AuthModule,
     UserModule,
     HealthModule,
     UploadModule,
+    CategoryModule,
   ],
   // providers: [
   //   {

@@ -22,7 +22,7 @@ export class LessonService {
     await this.lessonRepository.update(
       {
         order: MoreThanOrEqual(data.order),
-        course_category_id: data.course_category_id,
+        section_id: data.course_category_id,
       },
       {
         order: () => '"order" + 1',

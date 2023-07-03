@@ -3,18 +3,18 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThanOrEqual, Repository } from "typeorm";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
-import { CourseCategoryEntity } from "../../../entities/course-category.entity";
-import { CreateCourseCategoryDto } from "./dto/dto";
+import { SectionEntity } from "../../../entities/section";
+import { CreateSectionDto } from "./dto/dto";
 
 @Injectable()
-export class CourseCategoryService {
+export class SectionService {
   constructor(
-    @InjectRepository(CourseCategoryEntity)
-    private courseCategoryRepository: Repository<CourseCategoryEntity>,
+    @InjectRepository(SectionEntity)
+    private sectionRepository: Repository<SectionEntity>,
   ) {}
 
-  async createCourseCategory(data: CreateCourseCategoryDto) {
-    await this.courseCategoryRepository.update(
+  async createSection(data: CreateSectionDto) {
+    await this.sectionRepository.update(
       {
         order: MoreThanOrEqual(data.order),
         course_id: data.courseId,
@@ -24,19 +24,19 @@ export class CourseCategoryService {
       },
     );
 
-    const courseCategory = await this.courseCategoryRepository.save(data);
-    return courseCategory;
+    const section = await this.sectionRepository.save(data);
+    return section;
   }
 
-  async updateCourseCategory(title: string, id: number) {
-    return await this.courseCategoryRepository.update(id, { title });
+  async updateSection(title: string, id: number) {
+    return await this.sectionRepository.update(id, { title });
   }
 
   async swapOrder(categoryId1: number, categoryId2: number) {
-    const lesson1 = await this.courseCategoryRepository.findOne({
+    const lesson1 = await this.sectionRepository.findOne({
       where: { id: categoryId1 },
     });
-    const lesson2 = await this.courseCategoryRepository.findOne({
+    const lesson2 = await this.sectionRepository.findOne({
       where: { id: categoryId2 },
     });
 
@@ -52,15 +52,15 @@ export class CourseCategoryService {
     lesson1.order = lesson2.order;
     lesson2.order = temp;
 
-    await this.courseCategoryRepository.save(lesson1);
-    await this.courseCategoryRepository.save(lesson2);
+    await this.sectionRepository.save(lesson1);
+    await this.sectionRepository.save(lesson2);
   }
 
-  async deleteCourseCategory(id: number) {
-    const cat = await this.courseCategoryRepository.findOneOrFail({
+  async deleteSection(id: number) {
+    const cat = await this.sectionRepository.findOneOrFail({
       where: { id },
     });
-    await this.courseCategoryRepository.update(
+    await this.sectionRepository.update(
       {
         order: MoreThanOrEqual(cat.order),
         course_id: cat.course_id,
@@ -69,6 +69,6 @@ export class CourseCategoryService {
         order: () => '"order" + 1',
       },
     );
-    return await this.courseCategoryRepository.delete(id);
+    return await this.sectionRepository.delete(id);
   }
 }

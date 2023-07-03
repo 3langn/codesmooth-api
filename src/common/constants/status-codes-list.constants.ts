@@ -21,4 +21,6 @@ export const StatusCodesList = {
   EmailOrPasswordIncorrect: 1020,
   EmailAlreadyExists: 1021,
   LessonNotFound: 1022,
+  CategoryExists: 1023,
+  CategoryNotFound: 1024,
 } as const;

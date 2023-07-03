@@ -28,17 +28,14 @@ async function bootstrap() {
     rateLimit({
       windowMs: 15 * 60 * 1000,
       max: 10000,
-    })
+    }),
   );
 
   // app.useGlobalPipes(new ValidationPipe());
 
   app.use(compression());
 
-  app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector)),
-    new HTTPLogger()
-  );
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)), new HTTPLogger());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -46,14 +43,14 @@ async function bootstrap() {
       transform: true,
       dismissDefaultMessages: true,
       exceptionFactory: (errors) => new UnprocessableEntityException(errors),
-    })
+    }),
   );
 
   const configService = app.select(SharedModule).get(ApiConfigService);
 
   const port = configService.appConfig.port;
 
-  await app.listen(port);
+  await app.listen(port, "0.0.0.0");
   console.info(`Server running on port ${port} 👍`);
 }
 bootstrap();

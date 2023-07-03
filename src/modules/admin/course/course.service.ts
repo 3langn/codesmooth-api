@@ -5,6 +5,7 @@ import { ResponseDefault } from "../../../common/dto/response_default";
 import { CourseEntity } from "../../../entities/course.entity";
 import { SaveCourseDto } from "./dto/create-course.dto";
 import { generateId } from "../../../common/generate-nanoid";
+import { UserEntity } from "../../../entities/user.entity";
 
 @Injectable()
 export class CourseService {
@@ -13,8 +14,11 @@ export class CourseService {
     private courseRepository: Repository<CourseEntity>,
   ) {}
 
-  async saveCourse(data: SaveCourseDto) {
-    await this.courseRepository.upsert({ id: generateId(10), ...data }, { conflictPaths: ["id"] });
+  async saveCourse(data: SaveCourseDto, user_id: number) {
+    await this.courseRepository.upsert(
+      { id: generateId(10), owner_id: user_id, ...data },
+      { conflictPaths: ["id"] },
+    );
   }
 
   async getCourses() {

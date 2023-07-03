@@ -1,6 +1,9 @@
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
-import { CourseCategoryEntity } from "./course-category.entity";
+import { SectionEntity } from "./section";
+import { CourseStatus } from "../common/enum/course";
+import { UserEntity } from "./user.entity";
+import { CategoryEntity } from "./category.entity";
 
 @Entity("courses")
 export class CourseEntity extends BaseEntity {
@@ -37,6 +40,29 @@ export class CourseEntity extends BaseEntity {
   // @OneToMany(() => CourseCategoryEntity, (category) => category.course)
   // category: CourseCategoryEntity;
 
-  @Column({ default: false })
-  is_published: boolean;
+  @Column({ default: false, enum: CourseStatus })
+  status: CourseStatus;
+
+  @ManyToOne(() => UserEntity, (owner) => owner.courses, {
+    nullable: false,
+  })
+  @JoinColumn({ name: "owner_id" })
+  owner: UserEntity;
+
+  @Column({ nullable: false })
+  owner_id: number;
+
+  @ManyToMany(() => CategoryEntity, (category) => category.courses)
+  @JoinTable({
+    name: "course_cat",
+    joinColumn: {
+      name: "course_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "category_id",
+      referencedColumnName: "id",
+    },
+  })
+  cat: CategoryEntity[];
 }
