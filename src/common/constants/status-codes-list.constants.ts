@@ -23,4 +23,6 @@ export const StatusCodesList = {
   LessonNotFound: 1022,
   CategoryExists: 1023,
   CategoryNotFound: 1024,
+  SettingNotFound: 1025,
+  SettingAlreadyExists: 1026,
 } as const;

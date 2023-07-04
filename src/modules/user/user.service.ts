@@ -21,6 +21,9 @@ import { PageMetaDto } from "../../common/dto/page-meta.dto";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 import { UserRole } from "../../common/enum/user-role";
+import { MailerService } from "../mailer/mailer.service";
+import { TemplateId } from "../mailer/enum/template-id";
+import { JwtService } from "../jwt/jwt.service";
 
 @Injectable()
 export class UserService {
@@ -29,7 +32,7 @@ export class UserService {
     @InjectRepository(UserSettingsEntity)
     private userSettingRepository: Repository<UserSettingsEntity>,
     @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity> // private validatorService: ValidatorService,
+    private userRepository: Repository<UserEntity>, // private validatorService: ValidatorService,
   ) {}
 
   findOne(findData: FindOptionsWhere<UserEntity>): Promise<UserEntity | null> {
@@ -37,7 +40,7 @@ export class UserService {
   }
 
   async findByUsernameOrEmail(
-    options: Partial<{ username: string; email: string }>
+    options: Partial<{ username: string; email: string }>,
   ): Promise<UserEntity | null> {
     const queryBuilder = this.userRepository
       .createQueryBuilder("user")
@@ -60,14 +63,39 @@ export class UserService {
 
   // @Transactional()
   async createUser(
-    userRegisterDto: UserRegisterDto
+    userRegisterDto: UserRegisterDto,
     // file?: IFile,
   ): Promise<UserEntity> {
-    const findUser = await this.userRepository.findOneBy({
-      email: userRegisterDto.email,
-      role: UserRole.ADMINSTRATOR,
+    // TODO: check verify email
+    const findUser = await this.userRepository.findOne({
+      where: {
+        email: userRegisterDto.email,
+        role: UserRole.ADMINSTRATOR,
+      },
+      relations: ["settings"],
     });
-    if (findUser) {
+
+    if (!findUser) {
+      const user = this.userRepository.create(userRegisterDto);
+
+      const userRecord = await this.userRepository.save(user);
+      // if (file && !this.validatorService.isImage(file.mimetype)) {
+      //   throw new FileNotImageException();
+      // }
+
+      // if (file) {
+      //   user.avatar = await this.awsS3Service.uploadImage(file);
+      // }
+      const userSettings = this.userSettingRepository.create({
+        isEmailVerified: false,
+        user_id: userRecord.id,
+      });
+
+      user.settings = await this.userSettingRepository.save(userSettings);
+      return user;
+    }
+
+    if (findUser.settings.isEmailVerified) {
       throw new CustomHttpException({
         statusCode: HttpStatus.BAD_REQUEST,
         message: `Email ${userRegisterDto.email} already exists`,
@@ -75,29 +103,10 @@ export class UserService {
       });
     }
 
-    const user = this.userRepository.create(userRegisterDto);
-
-    const userRecord = await this.userRepository.save(user);
-    // if (file && !this.validatorService.isImage(file.mimetype)) {
-    //   throw new FileNotImageException();
-    // }
-
-    // if (file) {
-    //   user.avatar = await this.awsS3Service.uploadImage(file);
-    // }
-    const userSettings = this.userSettingRepository.create({
-      isEmailVerified: false,
-      user_id: userRecord.id,
-    });
-
-    user.settings = await this.userSettingRepository.save(userSettings);
-
-    return user;
+    return findUser;
   }
 
-  async getUsers(
-    pageOptionsDto: UsersPageOptionsDto
-  ): Promise<PageDto<UserDto>> {
+  async getUsers(pageOptionsDto: UsersPageOptionsDto): Promise<PageDto<UserDto>> {
     const q = this.userRepository
       .createQueryBuilder("user")
       .select([
@@ -113,8 +122,7 @@ export class UserService {
       ])
       .leftJoinAndSelect("user.settings", "settings");
 
-    pageOptionsDto.role &&
-      q.andWhere("user.role = :role", { role: pageOptionsDto.role });
+    pageOptionsDto.role && q.andWhere("user.role = :role", { role: pageOptionsDto.role });
     pageOptionsDto.search &&
       q.andWhere("user.username ILIKE :username", {
         username: `%${pageOptionsDto.search}%`,
@@ -131,7 +139,7 @@ export class UserService {
       new PageMetaDto({
         itemCount,
         pageOptionsDto,
-      })
+      }),
     );
   }
 

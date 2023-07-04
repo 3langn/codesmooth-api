@@ -1,8 +1,9 @@
+import { MailerOptions } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { isNil } from "lodash";
-
+import { EjsAdapter } from "@nestjs-modules/mailer/dist/adapters/ejs.adapter";
 @Injectable()
 export class ApiConfigService {
   constructor(private configService: ConfigService) {}
@@ -111,5 +112,29 @@ export class ApiConfigService {
     }
 
     return value;
+  }
+
+  get mailerConfig(): MailerOptions {
+    return {
+      transport: {
+        host: this.getString("EMAIL_HOST"),
+        port: this.getNumber("EMAIL_PORT"),
+        secure: true, // true for 465, false for other ports
+        auth: {
+          user: this.getString("EMAIL_USER"), // generated ethereal user
+          pass: this.getString("EMAIL_PASSWORD"), // generated ethereal password
+        },
+      },
+      defaults: {
+        from: '"nest-modules" <user@outlook.com>', // outgoing email ID
+      },
+      template: {
+        dir: `${process.cwd()}/templates`,
+        adapter: new EjsAdapter(),
+        options: {
+          strict: false,
+        },
+      },
+    };
   }
 }

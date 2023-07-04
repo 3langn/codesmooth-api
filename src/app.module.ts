@@ -16,6 +16,9 @@ import { UploadModule } from "./modules/upload/upload.module";
 import { LessonModule } from "./modules/admin/lesson/lesson.module";
 import { CategoryModule } from "./modules/admin/category/category.module";
 import { SectionModule } from "./modules/admin/section/section.module";
+import { SettingModule } from "./modules/admin/setting/setting.module";
+import { JwtModule } from "@nestjs/jwt";
+import { MailerModule } from "./modules/mailer/mailer.module";
 
 @Module({
   imports: [
@@ -39,6 +42,7 @@ import { SectionModule } from "./modules/admin/section/section.module";
       useFactory: (configService: ApiConfigService) => configService.postgresConfig,
       inject: [ApiConfigService],
     }),
+
     WinstonModule.forRoot(winstonConfig),
     ExcuteModule,
     LessonModule,
@@ -50,6 +54,9 @@ import { SectionModule } from "./modules/admin/section/section.module";
     HealthModule,
     UploadModule,
     CategoryModule,
+    SettingModule,
+    JwtModule,
+    MailerModule,
   ],
   // providers: [
   //   {

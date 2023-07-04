@@ -9,20 +9,14 @@ import { UserService } from "../user/user.service";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ApiConfigService,
-    private userService: UserService
-  ) {
+  constructor(private configService: ApiConfigService, private userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: configService.authConfig.jwtSecret,
     });
   }
 
-  async validate(args: {
-    user_id: number;
-    type: TokenType;
-  }): Promise<UserEntity> {
+  async validate(args: { user_id: number; type: TokenType }): Promise<UserEntity> {
     if (args.type !== TokenType.ACCESS_TOKEN) {
       throw new UnauthorizedException();
     }
