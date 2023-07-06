@@ -65,4 +65,18 @@ export class CourseEntity extends BaseEntity {
     },
   })
   cat: CategoryEntity[];
+
+  @ManyToMany(() => UserEntity, (user) => user.enrolledCourses)
+  @JoinTable({
+    name: "course_student",
+    joinColumn: {
+      name: "course_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "student_id",
+      referencedColumnName: "id",
+    },
+  })
+  students: UserEntity[];
 }

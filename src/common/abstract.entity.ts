@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import * as utils from "../common/generate-nanoid";
 export class BaseEntity {
-  @PrimaryColumn("bigint")
+  @PrimaryColumn()
   id: number;
 
   @CreateDateColumn()
@@ -22,6 +22,6 @@ export class BaseEntity {
 
   @BeforeInsert()
   generateId() {
-    this.id = utils.generateId(18);
+    this.id = utils.generateId(9);
   }
 }

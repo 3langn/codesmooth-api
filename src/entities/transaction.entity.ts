@@ -1,7 +1,8 @@
-import { BeforeInsert, Column, Entity, PrimaryColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { generateTransactionId } from "../common/generate-nanoid";
 import { TransactionStatus, TransactionType } from "../common/enum/transaction";
+import { UserEntity } from "./user.entity";
 
 @Entity("transaction")
 export class TransactionEntity {
@@ -12,6 +13,9 @@ export class TransactionEntity {
     type: "bigint",
   })
   user_id: number;
+
+  @ManyToOne(() => UserEntity, (user) => user.transactions)
+  user: UserEntity;
 
   @Column()
   amount: number;

@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, BeforeInsert, OneToMany } from "typeorm";
+import { Column, Entity, OneToOne, BeforeInsert, OneToMany, ManyToMany } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { UserRole } from "../common/enum/user-role";
 import { generateHash } from "../common/utils";
@@ -6,6 +6,7 @@ import { VirtualColumn } from "../decorators";
 import { UserDto } from "../modules/user/dtos/user.dto";
 import { UserSettingsEntity } from "./user-settings.entity";
 import { CourseEntity } from "./course.entity";
+import { TransactionEntity } from "./transaction.entity";
 
 @Entity({ name: "users" })
 export class UserEntity extends BaseEntity {
@@ -52,4 +53,10 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => CourseEntity, (course) => course.owner)
   courses: CourseEntity[];
+
+  @ManyToMany(() => CourseEntity, (course) => course.students)
+  enrolledCourses: CourseEntity[];
+
+  @OneToMany(() => TransactionEntity, (transaction) => transaction.user)
+  transactions: TransactionEntity[];
 }

@@ -17,12 +17,14 @@ import { HTTPLogger } from "./common/interceptor/logger";
 async function bootstrap() {
   // initializeTransactionalContext();
   // patchTypeORMRepositoryWithBaseRepository();
-
-  const app = await NestFactory.create(AppModule, { cors: true });
+  // all domains have vnpayment.vn as origin
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: ["http://localhost:3000", "https://codesmooth.netlify.app", "*.vnpayment.vn"],
+    },
+  });
   app.use(helmet());
   app.setGlobalPrefix("/api");
-
-  app.use(helmet());
 
   app.use(
     rateLimit({
