@@ -90,9 +90,8 @@ export class PaymentService {
     if (secureHash === signed) {
       const transaction = await this.transactionService.getTransactionById(transactionId);
 
-      //kiểm tra checksum
       if (transaction) {
-        if (vnpAmount / 100 !== transaction.amount) {
+        if (vnpAmount / 100 === transaction.amount) {
           if (transaction.status === TransactionStatus.PENDING) {
             //kiểm tra tình trạng giao dịch trước khi cập nhật tình trạng thanh toán
             if (rspCode == "00") {
