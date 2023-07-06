@@ -7,3 +7,10 @@ export function generateId(
   const nano = nanoid.customAlphabet(alphabet, size);
   return options.constraint + parseInt(nano());
 }
+
+// generate transaction id
+export function generateTransactionId(): string {
+  const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const nano = nanoid.customAlphabet(alphabet, 8);
+  return "SMOOTH-" + nano();
+}

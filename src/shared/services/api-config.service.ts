@@ -137,4 +137,17 @@ export class ApiConfigService {
       },
     };
   }
+
+  get VnpayConfig() {
+    return {
+      vnp_TmnCode: this.getString("VNP_TMN_CODE"),
+      vnp_HashSecret: this.getString("VNP_HASH_SECRET"),
+      vnp_ReturnUrl: this.getString("VNP_RETURN_URL"),
+      vnp_Locale: this.getString("VNP_LOCALE"),
+      vnp_CurrCode: this.getString("VNP_CURR_CODE"),
+      vnp_Command: this.getString("VNP_COMMAND"),
+      vnp_Version: this.getString("VNP_VERSION"),
+      vnp_VNPayUrl: this.getString("VNP_VNPayUrl"),
+    };
+  }
 }

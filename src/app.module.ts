@@ -19,6 +19,8 @@ import { SectionModule } from "./modules/admin/section/section.module";
 import { SettingModule } from "./modules/admin/setting/setting.module";
 import { JwtModule } from "@nestjs/jwt";
 import { MailerModule } from "./modules/mailer/mailer.module";
+import { PaymentModule } from "./modules/payment/payment.module";
+import { TransactionModule } from "./modules/admin/transaction/transaction.module";
 
 @Module({
   imports: [
@@ -56,7 +58,9 @@ import { MailerModule } from "./modules/mailer/mailer.module";
     CategoryModule,
     SettingModule,
     JwtModule,
+    PaymentModule,
     MailerModule,
+    TransactionModule,
   ],
   // providers: [
   //   {
