@@ -16,6 +16,9 @@ export class SettingEntity extends BaseEntity {
   @Column({ nullable: false, unique: true })
   key: string;
 
+  @Column({ nullable: true })
+  title: string;
+
   @Column({ nullable: false, type: "jsonb" })
   value: any | SettingValue;
 }

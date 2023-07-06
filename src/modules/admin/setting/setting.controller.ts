@@ -9,7 +9,7 @@ import { ResponseDefault } from "../../../common/dto/response_default";
 export class SettingController {
   constructor(private settingService: SettingService) {}
 
-  @Auth([UserRole.ADMINSTRATOR])
+  // @Auth([UserRole.ADMINSTRATOR])
   @Post("/")
   async save(@Body() body: SaveSettingDto) {
     await this.settingService.save(body);
@@ -17,9 +17,18 @@ export class SettingController {
     return new ResponseDefault("Setting saved successfully");
   }
 
-  @Auth([UserRole.ADMINSTRATOR])
+  // @Auth([UserRole.ADMINSTRATOR])
   @Get("/")
   async listSettings() {
-    return await this.settingService.listSettings();
+    const r = await this.settingService.listSettings();
+
+    return new ResponseDefault("List settings successfully", r);
+  }
+
+  @Get("/:key")
+  async getSetting(@Param("key") key: string) {
+    const r = await this.settingService.getSetting(key);
+
+    return new ResponseDefault("Get setting successfully", r);
   }
 }

@@ -19,7 +19,7 @@ export class SettingService {
   async save(data: SaveSettingDto) {
     await this.settingRepository.upsert(
       {
-        id: generateId(18),
+        id: generateId(9),
         ...data,
       },
       {
@@ -30,5 +30,19 @@ export class SettingService {
 
   async listSettings() {
     return await this.settingRepository.find();
+  }
+
+  async getSetting(key: string) {
+    const setting = await this.settingRepository.findOne({ where: { key } });
+
+    if (!setting) {
+      throw new CustomHttpException({
+        code: StatusCodesList.NotFound,
+        message: "Không tìm thấy setting '" + key + "'",
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
+
+    return setting;
   }
 }
