@@ -34,7 +34,7 @@ export class AdminCourseController {
 
   @Auth([UserRole.ADMINSTRATOR])
   @Patch("/rejected/:id")
-  async unpublishCourse(@Param("id") id: number) {
+  async rejected(@Param("id") id: number) {
     await this.courseService.rejectCourse(id);
     return new ResponseDefault("Success");
   }
