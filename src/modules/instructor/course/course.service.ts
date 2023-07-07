@@ -13,7 +13,7 @@ import { InstructorCourseReponseDto } from "./dto/course-response.dto";
 import { CategoryEntity } from "../../../entities/category.entity";
 
 @Injectable()
-export class CourseService {
+export class InstructorCourseService {
   constructor(
     @InjectRepository(CourseEntity)
     private courseRepository: Repository<CourseEntity>,

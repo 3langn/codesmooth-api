@@ -2,15 +2,15 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from "@ne
 import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 import { PageDto } from "../../../common/dto/page.dto";
 import { ResponseDefault } from "../../../common/dto/response_default";
-import { CourseService } from "./course.service";
+import { InstructorCourseService } from "./course.service";
 import { SaveCourseDto } from "./dto/create-course.dto";
 import { Auth } from "../../../decorators";
 import { PageOptionsDto } from "../../../common/dto/page-options.dto";
 import { InstructorCourseReponseDto } from "./dto/course-response.dto";
 
 @Controller("instructor/course")
-export class CourseController {
-  constructor(private courseService: CourseService) {}
+export class InstructorCourseController {
+  constructor(private courseService: InstructorCourseService) {}
 
   @Auth()
   @Post("/")

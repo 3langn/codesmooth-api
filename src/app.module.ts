@@ -22,6 +22,7 @@ import { MailerModule } from "./modules/mailer/mailer.module";
 import { PaymentModule } from "./modules/payment/payment.module";
 import { TransactionModule } from "./modules/admin/transaction/transaction.module";
 import { InstructorCategoryModule } from "./modules/category/category.module";
+import { CourseModule } from "./modules/course/course.module";
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { InstructorCategoryModule } from "./modules/category/category.module";
     TransactionModule,
     InstructorCategoryModule,
     InstructorCourseModule,
+    CourseModule,
   ],
   // providers: [
   //   {
