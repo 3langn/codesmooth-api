@@ -11,6 +11,7 @@ import { queryPagination } from "../../../common/utils";
 import { PageDto } from "../../../common/dto/page.dto";
 import { InstructorCourseReponseDto } from "./dto/course-response.dto";
 import { CategoryEntity } from "../../../entities/category.entity";
+import { CourseStatus } from "../../../common/enum/course";
 
 @Injectable()
 export class InstructorCourseService {
@@ -68,5 +69,9 @@ export class InstructorCourseService {
 
   async deleteCourseById(id: number) {
     await this.courseRepository.delete(id);
+  }
+
+  async submitCourseForReview(id: number) {
+    await this.courseRepository.update(id, { status: CourseStatus.Reviewing });
   }
 }

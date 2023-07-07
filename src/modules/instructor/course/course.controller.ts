@@ -52,4 +52,11 @@ export class InstructorCourseController {
     await this.courseService.deleteCourseById(id);
     return new ResponseDefault("Course deleted successfully");
   }
+
+  @Auth()
+  @Post("/submit-for-review/:id")
+  async submitCourseForReview(@Param("id") id: number) {
+    await this.courseService.submitCourseForReview(id);
+    return new ResponseDefault("Course submitted successfully");
+  }
 }
