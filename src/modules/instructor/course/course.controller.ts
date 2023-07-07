@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req } from "@nestjs/common";
 import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 import { PageDto } from "../../../common/dto/page.dto";
 import { ResponseDefault } from "../../../common/dto/response_default";
@@ -54,7 +54,7 @@ export class InstructorCourseController {
   }
 
   @Auth()
-  @Post("/submit-for-review/:id")
+  @Patch("/submit-for-review/:id")
   async submitCourseForReview(@Param("id") id: number) {
     await this.courseService.submitCourseForReview(id);
     return new ResponseDefault("Course submitted successfully");
