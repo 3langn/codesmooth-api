@@ -19,6 +19,6 @@ export class CategoryEntity extends BaseEntity {
   @Column({ default: 0, unique: true })
   order: number;
 
-  @ManyToMany(() => CourseEntity, (course) => course.cat)
+  @ManyToMany(() => CourseEntity, (course) => course.categories)
   courses: CourseEntity[];
 }

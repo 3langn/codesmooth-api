@@ -22,8 +22,11 @@ export class SaveCourseDto {
   // @IsArray({ message: "Will learn must be an array" })
   // will_learns: string[];
 
-  @IsArray({ message: "Skills must be an array" })
-  skills: string[];
+  // @IsArray({ message: "Skills must be an array" })
+  // skills: string[];
+
+  @IsArray({ message: "Category id must be an array" })
+  category_ids: number[];
 
   @IsString({ message: "Target audience must be a string" })
   target_audience: string;

@@ -22,8 +22,8 @@ export class CourseEntity extends BaseEntity {
   // @Column({ type: "text", array: true, default: [] })
   // will_learns: string[];
 
-  @Column({ type: "text", array: true, default: [] })
-  skills: string[];
+  // @Column({ type: "text", array: true, default: [] })
+  // skills: string[];
 
   @Column({ default: "" })
   target_audience: string;
@@ -40,7 +40,7 @@ export class CourseEntity extends BaseEntity {
   // @OneToMany(() => CourseCategoryEntity, (category) => category.course)
   // category: CourseCategoryEntity;
 
-  @Column({ default: false, enum: CourseStatus })
+  @Column({ default: CourseStatus.Draft, enum: CourseStatus })
   status: CourseStatus;
 
   @ManyToOne(() => UserEntity, (owner) => owner.courses, {
@@ -64,7 +64,7 @@ export class CourseEntity extends BaseEntity {
       referencedColumnName: "id",
     },
   })
-  cat: CategoryEntity[];
+  categories: CategoryEntity[];
 
   @ManyToMany(() => UserEntity, (user) => user.enrolledCourses)
   @JoinTable({
@@ -79,4 +79,7 @@ export class CourseEntity extends BaseEntity {
     },
   })
   students: UserEntity[];
+
+  @Column({ nullable: true })
+  feedback_email: string;
 }

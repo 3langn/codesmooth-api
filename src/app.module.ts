@@ -6,7 +6,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { SharedModule } from "./shared/services/shared.module";
 import { ApiConfigService } from "./shared/services/api-config.service";
 import { ConfigModule } from "@nestjs/config";
-import { CourseModule } from "./modules/admin/course/course.module";
+import { InstructorCourseModule } from "./modules/instructor/course/course.module";
 import { SampleModule } from "./modules/admin/sample/sample.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UserModule } from "./modules/user/user.module";
@@ -21,6 +21,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { MailerModule } from "./modules/mailer/mailer.module";
 import { PaymentModule } from "./modules/payment/payment.module";
 import { TransactionModule } from "./modules/admin/transaction/transaction.module";
+import { InstructorCategoryModule } from "./modules/category/category.module";
 
 @Module({
   imports: [
@@ -48,7 +49,7 @@ import { TransactionModule } from "./modules/admin/transaction/transaction.modul
     WinstonModule.forRoot(winstonConfig),
     ExcuteModule,
     LessonModule,
-    CourseModule,
+    InstructorCourseModule,
     SectionModule,
     SampleModule,
     AuthModule,
@@ -61,6 +62,8 @@ import { TransactionModule } from "./modules/admin/transaction/transaction.modul
     PaymentModule,
     MailerModule,
     TransactionModule,
+    InstructorCategoryModule,
+    InstructorCourseModule,
   ],
   // providers: [
   //   {
