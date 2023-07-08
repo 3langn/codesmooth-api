@@ -40,9 +40,10 @@ export class TransactionService {
     return this.transactionRepository.findOne({ where: { id } });
   }
 
-  async transactionSuccess(id: string): Promise<TransactionEntity> {
+  async transactionSuccess(id: string, tranNo: string): Promise<TransactionEntity> {
     const transaction = await this.getTransactionById(id);
     transaction.status = TransactionStatus.SUCCESS;
+    transaction.trans_no = tranNo;
 
     // TODO: Mail to dev if error and rollback then refund
 
@@ -61,9 +62,14 @@ export class TransactionService {
     return this.transactionRepository.save(transaction);
   }
 
-  async transactionFail(id: string, reason_code: string): Promise<TransactionEntity> {
+  async transactionFail(
+    id: string,
+    tranNo: string,
+    reason_code: string,
+  ): Promise<TransactionEntity> {
     const transaction = await this.getTransactionById(id);
     transaction.status = TransactionStatus.FAILED;
+    transaction.trans_no = tranNo;
     transaction.failed_reason = reason_code;
     return this.transactionRepository.save(transaction);
   }

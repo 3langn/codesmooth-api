@@ -1,4 +1,12 @@
-import { BeforeInsert, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { generateTransactionId } from "../common/generate-nanoid";
 import { TransactionStatus, TransactionType } from "../common/enum/transaction";
@@ -9,6 +17,12 @@ import { PaymentMethod } from "../common/enum/payment-method";
 export class TransactionEntity {
   @PrimaryColumn("varchar", { length: 15 })
   id: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @Column({
     type: "bigint",
@@ -46,4 +60,7 @@ export class TransactionEntity {
 
   @Column({ enum: PaymentMethod })
   payment_method: PaymentMethod;
+
+  @Column({ default: "" })
+  trans_no: string;
 }

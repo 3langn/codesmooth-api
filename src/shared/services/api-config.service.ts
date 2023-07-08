@@ -148,6 +148,7 @@ export class ApiConfigService {
       vnp_Command: this.getString("VNP_COMMAND"),
       vnp_Version: this.getString("VNP_VERSION"),
       vnp_VNPayUrl: this.getString("VNP_VNPayUrl"),
+      vnp_RefundUrl: this.getString("VNP_REFUND_URL"),
     };
   }
 }
