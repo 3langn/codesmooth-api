@@ -1,5 +1,6 @@
 import { Controller, Get, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
+import axios from "axios";
 @Controller("/health")
 export class HealthController {
   private logger = new Logger(HealthController.name);
@@ -15,6 +16,6 @@ export class HealthController {
 
   @Cron("45 * * * * *")
   cronHeathCheck() {
-    this.logger.log(JSON.stringify(this.getHello()));
+    axios.get("https://codesmooth.onrender.com/api/heath");
   }
 }
