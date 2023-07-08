@@ -52,6 +52,7 @@ export class TransactionService {
     const buyer = await this.userRepository.findOne({ where: { id: transaction.user_id } });
     if (!buyer) throw new Error("Không tìm thấy người mua");
 
+    if (!course.students) course.students = [];
     course.students.push(buyer);
     course.total_enrollment += 1;
 
