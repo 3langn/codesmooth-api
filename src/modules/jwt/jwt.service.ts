@@ -44,7 +44,7 @@ export class JwtService {
     return this.generateToken(user_id, TokenType.VERIFY_EMAIL_TOKEN, 3600);
   }
 
-  generateToken(user_id: number, type: TokenType, expiresIn: number) {
+  generateToken(user_id: number, type: TokenType, expiresIn: number | string) {
     const payload = { sub: user_id, type };
     return this.nestJwtService.sign(payload, {
       expiresIn: expiresIn,

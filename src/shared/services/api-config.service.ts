@@ -94,7 +94,7 @@ export class ApiConfigService {
       publicKey: this.getString("JWT_PUBLIC_KEY"),
       jwtSecret: this.getString("JWT_SECRET"),
       jwtRefreshExpirationTime: this.getNumber("JWT_REFRESH_EXPIRATION_TIME"),
-      jwtAccessExpirationTime: this.getNumber("JWT_ACCESS_EXPIRATION_TIME"),
+      jwtAccessExpirationTime: this.getString("JWT_ACCESS_EXPIRATION_TIME"),
     };
   }
 

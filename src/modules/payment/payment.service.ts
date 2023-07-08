@@ -23,6 +23,7 @@ export class PaymentService {
       description: description,
       course_id: body.course_id,
       course_name: body.course_name,
+      payment_method: body.payment_method,
     });
 
     let date = new Date();
@@ -98,7 +99,7 @@ export class PaymentService {
               await this.transactionService.transactionSuccess(transactionId);
               return { RspCode: "00", Message: "Success" };
             } else {
-              await this.transactionService.transactionFail(transactionId);
+              await this.transactionService.transactionFail(transactionId, rspCode);
               return { RspCode: "00", Message: "Success" };
             }
           } else {
