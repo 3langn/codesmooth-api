@@ -24,6 +24,7 @@ import { TransactionModule } from "./modules/admin/transaction/transaction.modul
 import { InstructorCategoryModule } from "./modules/category/category.module";
 import { CourseModule } from "./modules/course/course.module";
 import { AdminCourseModule } from "./modules/admin/course/course.module";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { AdminCourseModule } from "./modules/admin/course/course.module";
     }),
 
     WinstonModule.forRoot(winstonConfig),
+    ScheduleModule.forRoot(),
     ExcuteModule,
     LessonModule,
     InstructorCourseModule,

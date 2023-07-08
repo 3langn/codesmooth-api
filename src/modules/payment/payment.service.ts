@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { sortObject } from "../../common/utils";
 import * as moment from "moment";
 import { ApiConfigService } from "../../shared/services/api-config.service";
@@ -9,6 +9,8 @@ import { CourseService } from "../course/course.service";
 import { CreatePaymentUrlInput } from "./dto/payment.dto";
 import { TransactionEntity } from "../../entities/transaction.entity";
 import axios from "axios";
+import { CustomHttpException } from "../../common/exception/custom-http.exception";
+import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 
 @Injectable()
 export class PaymentService {
@@ -18,7 +20,15 @@ export class PaymentService {
     private courseService: CourseService,
   ) {}
   async createPaymentUrl(body: CreatePaymentUrlInput, req: any): Promise<string | null> {
-    const course = await this.courseService.getCourseById(body.course_id);
+    const course = await this.courseService.getCourseById(body.course_id, req.user.id);
+
+    if (course.is_bought) {
+      throw new CustomHttpException({
+        code: StatusCodesList.BadRequest,
+        message: "Bạn đã mua khóa học này rồi",
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
     const description =
       "Thanh toán cho khóa học " + course.name + "- mã khóa học " + body.course_id;
 

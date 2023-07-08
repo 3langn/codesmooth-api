@@ -22,9 +22,10 @@ export class CourseController {
     );
   }
 
+  @Auth([], { public: true })
   @Get("/:id")
   async getCourseById(@Param("id") id: number, @Req() req: any) {
-    const data = await this.courseService.getCourseById(id);
+    const data = await this.courseService.getCourseById(id, req.user?.id);
     return new ResponseDefault("Success", data);
   }
 }

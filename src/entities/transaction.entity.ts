@@ -24,9 +24,7 @@ export class TransactionEntity {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @Column({
-    type: "bigint",
-  })
+  @Column()
   user_id: number;
 
   @ManyToOne(() => UserEntity, (user) => user.transactions)

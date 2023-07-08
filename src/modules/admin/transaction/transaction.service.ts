@@ -73,4 +73,13 @@ export class TransactionService {
     transaction.failed_reason = reason_code;
     return this.transactionRepository.save(transaction);
   }
+
+  async getExistedTransactionByCourseIdAndUserId(
+    courseId: number,
+    userId: number,
+  ): Promise<TransactionEntity> {
+    return this.transactionRepository.findOne({
+      where: { course_id: courseId, user_id: userId },
+    });
+  }
 }
