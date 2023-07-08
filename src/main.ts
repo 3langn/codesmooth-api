@@ -22,7 +22,7 @@ async function bootstrap() {
   // all domains have vnpayment.vn as origin
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: ["http://localhost:3000", "https://codesmooth.netlify.app", "*.vnpayment.vn"],
+      origin: ["http://localhost:3000", "https://*-codesmooth.netlify.app", "*.vnpayment.vn"],
     },
   });
   app.use(helmet());
