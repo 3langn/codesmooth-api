@@ -21,9 +21,7 @@ async function bootstrap() {
   // patchTypeORMRepositoryWithBaseRepository();
   // all domains have vnpayment.vn as origin
   const app = await NestFactory.create(AppModule, {
-    cors: {
-      origin: ["http://localhost:3000", "https://*-codesmooth.netlify.app", "*.vnpayment.vn"],
-    },
+    cors: true,
   });
   app.use(helmet());
   app.setGlobalPrefix("/api");

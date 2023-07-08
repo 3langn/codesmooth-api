@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post, Req } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Post, Req } from "@nestjs/common";
 import { PaymentService } from "./payment.service";
 import { ResponseDefault } from "../../common/dto/response_default";
 import { Auth } from "../../decorators";
 import { CreatePaymentUrlInput } from "./dto/payment.dto";
+import { CustomHttpException } from "../../common/exception/custom-http.exception";
+import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 
 @Controller("payment")
 export class PaymentController {
@@ -17,6 +19,14 @@ export class PaymentController {
 
   @Get("/vnpay_ipn")
   async vnpayIpn(@Req() req: any) {
+    if (!req.host.includes("vnpayment.vn")) {
+      throw new CustomHttpException({
+        message: "Invalid request",
+        code: StatusCodesList.InvalidCredentials,
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
+
     return await this.paymentService.vnpayIpn(req);
   }
 }
