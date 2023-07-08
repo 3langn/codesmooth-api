@@ -19,7 +19,15 @@ export class CourseService {
   async getCourses(pageOptionsDto: PageOptionsDto): Promise<[CourseEntity[], number]> {
     const qb = this.courseRepository
       .createQueryBuilder("course")
-      .select(["course", "categories.id", "categories.name"])
+      .select([
+        "course",
+        "categories.id",
+        "categories.name",
+        "owner.id",
+        "owner.username",
+        "owner.email",
+        "owner.avatar",
+      ])
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
       .where("course.status = :status", { status: CourseStatus.Published })
@@ -28,7 +36,7 @@ export class CourseService {
     return await queryPagination({ query: qb, o: pageOptionsDto });
   }
 
-  async getCourseById(id: number, user_id: number): Promise<any> {
+  async getCourseById(id: number): Promise<any> {
     // select id, title from lessons
     return await this.courseRepository
       .createQueryBuilder("course")

@@ -17,6 +17,7 @@ export class SettingController {
     return new ResponseDefault("Setting saved successfully");
   }
 
+  // TODO: Uncomment this line
   // @Auth([UserRole.ADMINSTRATOR])
   @Get("/")
   async listSettings() {

@@ -19,6 +19,9 @@ export class CourseEntity extends BaseEntity {
   @Column()
   price: number;
 
+  @Column({ default: 0 })
+  base_price: number;
+
   // @Column({ type: "text", array: true, default: [] })
   // will_learns: string[];
 
@@ -82,4 +85,7 @@ export class CourseEntity extends BaseEntity {
 
   @Column({ nullable: true })
   feedback_email: string;
+
+  @Column({ default: 0 })
+  total_enrollment: number;
 }

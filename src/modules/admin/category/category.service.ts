@@ -19,12 +19,12 @@ export class CategoryService {
 
   async create(data: CreateCategoryDto) {
     const isExist = await this.categoryRepository.findOne({
-      where: { name: data.name },
+      where: [{ name: data.name }, { order: data.order }],
     });
     if (isExist) {
       throw new CustomHttpException({
         statusCode: HttpStatus.BAD_REQUEST,
-        message: "Category already exists",
+        message: "Category name or order already exists",
         code: StatusCodesList.CategoryExists,
       });
     }

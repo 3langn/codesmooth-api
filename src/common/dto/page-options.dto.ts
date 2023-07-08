@@ -1,4 +1,13 @@
 import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  ValidateIf,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from "class-validator";
+import {
   EnumFieldOptional,
   NumberFieldOptional,
   StringField,
@@ -7,12 +16,14 @@ import {
 import { OrderType } from "../enum/order";
 
 export class PageOptionsDto {
+  @IsOptional()
+  @IsString()
   readonly sort?: string = "created_at";
 
   @EnumFieldOptional(() => OrderType, {
-    default: OrderType.ASC,
+    default: OrderType.DESC,
   })
-  readonly order: OrderType = OrderType.ASC;
+  readonly order: OrderType = OrderType.DESC;
 
   @NumberFieldOptional({
     minimum: 1,

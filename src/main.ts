@@ -13,6 +13,8 @@ import { AppModule } from "./app.module";
 import { SharedModule } from "./shared/services/shared.module";
 import { ApiConfigService } from "./shared/services/api-config.service";
 import { HTTPLogger } from "./common/interceptor/logger";
+import { CustomHttpException } from "./common/exception/custom-http.exception";
+import { StatusCodesList } from "./common/constants/status-codes-list.constants";
 
 async function bootstrap() {
   // initializeTransactionalContext();
@@ -44,7 +46,15 @@ async function bootstrap() {
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       transform: true,
       dismissDefaultMessages: true,
-      exceptionFactory: (errors) => new UnprocessableEntityException(errors),
+      exceptionFactory: (errors) => {
+        const msg = Object.keys(errors[0].constraints).map((key) => errors[0].constraints[key])[0];
+
+        return new CustomHttpException({
+          message: msg,
+          code: StatusCodesList.ValidationError,
+          statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        });
+      },
     }),
   );
 

@@ -30,7 +30,7 @@ export function validateHash(
   return bcrypt.compare(password, hash);
 }
 
-export async function queryPagination<T>({
+export async function queryPagination<X extends string[], T>({
   query,
   o,
 }: {

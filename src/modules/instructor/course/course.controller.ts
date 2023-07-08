@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+  Req,
+  ValidationPipe,
+} from "@nestjs/common";
 import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 import { PageDto } from "../../../common/dto/page.dto";
 import { ResponseDefault } from "../../../common/dto/response_default";
@@ -7,7 +19,7 @@ import { SaveCourseDto } from "./dto/create-course.dto";
 import { Auth } from "../../../decorators";
 import { PageOptionsDto } from "../../../common/dto/page-options.dto";
 import { InstructorCourseReponseDto } from "./dto/course-response.dto";
-
+import { InstructorGetCoursePageOptionsDto } from "./dto";
 @Controller("instructor/course")
 export class InstructorCourseController {
   constructor(private courseService: InstructorCourseService) {}
@@ -26,9 +38,12 @@ export class InstructorCourseController {
     return new ResponseDefault("Course updated successfully");
   }
 
-  @Auth()
+  // @Auth() TODO: Uncomment this line
   @Get("/")
-  async getCourses(@Query() pageOptionsDto: PageOptionsDto) {
+  async getCourses(
+    @Query(new ValidationPipe({ transform: true }))
+    pageOptionsDto: InstructorGetCoursePageOptionsDto,
+  ) {
     const [courses, total] = await this.courseService.getCourses(pageOptionsDto);
     return new PageDto<InstructorCourseReponseDto>(
       courses,

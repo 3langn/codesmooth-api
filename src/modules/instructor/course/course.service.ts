@@ -12,6 +12,7 @@ import { PageDto } from "../../../common/dto/page.dto";
 import { InstructorCourseReponseDto } from "./dto/course-response.dto";
 import { CategoryEntity } from "../../../entities/category.entity";
 import { CourseStatus } from "../../../common/enum/course";
+import { InstructorGetCoursePageOptionsDto } from "./dto";
 
 @Injectable()
 export class InstructorCourseService {
@@ -36,11 +37,32 @@ export class InstructorCourseService {
     await this.courseRepository.update(id, data);
   }
 
-  async getCourses(pageOptionsDto: PageOptionsDto): Promise<[CourseEntity[], number]> {
-    const qb = this.courseRepository.createQueryBuilder("course");
-    qb.select(["course", "categories.id", "categories.name"]);
-    qb.leftJoin("course.categories", "categories");
-    qb.where("course.deleted_at IS NULL");
+  async getCourses(
+    pageOptionsDto: InstructorGetCoursePageOptionsDto,
+  ): Promise<[CourseEntity[], number]> {
+    const qb = this.courseRepository
+      .createQueryBuilder("course")
+      .select([
+        "course",
+        "categories.id",
+        "categories.name",
+        "owner.id",
+        "owner.username",
+        "owner.email",
+        "owner.avatar",
+      ])
+      .leftJoin("course.categories", "categories")
+      .leftJoin("course.owner", "owner");
+
+    if (pageOptionsDto.q) {
+      qb.andWhere("course.name ILIKE :q", { q: `%${pageOptionsDto.q}%` });
+    }
+
+    if (pageOptionsDto.status) {
+      qb.andWhere("course.status = :status", { status: pageOptionsDto.status });
+    }
+
+    qb.andWhere("course.deleted_at IS NULL");
 
     return await queryPagination({ query: qb, o: pageOptionsDto });
   }
@@ -53,11 +75,16 @@ export class InstructorCourseService {
         "course",
         "categories.id",
         "categories.name",
+        "owner.id",
+        "owner.username",
+        "owner.email",
+        "owner.avatar",
         // "lessons.id",
         // "lessons.title",
         // "lessons.isCompleted",
       ])
       .leftJoin("course.categories", "categories")
+      .leftJoin("course.owner", "owner")
       // .leftJoin("category.lessons", "lessons")
       .where("course.id = :id", { id })
       .andWhere("course.owner_id = :user_id", { user_id })
