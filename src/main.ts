@@ -47,6 +47,8 @@ async function bootstrap() {
       transform: true,
       dismissDefaultMessages: true,
       exceptionFactory: (errors) => {
+        console.log(errors);
+
         const msg = Object.keys(errors[0].constraints).map((key) => errors[0].constraints[key])[0];
 
         return new CustomHttpException({

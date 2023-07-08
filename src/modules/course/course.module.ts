@@ -9,5 +9,6 @@ import { CategoryEntity } from "../../entities/category.entity";
   imports: [TypeOrmModule.forFeature([CourseEntity, CategoryEntity])],
   controllers: [CourseController],
   providers: [CourseService],
+  exports: [CourseService],
 })
 export class CourseModule {}

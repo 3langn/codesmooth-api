@@ -4,28 +4,38 @@ import * as moment from "moment";
 import { ApiConfigService } from "../../shared/services/api-config.service";
 import { TransactionService } from "../admin/transaction/transaction.service";
 import { TransactionStatus, TransactionType } from "../../common/enum/transaction";
+import { CreateTransactionInput } from "../admin/transaction/dto/transaction.dto";
+import { CourseService } from "../course/course.service";
+import { CreatePaymentUrlInput } from "./dto/payment.dto";
 
 @Injectable()
 export class PaymentService {
   constructor(
     private configService: ApiConfigService,
     private transactionService: TransactionService,
+    private courseService: CourseService,
   ) {}
-  async createPaymentUrl(body: any, req: any) {
-    // const course = await this.courseService.getCourseById(body.course_id);
+  async createPaymentUrl(body: CreatePaymentUrlInput, req: any): Promise<string | null> {
+    const course = await this.courseService.getCourseById(body.course_id);
     const description =
-      "Thanh toán cho khóa học " + body.course_name + "- mã khóa học " + body.course_id;
+      "Thanh toán cho khóa học " + course.name + "- mã khóa học " + body.course_id;
+
+    const isFree = course.price === 0;
 
     const transaction = await this.transactionService.createTransaction({
       user_id: req.user.id,
-      amount: body.amount,
       type: TransactionType.CUSTOMER_PAY,
-      description: description,
       course_id: body.course_id,
-      course_name: body.course_name,
       payment_method: body.payment_method,
+      amount: course.price,
+      course_name: course.name,
+      description: description,
+      status: isFree ? TransactionStatus.SUCCESS : TransactionStatus.PENDING,
     });
 
+    if (isFree) {
+      return null;
+    }
     let date = new Date();
     let createDate = moment(date).format("YYYYMMDDHHmmss");
 
@@ -34,8 +44,6 @@ export class PaymentService {
       req.connection.remoteAddress ||
       req.socket.remoteAddress ||
       req.connection.socket.remoteAddress;
-
-    let amount = req.body.amount;
 
     let vnp_Params = {};
     let vnpUrl = this.configService.VnpayConfig.vnp_VNPayUrl;
@@ -46,9 +54,9 @@ export class PaymentService {
     vnp_Params["vnp_Locale"] = this.configService.VnpayConfig.vnp_Locale;
     vnp_Params["vnp_CurrCode"] = this.configService.VnpayConfig.vnp_CurrCode;
     vnp_Params["vnp_TxnRef"] = transaction.id;
-    vnp_Params["vnp_OrderInfo"] = description;
+    vnp_Params["vnp_OrderInfo"] = transaction.description;
     vnp_Params["vnp_OrderType"] = "190000"; // Mã đào tạo
-    vnp_Params["vnp_Amount"] = amount * 100;
+    vnp_Params["vnp_Amount"] = transaction.amount * 100;
     vnp_Params["vnp_ReturnUrl"] = this.configService.VnpayConfig.vnp_ReturnUrl;
     vnp_Params["vnp_IpAddr"] = ipAddr;
     vnp_Params["vnp_CreateDate"] = createDate;

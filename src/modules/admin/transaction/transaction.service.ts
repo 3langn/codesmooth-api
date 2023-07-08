@@ -6,16 +6,9 @@ import { Repository } from "typeorm";
 import { CourseEntity } from "../../../entities/course.entity";
 import { UserEntity } from "../../../entities/user.entity";
 import { PaymentMethod } from "../../../common/enum/payment-method";
-
-interface CreateTransactionInput {
-  user_id: number;
-  amount: number;
-  type: TransactionType;
-  description: string;
-  course_id: number;
-  course_name: string;
-  payment_method: PaymentMethod;
-}
+import { IsEnum, IsNumber, IsString } from "class-validator";
+import { CreateTransactionInput } from "./dto/transaction.dto";
+import { CourseService } from "../../course/course.service";
 
 @Injectable()
 export class TransactionService {
@@ -24,12 +17,22 @@ export class TransactionService {
     private readonly transactionRepository: Repository<TransactionEntity>,
     @InjectRepository(CourseEntity)
     private readonly courseRepository: Repository<CourseEntity>,
+    private readonly courseService: CourseService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   async createTransaction(data: CreateTransactionInput): Promise<TransactionEntity> {
-    const transaction = this.transactionRepository.create(data);
+    const transaction = this.transactionRepository.create({
+      user_id: data.user_id,
+      type: data.type,
+      description: data.description,
+      course_id: data.course_id,
+      payment_method: data.payment_method,
+      amount: data.amount,
+      course_name: data.course_name,
+      status: data.status,
+    });
     return this.transactionRepository.save(transaction);
   }
 

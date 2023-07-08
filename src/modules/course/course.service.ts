@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { CourseEntity } from "../../entities/course.entity";
@@ -6,6 +6,8 @@ import { CategoryEntity } from "../../entities/category.entity";
 import { queryPagination } from "../../common/utils";
 import { PageOptionsDto } from "../../common/dto/page-options.dto";
 import { CourseStatus } from "../../common/enum/course";
+import { CustomHttpException } from "../../common/exception/custom-http.exception";
+import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 
 @Injectable()
 export class CourseService {
@@ -36,9 +38,9 @@ export class CourseService {
     return await queryPagination({ query: qb, o: pageOptionsDto });
   }
 
-  async getCourseById(id: number): Promise<any> {
+  async getCourseById(id: number): Promise<CourseEntity> {
     // select id, title from lessons
-    return await this.courseRepository
+    const c = await this.courseRepository
       .createQueryBuilder("course")
       .select([
         "course",
@@ -58,5 +60,14 @@ export class CourseService {
       // .orderBy("category.order", "ASC")
       // .addOrderBy("lessons.order", "ASC")
       .getOne();
+
+    if (!c)
+      throw new CustomHttpException({
+        message: "Không tìm thấy khóa học",
+        statusCode: HttpStatus.NOT_FOUND,
+        code: StatusCodesList.NotFound,
+      });
+
+    return c;
   }
 }
