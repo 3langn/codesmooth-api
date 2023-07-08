@@ -13,13 +13,8 @@ export class HealthController {
     };
   }
 
-  @Cron("5 * * * * *")
+  @Cron("45 * * * * *")
   cronHeathCheck() {
-    this.logger.log({
-      api: "CodeSmooth API",
-      version: "1.0.0",
-      status: "OK",
-      timestamp: new Date().toISOString(),
-    });
+    this.logger.log(JSON.stringify(this.getHello()));
   }
 }
