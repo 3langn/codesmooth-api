@@ -28,6 +28,9 @@ export class SaveCourseDto {
   @IsArray({ message: "Category id must be an array" })
   category_ids: number[];
 
+  @IsArray({ message: "objectives must be an array" })
+  objectives: string[];
+
   @IsString({ message: "Target audience must be a string" })
   target_audience: string;
 

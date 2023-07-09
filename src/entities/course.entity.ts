@@ -37,6 +37,9 @@ export class CourseEntity extends BaseEntity {
   @Column({ type: "text", array: true, default: [] })
   requirements: string[];
 
+  @Column({ type: "text", array: true, default: [] })
+  objectives: string[];
+
   @Column({ default: "" })
   thumbnail: string;
 

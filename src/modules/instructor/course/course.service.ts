@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { ResponseDefault } from "../../../common/dto/response_default";
@@ -13,6 +13,8 @@ import { InstructorCourseReponseDto } from "./dto/course-response.dto";
 import { CategoryEntity } from "../../../entities/category.entity";
 import { CourseStatus } from "../../../common/enum/course";
 import { InstructorGetCoursePageOptionsDto } from "./dto";
+import { CustomHttpException } from "../../../common/exception/custom-http.exception";
+import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 
 @Injectable()
 export class InstructorCourseService {
@@ -28,6 +30,7 @@ export class InstructorCourseService {
     const course = this.courseRepository.create({
       categories: categories,
       owner_id: user_id,
+      base_price: data.price,
       ...data,
     });
     await this.courseRepository.save(course);
@@ -69,7 +72,7 @@ export class InstructorCourseService {
 
   async getCourseById(id: number, user_id: number): Promise<InstructorCourseReponseDto> {
     // select id, title from lessons
-    return await this.courseRepository
+    const c = await this.courseRepository
       .createQueryBuilder("course")
       .select([
         "course",
@@ -92,6 +95,16 @@ export class InstructorCourseService {
       // .orderBy("category.order", "ASC")
       // .addOrderBy("lessons.order", "ASC")
       .getOne();
+
+    if (!c) {
+      throw new CustomHttpException({
+        message: "Course not found",
+        code: StatusCodesList.NotFound,
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
+
+    return c;
   }
 
   async deleteCourseById(id: number) {
