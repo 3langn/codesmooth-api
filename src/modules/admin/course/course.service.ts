@@ -25,6 +25,8 @@ export class AdminCourseService {
 
     if (pageOptionsDto.status) {
       qb.andWhere("course.status = :status", { status: pageOptionsDto.status });
+    } else {
+      qb.andWhere("course.status != :status", { status: CourseStatus.Draft });
     }
     if (pageOptionsDto.category_id) {
       qb.andWhere("categories.id = :category_id", { category_id: pageOptionsDto.category_id });
