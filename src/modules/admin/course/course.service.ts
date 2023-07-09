@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { In, Not, Repository } from "typeorm";
 import { ListCourseQueryDto } from "./dto/list-course.dto";
 import { CourseEntity } from "../../../entities/course.entity";
 import { CategoryEntity } from "../../../entities/category.entity";
@@ -75,5 +75,21 @@ export class AdminCourseService {
   // TODO: Reject note for instructor
   async rejectCourse(id: number) {
     await this.courseRepository.update(id, { status: CourseStatus.Rejected });
+  }
+
+  async countCourse() {
+    const [allCount, publishedCount, reviewingCount, rejectedCount] = await Promise.all([
+      this.courseRepository.count({ where: { status: Not(In([CourseStatus.Draft])) } }),
+      this.courseRepository.count({ where: { status: CourseStatus.Published } }),
+      this.courseRepository.count({ where: { status: CourseStatus.Reviewing } }),
+      this.courseRepository.count({ where: { status: CourseStatus.Rejected } }),
+    ]);
+
+    return {
+      all: allCount,
+      [CourseStatus.Published]: publishedCount,
+      [CourseStatus.Reviewing]: reviewingCount,
+      [CourseStatus.Rejected]: rejectedCount,
+    };
   }
 }

@@ -26,6 +26,13 @@ export class AdminCourseController {
   }
 
   @Auth([UserRole.ADMINSTRATOR])
+  @Get("/count-course")
+  async countCourse() {
+    const count = await this.courseService.countCourse();
+    return new ResponseDefault("Success", count);
+  }
+
+  @Auth([UserRole.ADMINSTRATOR])
   @Patch("/publish/:id")
   async publishCourse(@Param("id") id: number) {
     await this.courseService.publishCourse(id);
