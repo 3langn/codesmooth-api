@@ -14,7 +14,8 @@ export class HealthController {
     };
   }
 
-  @Cron("* 2 * * * *")
+  // every 5 minutes
+  @Cron("0 */5 * * * *")
   cronHeathCheck() {
     axios.get("https://codesmooth.onrender.com/api/health");
   }
