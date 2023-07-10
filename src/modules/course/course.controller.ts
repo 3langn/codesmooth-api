@@ -22,6 +22,19 @@ export class CourseController {
     );
   }
 
+  @Auth()
+  @Get("/my-course")
+  async getMyCourses(@Query() pageOptionsDto: PageOptionsDto, @Req() req: any) {
+    const [courses, total] = await this.courseService.getMyCourses(pageOptionsDto, req.user?.id);
+    return new PageDto<any>(
+      courses,
+      new PageMetaDto({
+        itemCount: total,
+        pageOptionsDto,
+      }),
+    );
+  }
+
   @Auth([], { public: true })
   @Get("/:id")
   async getCourseById(@Param("id") id: number, @Req() req: any) {

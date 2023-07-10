@@ -6,6 +6,7 @@ import { CourseEntity } from "../../../entities/course.entity";
 import { CategoryEntity } from "../../../entities/category.entity";
 import { CourseStatus } from "../../../common/enum/course";
 import { queryPagination } from "../../../common/utils";
+import { generateId } from "../../../common/generate-nanoid";
 
 @Injectable()
 export class AdminCourseService {
@@ -69,7 +70,27 @@ export class AdminCourseService {
   }
 
   async publishCourse(id: number) {
-    await this.courseRepository.update(id, { status: CourseStatus.Published });
+    const course = await this.courseRepository.findOne({
+      where: { id },
+      relations: ["owner"],
+    });
+
+    const publishedCourse = {
+      ...course,
+      id: generateId(9),
+      published_at: new Date(),
+    };
+
+    const p = await this.courseRepository.save(publishedCourse);
+    await this.courseRepository.update(
+      {
+        id,
+      },
+      {
+        published_course_id: p.id,
+        status: CourseStatus.Published,
+      },
+    );
   }
 
   // TODO: Reject note for instructor

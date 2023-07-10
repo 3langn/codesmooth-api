@@ -43,6 +43,7 @@ async function bootstrap() {
     new ValidationPipe({
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       transform: true,
+      whitelist: true,
       dismissDefaultMessages: true,
       exceptionFactory: (errors) => {
         console.log(errors);

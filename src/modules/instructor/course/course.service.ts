@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { In, IsNull, Not, Repository } from "typeorm";
 import { ResponseDefault } from "../../../common/dto/response_default";
 import { CourseEntity } from "../../../entities/course.entity";
 import { SaveCourseDto } from "./dto/create-course.dto";
@@ -25,7 +25,7 @@ export class InstructorCourseService {
     private categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-  async saveCourse(data: SaveCourseDto, user_id: number) {
+  async createCourse(data: SaveCourseDto, user_id: number) {
     const categories = await this.categoryRepository.find({ where: { id: In(data.category_ids) } });
     const course = this.courseRepository.create({
       categories: categories,
@@ -36,12 +36,34 @@ export class InstructorCourseService {
     await this.courseRepository.save(course);
   }
 
-  async updateCourse(id: number, data: SaveCourseDto) {
-    await this.courseRepository.update(id, data);
+  async updateCourse(id: number, data: SaveCourseDto, user_id: number) {
+    const { category_ids, ...update } = data;
+    const categories = await this.categoryRepository.find({
+      where: { id: In(category_ids) },
+    });
+
+    // check published has draft
+    const course = await this.courseRepository.findOne({
+      where: { id, owner_id: user_id },
+    });
+
+    if (!course) {
+      throw new CustomHttpException({
+        message: "Course not found",
+        code: StatusCodesList.NotFound,
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
+    course.categories = categories;
+    for (const key in update) {
+      course[key] = update[key];
+    }
+    await this.courseRepository.save(course);
   }
 
   async getCourses(
     pageOptionsDto: InstructorGetCoursePageOptionsDto,
+    user_id: number,
   ): Promise<[CourseEntity[], number]> {
     const qb = this.courseRepository
       .createQueryBuilder("course")
@@ -55,7 +77,9 @@ export class InstructorCourseService {
         "owner.avatar",
       ])
       .leftJoin("course.categories", "categories")
-      .leftJoin("course.owner", "owner");
+      .leftJoin("course.owner", "owner")
+      .where("course.owner_id = :user_id", { user_id })
+      .andWhere("course.published_at IS NULL");
 
     if (pageOptionsDto.q) {
       qb.andWhere("course.name ILIKE :q", { q: `%${pageOptionsDto.q}%` });
@@ -68,6 +92,28 @@ export class InstructorCourseService {
     qb.andWhere("course.deleted_at IS NULL");
 
     return await queryPagination({ query: qb, o: pageOptionsDto });
+  }
+
+  async countCourse(user_id: number) {
+    const [allCount, publishedCount, reviewingCount, rejectedCount] = await Promise.all([
+      this.courseRepository.count({
+        where: { owner_id: user_id, published_at: IsNull() },
+      }),
+      // this.courseRepository.count({ where: { status: CourseStatus.Draft, owner_id: user_id } }),
+      this.courseRepository.count({
+        where: { status: CourseStatus.Published, owner_id: user_id, published_at: IsNull() },
+      }),
+      this.courseRepository.count({ where: { status: CourseStatus.Reviewing, owner_id: user_id } }),
+      this.courseRepository.count({ where: { status: CourseStatus.Rejected, owner_id: user_id } }),
+    ]);
+
+    return {
+      all: allCount,
+      [CourseStatus.Published]: publishedCount,
+      [CourseStatus.Reviewing]: reviewingCount,
+      [CourseStatus.Rejected]: rejectedCount,
+      [CourseStatus.Draft]: allCount - publishedCount - reviewingCount - rejectedCount,
+    };
   }
 
   async getCourseById(id: number, user_id: number): Promise<InstructorCourseReponseDto> {
@@ -107,11 +153,11 @@ export class InstructorCourseService {
     return c;
   }
 
-  async deleteCourseById(id: number) {
-    await this.courseRepository.delete(id);
+  async deleteCourseById(id: number, user_id: number) {
+    await this.courseRepository.softDelete({ id, owner_id: user_id });
   }
 
-  async submitCourseForReview(id: number) {
-    await this.courseRepository.update(id, { status: CourseStatus.Reviewing });
+  async submitCourseForReview(id: number, user_id: number) {
+    await this.courseRepository.update(id, { status: CourseStatus.Reviewing, owner_id: user_id });
   }
 }

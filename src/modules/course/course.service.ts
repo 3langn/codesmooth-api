@@ -35,6 +35,33 @@ export class CourseService {
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
       .where("course.status = :status", { status: CourseStatus.Published })
+      .andWhere("course.published_at IS NOT NULL")
+      .andWhere("course.deleted_at IS NULL");
+
+    return await queryPagination({ query: qb, o: pageOptionsDto });
+  }
+
+  async getMyCourses(
+    pageOptionsDto: PageOptionsDto,
+    user_id: number,
+  ): Promise<[CourseEntity[], number]> {
+    const qb = this.courseRepository
+      .createQueryBuilder("course")
+      .select([
+        "course",
+        "categories.id",
+        "categories.name",
+        "owner.id",
+        "owner.username",
+        "owner.email",
+        "owner.avatar",
+      ])
+      .leftJoin("course.categories", "categories")
+      .leftJoin("course.owner", "owner")
+      .leftJoin("course.students", "students")
+      .where("course.status = :status", { status: CourseStatus.Published })
+      .andWhere("students.id = :user_id", { user_id })
+      .andWhere("course.published_at IS NOT NULL")
       .andWhere("course.deleted_at IS NULL");
 
     return await queryPagination({ query: qb, o: pageOptionsDto });
@@ -61,6 +88,7 @@ export class CourseService {
       .where("course.status = :status", { status: CourseStatus.Published })
       // .leftJoin("category.lessons", "lessons")
       .andWhere("course.id = :id", { id })
+      .andWhere("course.published_at IS NOT NULL")
       .andWhere("course.deleted_at IS NULL")
       .getOne();
     // .orderBy("category.order", "ASC")

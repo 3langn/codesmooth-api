@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
 import { WinstonModule } from "nest-winston";
 import winstonConfig from "src/config/winston";

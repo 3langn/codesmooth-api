@@ -22,6 +22,9 @@ export class CourseEntity extends BaseEntity {
   @Column({ default: 0 })
   base_price: number;
 
+  @Column({ nullable: true })
+  published_at: Date;
+
   // @Column({ type: "text", array: true, default: [] })
   // will_learns: string[];
 
@@ -91,4 +94,10 @@ export class CourseEntity extends BaseEntity {
 
   @Column({ default: 0 })
   total_enrollment: number;
+
+  @Column({ nullable: true })
+  published_course_id: number;
+
+  @Column({ nullable: true })
+  draft_course_id: number;
 }

@@ -27,24 +27,25 @@ export class InstructorCourseController {
   @Auth()
   @Post("/")
   async createCourse(@Body() body: SaveCourseDto, @Req() req: any) {
-    await this.courseService.saveCourse(body, req.user.id);
+    await this.courseService.createCourse(body, req.user.id);
     return new ResponseDefault("Course saved successfully");
   }
 
   @Auth()
   @Put("/:id")
-  async updateCourse(@Param("id") id: number, @Body() body: SaveCourseDto) {
-    await this.courseService.updateCourse(id, body);
+  async updateCourse(@Param("id") id: number, @Body() body: SaveCourseDto, @Req() req: any) {
+    await this.courseService.updateCourse(id, body, req.user.id);
     return new ResponseDefault("Course updated successfully");
   }
 
-  // @Auth() TODO: Uncomment this line
+  @Auth()
   @Get("/")
   async getCourses(
-    @Query(new ValidationPipe({ transform: true }))
+    @Query()
     pageOptionsDto: InstructorGetCoursePageOptionsDto,
+    @Req() req: any,
   ) {
-    const [courses, total] = await this.courseService.getCourses(pageOptionsDto);
+    const [courses, total] = await this.courseService.getCourses(pageOptionsDto, req.user.id);
     return new PageDto<InstructorCourseReponseDto>(
       courses,
       new PageMetaDto({
@@ -52,6 +53,12 @@ export class InstructorCourseController {
         pageOptionsDto,
       }),
     );
+  }
+  @Auth()
+  @Get("/count-course")
+  async countCourse(@Req() req: any) {
+    const count = await this.courseService.countCourse(req.user.id);
+    return new ResponseDefault("Success", count);
   }
 
   @Auth()
@@ -63,15 +70,15 @@ export class InstructorCourseController {
 
   @Auth()
   @Delete("/:id")
-  async deleteCourseById(@Param("id") id: number) {
-    await this.courseService.deleteCourseById(id);
+  async deleteCourseById(@Param("id") id: number, @Req() req: any) {
+    await this.courseService.deleteCourseById(id, req.user.id);
     return new ResponseDefault("Course deleted successfully");
   }
 
   @Auth()
   @Patch("/submit-for-review/:id")
-  async submitCourseForReview(@Param("id") id: number) {
-    await this.courseService.submitCourseForReview(id);
+  async submitCourseForReview(@Param("id") id: number, @Req() req: any) {
+    await this.courseService.submitCourseForReview(id, req.user.id);
     return new ResponseDefault("Course submitted successfully");
   }
 }
