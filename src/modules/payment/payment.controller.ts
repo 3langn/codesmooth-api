@@ -19,13 +19,15 @@ export class PaymentController {
 
   @Get("/vnpay_ipn")
   async vnpayIpn(@Req() req: any) {
-    if (!req.host.includes("vnpayment.vn")) {
-      throw new CustomHttpException({
-        message: "Invalid request",
-        code: StatusCodesList.InvalidCredentials,
-        statusCode: HttpStatus.BAD_REQUEST,
-      });
-    }
+    console.log("Host", req.host);
+
+    // if (!req.host.includes("vnpayment.vn")) {
+    //   throw new CustomHttpException({
+    //     message: "Invalid request",
+    //     code: StatusCodesList.InvalidCredentials,
+    //     statusCode: HttpStatus.BAD_REQUEST,
+    //   });
+    // }
 
     return await this.paymentService.vnpayIpn(req);
   }

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Not, Repository } from "typeorm";
 import { ListCourseQueryDto } from "./dto/list-course.dto";
@@ -7,6 +7,8 @@ import { CategoryEntity } from "../../../entities/category.entity";
 import { CourseStatus } from "../../../common/enum/course";
 import { queryPagination } from "../../../common/utils";
 import { generateId } from "../../../common/generate-nanoid";
+import { CustomHttpException } from "../../../common/exception/custom-http.exception";
+import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 
 @Injectable()
 export class AdminCourseService {
@@ -21,14 +23,18 @@ export class AdminCourseService {
     const qb = this.courseRepository
       .createQueryBuilder("course")
       .select(["course", "categories.id", "categories.name"])
-      .leftJoin("course.categories", "categories")
-      .leftJoin("course.owner", "owner");
+      .leftJoinAndSelect("course.categories", "categories")
+      .leftJoinAndSelect("course.owner", "owner")
+      .where("course.deleted_at IS NULL");
 
     if (pageOptionsDto.status) {
       qb.andWhere("course.status = :status", { status: pageOptionsDto.status });
     } else {
-      qb.andWhere("course.status != :status", { status: CourseStatus.Draft });
+      qb.andWhere("course.status != :status", { status: CourseStatus.Draft })
+        .andWhere("course.published_course_id IS NULL")
+        .andWhere("course.draft_course_id IS NULL");
     }
+
     if (pageOptionsDto.category_id) {
       qb.andWhere("categories.id = :category_id", { category_id: pageOptionsDto.category_id });
     }
@@ -40,7 +46,6 @@ export class AdminCourseService {
     if (pageOptionsDto.name) {
       qb.andWhere("course.name ILIKE :name", { name: `%${pageOptionsDto.name}%` });
     }
-    qb.andWhere("course.deleted_at IS NULL");
 
     return await queryPagination({ query: qb, o: pageOptionsDto });
   }
@@ -75,9 +80,47 @@ export class AdminCourseService {
       relations: ["owner"],
     });
 
+    if (!course)
+      throw new CustomHttpException({
+        message: "Course not found",
+        code: StatusCodesList.NotFound,
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+
+    if (course.published_course_id) {
+      const p = await this.courseRepository.findOne({
+        where: { id: course.published_course_id },
+      });
+
+      if (!p) {
+        throw new CustomHttpException({
+          message: "Course not found",
+          code: StatusCodesList.NotFound,
+          statusCode: HttpStatus.NOT_FOUND,
+        });
+      }
+      p.base_price = course.base_price;
+      p.categories = course.categories;
+      p.description = course.description;
+      p.draft_course_id = null;
+      p.name = course.name;
+      p.price = course.price;
+      p.requirements = course.requirements;
+      p.target_audience = course.target_audience;
+      p.thumbnail = course.thumbnail;
+      p.feedback_email = course.feedback_email;
+      p.objectives = course.objectives;
+      p.short_description = course.short_description;
+      p.published_at = new Date();
+
+      await this.courseRepository.save(p);
+      return;
+    }
+
     const publishedCourse = {
       ...course,
       id: generateId(9),
+      status: CourseStatus.Published,
       published_at: new Date(),
     };
 
@@ -88,7 +131,7 @@ export class AdminCourseService {
       },
       {
         published_course_id: p.id,
-        status: CourseStatus.Published,
+        status: CourseStatus.Draft,
       },
     );
   }

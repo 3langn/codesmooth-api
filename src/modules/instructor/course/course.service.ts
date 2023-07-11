@@ -158,6 +158,26 @@ export class InstructorCourseService {
   }
 
   async submitCourseForReview(id: number, user_id: number) {
+    const c = await this.courseRepository.findOne({ where: { id, owner_id: user_id } });
+    if (!c) {
+      throw new CustomHttpException({
+        message: "Course not found",
+        code: StatusCodesList.NotFound,
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
+
+    if (c.status !== CourseStatus.Draft) {
+      throw new CustomHttpException({
+        message: "Course is not draft",
+        code: StatusCodesList.BadRequest,
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
+
+    if (c.published_course_id) {
+      await this.courseRepository.update({ id: c.published_course_id }, { draft_course_id: c.id });
+    }
     await this.courseRepository.update(id, { status: CourseStatus.Reviewing, owner_id: user_id });
   }
 }
