@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post, Req } from "@nestjs/common";
+import { Body, Controller, Get, Headers, HttpStatus, Post, Req } from "@nestjs/common";
 import { PaymentService } from "./payment.service";
 import { ResponseDefault } from "../../common/dto/response_default";
 import { Auth } from "../../decorators";
@@ -19,8 +19,7 @@ export class PaymentController {
 
   @Get("/vnpay_ipn")
   async vnpayIpn(@Req() req: any) {
-    console.log("Host", req.host);
-
+    req.get("origin");
     // if (!req.host.includes("vnpayment.vn")) {
     //   throw new CustomHttpException({
     //     message: "Invalid request",
