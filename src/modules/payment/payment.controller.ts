@@ -19,7 +19,8 @@ export class PaymentController {
 
   @Get("/vnpay_ipn")
   async vnpayIpn(@Req() req: any) {
-    req.get("origin");
+    console.log(req.headers);
+
     // if (!req.host.includes("vnpayment.vn")) {
     //   throw new CustomHttpException({
     //     message: "Invalid request",
