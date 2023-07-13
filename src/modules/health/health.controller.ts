@@ -7,7 +7,7 @@ export class HealthController {
   @Get()
   getHello() {
     return {
-      api: "CodeSmooth API",
+      api: "CodeDrafts API",
       version: "1.0.0",
       status: "OK",
       timestamp: new Date().toISOString(),
@@ -17,6 +17,6 @@ export class HealthController {
   // every 5 minutes
   @Cron("0 */5 * * * *")
   cronHeathCheck() {
-    axios.get("https://codesmooth.onrender.com/api/health");
+    axios.get("https://codedrafts.onrender.com/api/health");
   }
 }

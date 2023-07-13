@@ -23,16 +23,7 @@ export class TransactionService {
   ) {}
 
   async createTransaction(data: CreateTransactionInput): Promise<TransactionEntity> {
-    const transaction = this.transactionRepository.create({
-      user_id: data.user_id,
-      type: data.type,
-      description: data.description,
-      course_id: data.course_id,
-      payment_method: data.payment_method,
-      amount: data.amount,
-      course_name: data.course_name,
-      status: data.status,
-    });
+    const transaction = this.transactionRepository.create(data);
     return this.transactionRepository.save(transaction);
   }
 

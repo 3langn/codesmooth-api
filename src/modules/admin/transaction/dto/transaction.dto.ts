@@ -3,6 +3,7 @@ import { PaymentMethod } from "../../../../common/enum/payment-method";
 import { TransactionStatus, TransactionType } from "../../../../common/enum/transaction";
 
 export class CreateTransactionInput {
+  id: string;
   user_id: number;
 
   type: TransactionType;
@@ -18,4 +19,6 @@ export class CreateTransactionInput {
   status?: TransactionStatus;
 
   payment_method: PaymentMethod;
+
+  gen_secure_hash: string;
 }

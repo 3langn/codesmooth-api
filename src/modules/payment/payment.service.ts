@@ -11,6 +11,7 @@ import { TransactionEntity } from "../../entities/transaction.entity";
 import axios from "axios";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
+import { generateTransactionId } from "../../common/generate-nanoid";
 
 @Injectable()
 export class PaymentService {
@@ -33,17 +34,7 @@ export class PaymentService {
       "Thanh toán cho khóa học " + course.name + "- mã khóa học " + body.course_id;
 
     const isFree = course.price === 0;
-
-    const transaction = await this.transactionService.createTransaction({
-      user_id: req.user.id,
-      type: TransactionType.CUSTOMER_PAY,
-      course_id: body.course_id,
-      payment_method: body.payment_method,
-      amount: course.price,
-      course_name: course.name,
-      description: description,
-      status: isFree ? TransactionStatus.SUCCESS : TransactionStatus.PENDING,
-    });
+    const transId = generateTransactionId();
 
     if (isFree) {
       return null;
@@ -65,10 +56,10 @@ export class PaymentService {
     vnp_Params["vnp_TmnCode"] = this.configService.VnpayConfig.vnp_TmnCode;
     vnp_Params["vnp_Locale"] = this.configService.VnpayConfig.vnp_Locale;
     vnp_Params["vnp_CurrCode"] = this.configService.VnpayConfig.vnp_CurrCode;
-    vnp_Params["vnp_TxnRef"] = transaction.id;
-    vnp_Params["vnp_OrderInfo"] = transaction.description;
+    vnp_Params["vnp_TxnRef"] = transId;
+    vnp_Params["vnp_OrderInfo"] = description;
     vnp_Params["vnp_OrderType"] = "190000"; // Mã đào tạo
-    vnp_Params["vnp_Amount"] = transaction.amount * 100;
+    vnp_Params["vnp_Amount"] = course.price * 100;
     vnp_Params["vnp_ReturnUrl"] = this.configService.VnpayConfig.vnp_ReturnUrl;
     vnp_Params["vnp_IpAddr"] = ipAddr;
     vnp_Params["vnp_CreateDate"] = createDate;
@@ -85,6 +76,20 @@ export class PaymentService {
     let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
     vnp_Params["vnp_SecureHash"] = signed;
     vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
+
+    await this.transactionService.createTransaction({
+      id: transId,
+      user_id: req.user.id,
+      type: TransactionType.CUSTOMER_PAY,
+      course_id: body.course_id,
+      payment_method: body.payment_method,
+      amount: course.price,
+      course_name: course.name,
+      description: description,
+      status: isFree ? TransactionStatus.SUCCESS : TransactionStatus.PENDING,
+      gen_secure_hash: signed,
+    });
+
     return vnpUrl;
   }
 
@@ -109,9 +114,8 @@ export class PaymentService {
     let crypto = require("crypto");
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
-    if (secureHash === signed) {
-      const transaction = await this.transactionService.getTransactionById(transactionId);
-
+    const transaction = await this.transactionService.getTransactionById(transactionId);
+    if (secureHash === signed && transaction.gen_secure_hash !== secureHash) {
       if (transaction) {
         if (vnpAmount / 100 === transaction.amount) {
           if (transaction.status === TransactionStatus.PENDING) {
@@ -157,14 +161,14 @@ export class PaymentService {
     let vnp_TransactionDate = transaction.created_at;
     let vnp_Amount = transaction.amount * 100;
     let vnp_TransactionType = "02"; // 02: Giao dịch hoàn trả toàn phần (vnp_TransactionType=02)
-    let vnp_CreateBy = "CodeSmooth";
+    let vnp_CreateBy = "CodeDrafts";
 
     let currCode = "VND";
 
     let vnp_RequestId = moment(date).format("HHmmss");
     let vnp_Version = this.configService.VnpayConfig.vnp_Version;
     let vnp_Command = "refund";
-    let vnp_OrderInfo = "CodeSmooth hoan tien GD ma:" + vnp_TxnRef;
+    let vnp_OrderInfo = "CodeDrafts hoan tien GD ma:" + vnp_TxnRef;
 
     let vnp_IpAddr = "127.0.0.1";
 

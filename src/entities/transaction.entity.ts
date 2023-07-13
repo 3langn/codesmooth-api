@@ -48,11 +48,6 @@ export class TransactionEntity {
   @Column()
   course_name: string;
 
-  @BeforeInsert()
-  generateId() {
-    this.id = generateTransactionId();
-  }
-
   @Column({ nullable: true })
   failed_reason: string;
 
@@ -61,4 +56,7 @@ export class TransactionEntity {
 
   @Column({ default: "" })
   trans_no: string;
+
+  @Column({ default: "" })
+  gen_secure_hash: string;
 }
