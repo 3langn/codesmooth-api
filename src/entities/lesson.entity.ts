@@ -1,26 +1,44 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, Unique } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { LessonComponentType } from "../common/enum/lesson-component-type";
-import { SectionEntity } from "./section";
+import { SectionEntity } from "./section.entity";
+import { IsEnum, IsNotEmpty, IsObject, IsString, ValidateNested } from "class-validator";
+import { CourseEntity } from "./course.entity";
+import { UserEntity } from "./user.entity";
 
-export interface ContentCode {
-  code: string | undefined;
+export class ContentCode {
+  code: string;
   judgeContent: {
-    testCode: string | undefined;
-    executeCode: string | undefined;
+    testCode?: string;
+    executeCode?: string;
+    answerCode?: string;
+    sampleCode?: string;
+    baseOn?: string; // console or results
   };
   language: string;
   runable: boolean;
+  isExercise: boolean;
+  isReadOnly: boolean;
   timeLimit: number;
   allowDownload: false;
 }
 export class LessonComponent {
+  @IsNotEmpty({ message: "Content must be not empty" })
   content: ContentCode | any;
+  @IsEnum(LessonComponentType, { message: "Type must be a valid type" })
   type: LessonComponentType;
 }
-
+@Unique("UQ_LESSON_ORDER", ["order", "section_id"])
 @Entity("lessons")
 export class LessonEntity extends BaseEntity {
+  @ManyToOne(() => CourseEntity)
+  @JoinColumn({ name: "course_id" })
+  course: CourseEntity;
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: "owner_id" })
+  owner: UserEntity;
+
   @Column()
   title: string;
 
@@ -36,12 +54,14 @@ export class LessonEntity extends BaseEntity {
   @Column({ default: "" })
   summary: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   section_id: number;
 
   @ManyToOne(() => SectionEntity, (section) => section.lessons, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "section_id" })
-  sections: SectionEntity;
+  section: SectionEntity;
 }

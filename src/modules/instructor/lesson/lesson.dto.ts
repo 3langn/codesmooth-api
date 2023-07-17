@@ -10,52 +10,30 @@ import {
 import { LessonComponent } from "../../../entities/lesson.entity";
 
 export class SaveLessonDto {
-  @IsNumber(undefined, { message: "Id phải là một số" })
-  id?: number;
+  @IsNumber(undefined, { message: "id bài học phải là một số" })
+  id: number;
 
   @IsNotEmpty({ message: "Tiêu đề không được để trống" })
   @IsString({ message: "Tiêu đề phải là một chuỗi" })
   title: string;
 
-  isCompleted?: boolean;
-
   @IsString({ message: "Tóm tắt phải là một chuỗi" })
   summary?: string;
 
-  order?: number;
-
-  @IsArray()
+  @IsArray({
+    message: "Các thành phần của bài học phải là một mảng",
+  })
   @ValidateNested({ each: true })
   @Type(() => LessonComponent)
   components?: LessonComponent[];
-
-  @IsNotEmpty({ message: "Id danh mục không được để trống" })
-  @IsNumber(undefined, { message: "Id danh mục phải là một số" })
-  course_category_id: number;
 }
 
 export class AddLessonDto {
-  @IsNumber(undefined, { message: "Id phải là một số" })
-  id?: number;
+  @IsNumber(undefined, { message: "order phải là một số" })
+  order: number;
 
-  @IsNotEmpty({ message: "Tiêu đề không được để trống" })
-  @IsString({ message: "Tiêu đề phải là một chuỗi" })
-  title: string;
-
-  @IsString({ message: "Tóm tắt phải là một chuỗi" })
-  summary?: string;
-
-  @IsNumber(undefined, { message: "Thứ tự phải là một số" })
-  order?: number;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => LessonComponent)
-  components?: LessonComponent[];
-
-  @IsNotEmpty({ message: "Id danh mục không được để trống" })
-  @IsNumber(undefined, { message: "Id danh mục phải là một số" })
-  course_category_id: number;
+  @IsNumber(undefined, { message: "section_id phải là một số" })
+  section_id: number;
 }
 
 export class MarkLessonAsCompletedDto {

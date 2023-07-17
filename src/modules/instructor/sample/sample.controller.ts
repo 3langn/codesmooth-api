@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { CreateSampleDto } from "./sample.dto";
 import { SampleService } from "./sample.service";
+import { ResponseDefault } from "../../../common/dto/response_default";
 
-@Controller("admin/sample")
+@Controller("instructor/sample")
 export class SampleController {
   constructor(private sampleService: SampleService) {}
 
@@ -13,6 +14,6 @@ export class SampleController {
 
   @Get("/:language")
   async getSample(@Param("language") language: string) {
-    return await this.sampleService.getSample(language);
+    return new ResponseDefault("success", await this.sampleService.getSample(language));
   }
 }

@@ -104,6 +104,10 @@ export class ApiConfigService {
     };
   }
 
+  getPostgresConfig() {
+    return this.configService.get("typeorm");
+  }
+
   private get(key: string): string {
     const value = this.configService.get<string>(key);
 

@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { MoreThanOrEqual, Repository } from "typeorm";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
-import { SectionEntity } from "../../../entities/section";
+import { SectionEntity } from "../../../entities/section.entity";
 import { CreateSectionDto } from "./dto/dto";
 
 @Injectable()

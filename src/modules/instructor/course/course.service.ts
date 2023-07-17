@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, IsNull, Not, Repository } from "typeorm";
 import { ResponseDefault } from "../../../common/dto/response_default";
@@ -15,25 +15,42 @@ import { CourseStatus } from "../../../common/enum/course";
 import { InstructorGetCoursePageOptionsDto } from "./dto";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
+import { SectionService } from "../section/section.service";
 
 @Injectable()
 export class InstructorCourseService {
+  private logger = new Logger(InstructorCourseService.name);
+
   constructor(
     @InjectRepository(CourseEntity)
     private courseRepository: Repository<CourseEntity>,
     @InjectRepository(CategoryEntity)
     private categoryRepository: Repository<CategoryEntity>,
+    private sectionService: SectionService,
   ) {}
 
   async createCourse(data: SaveCourseDto, user_id: number) {
-    const categories = await this.categoryRepository.find({ where: { id: In(data.category_ids) } });
-    const course = this.courseRepository.create({
-      categories: categories,
-      owner_id: user_id,
-      base_price: data.price,
-      ...data,
-    });
-    await this.courseRepository.save(course);
+    try {
+      const categories = await this.categoryRepository.find({
+        where: { id: In(data.category_ids) },
+      });
+      const course = this.courseRepository.create({
+        categories: categories,
+        owner_id: user_id,
+        base_price: data.price,
+        ...data,
+      });
+      const c = await this.courseRepository.save(course);
+      await this.sectionService.createSection(
+        {
+          course_id: c.id,
+          order: 1,
+        },
+        user_id,
+      );
+    } catch (error) {
+      this.logger.error(error, error.stack);
+    }
   }
 
   async updateCourse(id: number, data: SaveCourseDto, user_id: number) {
@@ -128,18 +145,28 @@ export class InstructorCourseService {
         "owner.username",
         "owner.email",
         "owner.avatar",
+        "sections.id",
+        "sections.title",
+        "sections.order",
+        "sections.type",
+        "lessons.id",
+        "lessons.title",
+        "lessons.order",
+        "lessons.section_id",
         // "lessons.id",
         // "lessons.title",
         // "lessons.isCompleted",
       ])
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
+      .leftJoin("course.sections", "sections")
+      .leftJoin("sections.lessons", "lessons")
       // .leftJoin("category.lessons", "lessons")
       .where("course.id = :id", { id })
       .andWhere("course.owner_id = :user_id", { user_id })
       .andWhere("course.deleted_at IS NULL")
-      // .orderBy("category.order", "ASC")
-      // .addOrderBy("lessons.order", "ASC")
+      .orderBy("sections.order", "ASC")
+      .addOrderBy("lessons.order", "ASC")
       .getOne();
 
     if (!c) {
@@ -167,7 +194,7 @@ export class InstructorCourseService {
       });
     }
 
-    if (c.status !== CourseStatus.Draft) {
+    if (c.status !== CourseStatus.Draft && !c.published_course_id) {
       throw new CustomHttpException({
         message: "Course is not draft",
         code: StatusCodesList.BadRequest,
@@ -179,5 +206,9 @@ export class InstructorCourseService {
       await this.courseRepository.update({ id: c.published_course_id }, { draft_course_id: c.id });
     }
     await this.courseRepository.update(id, { status: CourseStatus.Reviewing, owner_id: user_id });
+  }
+
+  async isCourseOwner(course_id: number, user_id: number) {
+    return await this.courseRepository.findOne({ where: { id: course_id, owner_id: user_id } });
   }
 }

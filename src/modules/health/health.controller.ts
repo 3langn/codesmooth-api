@@ -17,6 +17,8 @@ export class HealthController {
   // every 5 minutes
   @Cron("0 */5 * * * *")
   cronHeathCheck() {
-    axios.get("https://codedrafts.onrender.com/api/health");
+    try {
+      axios.get("https://codedrafts.onrender.com/api/health");
+    } catch (error) {}
   }
 }

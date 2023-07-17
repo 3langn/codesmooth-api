@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
-import { SectionEntity } from "./section";
+import { SectionEntity } from "./section.entity";
 import { CourseStatus } from "../common/enum/course";
 import { UserEntity } from "./user.entity";
 import { CategoryEntity } from "./category.entity";
@@ -100,4 +100,9 @@ export class CourseEntity extends BaseEntity {
 
   @Column({ nullable: true })
   draft_course_id: number;
+
+  @OneToMany(() => SectionEntity, (section) => section.course, {
+    cascade: true,
+  })
+  sections: SectionEntity[];
 }

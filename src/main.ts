@@ -46,10 +46,17 @@ async function bootstrap() {
       whitelist: true,
       dismissDefaultMessages: true,
       exceptionFactory: (errors) => {
-        console.log(errors);
+        function getErrorMsg(errors) {
+          if (errors.constraints) {
+            return Object.keys(errors.constraints).map((key) => errors.constraints[key])[0];
+          } else if (errors.children && errors.children.length > 0) {
+            return getErrorMsg(errors.children[0]);
+          } else {
+            return "Validation failed";
+          }
+        }
 
-        const msg = Object.keys(errors[0].constraints).map((key) => errors[0].constraints[key])[0];
-
+        let msg = getErrorMsg(errors[0]);
         return new CustomHttpException({
           message: msg,
           code: StatusCodesList.ValidationError,

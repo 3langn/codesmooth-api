@@ -3,6 +3,7 @@ export enum LessonComponentType {
   SlateHTML = "SlateHTML",
   Code = "Code",
   Quiz = "Quiz",
+  Text = "Text",
   Project = "Project",
   Assessment = "Assessment",
 }

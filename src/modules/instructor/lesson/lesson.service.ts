@@ -2,34 +2,82 @@ import { HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, MoreThanOrEqual, Repository } from "typeorm";
 import { LessonEntity } from "../../../entities/lesson.entity";
-import { SaveLessonDto, UpdateLessonsOrder } from "./lesson.dto";
+import { AddLessonDto, SaveLessonDto, UpdateLessonsOrder } from "./lesson.dto";
 import { NotFoundException } from "src/common/exception/not-found.exception";
 import { ExceptionTitleList } from "src/common/constants/exception-title-list.constants";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
+import { SectionEntity } from "../../../entities/section.entity";
 @Injectable()
 export class LessonService {
   constructor(
     @InjectRepository(LessonEntity)
     private lessonRepository: Repository<LessonEntity>,
+    @InjectRepository(SectionEntity)
+    private sectionRepository: Repository<LessonEntity>,
   ) {}
 
-  async saveLesson(data: SaveLessonDto) {
+  async findOneLessonOrFail(lesson_id: number, user_id: number) {
+    const lessonExist = await this.lessonRepository.findOne({
+      where: { id: lesson_id, owner: { id: user_id } },
+      relations: ["section"],
+    });
+    if (!lessonExist) {
+      throw new CustomHttpException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Lesson ${lesson_id} not found`,
+        code: StatusCodesList.LessonNotFound,
+      });
+    }
+    return lessonExist;
+  }
+
+  async saveLesson(data: SaveLessonDto, user_id: number) {
+    await this.findOneLessonOrFail(data.id, user_id);
     await this.lessonRepository.save(data);
   }
 
-  async addLesson(data: SaveLessonDto) {
-    await this.lessonRepository.update(
+  async addLesson(data: AddLessonDto, user_id: number) {
+    await this.lessonRepository.increment(
       {
+        section: {
+          id: data.section_id,
+        },
+        owner: {
+          id: user_id,
+        },
         order: MoreThanOrEqual(data.order),
-        section_id: data.course_category_id,
       },
-      {
-        order: () => '"order" + 1',
-      },
+      "order",
+      1,
     );
+    const section = await this.sectionRepository.findOne({
+      where: { id: data.section_id, owner: { id: user_id } },
+      relations: ["course", "owner"],
+    });
+    if (!section) {
+      throw new CustomHttpException({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: `Section ${data.section_id} not found`,
+        code: StatusCodesList.NotFound,
+      });
+    }
+    const d = this.lessonRepository.create({
+      components: [],
+      title: "New Lesson",
+      order: data.order,
+      section: {
+        id: data.section_id,
+      },
+      course: {
+        id: section.course.id,
+      },
+      owner: {
+        id: section.owner.id,
+      },
+    });
 
-    const lesson = await this.lessonRepository.save(data);
+    const lesson = await this.lessonRepository.save(d);
     return lesson;
   }
 
@@ -88,18 +136,30 @@ export class LessonService {
     await this.lessonRepository.save(lesson2);
   }
 
-  async deleteLessonById(lesson_id: number) {
-    const lesson = await this.lessonRepository.findOneOrFail({
-      where: { id: lesson_id },
-    });
-    await this.lessonRepository.update(
+  async deleteLessonById(lesson_id: number, userId: number) {
+    const lesson = await this.findOneLessonOrFail(lesson_id, userId);
+    await this.lessonRepository.decrement(
       {
+        section: {
+          id: lesson.section.id,
+        },
+        owner: {
+          id: userId,
+        },
         order: MoreThanOrEqual(lesson.order),
       },
-      {
-        order: () => '"order" - 1',
-      },
+      "order",
+      1,
     );
     await this.lessonRepository.delete(lesson_id);
+  }
+
+  async getLessonsBySectionId(section_id: number, userId: number) {
+    const lessons = await this.lessonRepository.find({
+      select: ["id", "title", "order", "section_id"],
+      where: { section: { id: section_id }, owner: { id: userId } },
+      order: { order: "ASC" },
+    });
+    return lessons;
   }
 }

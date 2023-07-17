@@ -3,4 +3,5 @@ export enum CourseStatus {
   Published = "published",
   Reviewing = "reviewing",
   Rejected = "rejected",
+  // TODO: Status Draft Has PublishedCouse ?
 }
