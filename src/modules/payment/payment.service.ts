@@ -4,7 +4,7 @@ import * as moment from "moment";
 import { ApiConfigService } from "../../shared/services/api-config.service";
 import { TransactionStatus, TransactionType } from "../../common/enum/transaction";
 import { CourseService } from "../course/course.service";
-import { CreatePaymentUrlInput } from "./dto/payment.dto";
+import { CalculateRequestDto, CreatePaymentUrlInput } from "./dto/payment.dto";
 import { TransactionEntity } from "../../entities/transaction.entity";
 import axios from "axios";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
@@ -233,5 +233,30 @@ export class PaymentService {
     //         }, function (error, response, body){
     //             console.log(response);
     //         });
+  }
+
+  async calculate(body: CalculateRequestDto) {
+    const course = await this.courseService.getCourseById(body.course_id);
+    if (!course)
+      throw new CustomHttpException({
+        message: "Không tìm thấy khóa học",
+        code: StatusCodesList.NotFound,
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    let discount = 0;
+    // const price = course.price;
+    // const promotion = await this.courseService.getPromotionByCode(body.promotion_code);
+    // if (promotion) {
+    //   if (promotion.type === "percent") {
+    //     return price - (price * promotion.discount) / 100;
+    //   } else if (promotion.type === "amount") {
+    //     return price - promotion.discount;
+    //   }
+    // }
+    return {
+      price: course.price,
+      discount: discount,
+      total: course.price - discount,
+    };
   }
 }

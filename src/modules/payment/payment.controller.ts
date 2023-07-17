@@ -2,7 +2,7 @@ import { Body, Controller, Get, Headers, HttpStatus, Post, Req } from "@nestjs/c
 import { PaymentService } from "./payment.service";
 import { ResponseDefault } from "../../common/dto/response_default";
 import { Auth } from "../../decorators";
-import { CreatePaymentUrlInput } from "./dto/payment.dto";
+import { CalculateRequestDto, CreatePaymentUrlInput } from "./dto/payment.dto";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 
@@ -30,5 +30,11 @@ export class PaymentController {
     // }
 
     return await this.paymentService.vnpayIpn(req);
+  }
+
+  @Auth()
+  @Post("/calculate")
+  async calculate(@Body() body: CalculateRequestDto) {
+    return await this.paymentService.calculate(body);
   }
 }

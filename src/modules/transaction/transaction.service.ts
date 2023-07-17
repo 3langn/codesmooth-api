@@ -1,14 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { InjectConnection, InjectDataSource, InjectRepository } from "@nestjs/typeorm";
+import { HttpStatus, Injectable } from "@nestjs/common";
+import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
-import { IsEnum, IsNumber, IsString } from "class-validator";
 import { CreateTransactionInput } from "./dto/transaction.dto";
 import { TransactionEntity } from "../../entities/transaction.entity";
 import { CourseEntity } from "../../entities/course.entity";
 import { UserEntity } from "../../entities/user.entity";
 import { CourseService } from "../course/course.service";
 import { TransactionStatus } from "../../common/enum/transaction";
-import { CronJob } from "cron";
 import { Cron } from "@nestjs/schedule";
 
 @Injectable()
