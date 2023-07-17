@@ -1,6 +1,6 @@
 import { IsEnum, IsNumber, IsString } from "class-validator";
-import { PaymentMethod } from "../../../../common/enum/payment-method";
-import { TransactionStatus, TransactionType } from "../../../../common/enum/transaction";
+import { TransactionStatus, TransactionType } from "../../../common/enum/transaction";
+import { PaymentMethod } from "../../../common/enum/payment-method";
 
 export class CreateTransactionInput {
   id: string;

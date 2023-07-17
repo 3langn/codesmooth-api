@@ -2,9 +2,7 @@ import { HttpStatus, Injectable } from "@nestjs/common";
 import { sortObject } from "../../common/utils";
 import * as moment from "moment";
 import { ApiConfigService } from "../../shared/services/api-config.service";
-import { TransactionService } from "../admin/transaction/transaction.service";
 import { TransactionStatus, TransactionType } from "../../common/enum/transaction";
-import { CreateTransactionInput } from "../admin/transaction/dto/transaction.dto";
 import { CourseService } from "../course/course.service";
 import { CreatePaymentUrlInput } from "./dto/payment.dto";
 import { TransactionEntity } from "../../entities/transaction.entity";
@@ -12,6 +10,7 @@ import axios from "axios";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 import { generateTransactionId } from "../../common/generate-nanoid";
+import { TransactionService } from "../transaction/transaction.service";
 
 @Injectable()
 export class PaymentService {

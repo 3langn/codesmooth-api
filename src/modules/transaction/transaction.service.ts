@@ -1,14 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { TransactionEntity } from "../../../entities/transaction.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { TransactionStatus, TransactionType } from "../../../common/enum/transaction";
-import { Repository } from "typeorm";
-import { CourseEntity } from "../../../entities/course.entity";
-import { UserEntity } from "../../../entities/user.entity";
-import { PaymentMethod } from "../../../common/enum/payment-method";
+import { InjectConnection, InjectDataSource, InjectRepository } from "@nestjs/typeorm";
+import { DataSource, Repository } from "typeorm";
 import { IsEnum, IsNumber, IsString } from "class-validator";
 import { CreateTransactionInput } from "./dto/transaction.dto";
-import { CourseService } from "../../course/course.service";
+import { TransactionEntity } from "../../entities/transaction.entity";
+import { CourseEntity } from "../../entities/course.entity";
+import { UserEntity } from "../../entities/user.entity";
+import { CourseService } from "../course/course.service";
+import { TransactionStatus } from "../../common/enum/transaction";
+import { CronJob } from "cron";
+import { Cron } from "@nestjs/schedule";
 
 @Injectable()
 export class TransactionService {
@@ -20,6 +21,7 @@ export class TransactionService {
     private readonly courseService: CourseService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectDataSource() private datasource: DataSource,
   ) {}
 
   async createTransaction(data: CreateTransactionInput): Promise<TransactionEntity> {
@@ -47,10 +49,11 @@ export class TransactionService {
     if (!course.students) course.students = [];
     course.students.push(buyer);
     course.total_enrollment += 1;
+    return await this.datasource.transaction(async (manager) => {
+      await manager.save(course);
 
-    await this.courseRepository.save(course);
-
-    return this.transactionRepository.save(transaction);
+      return manager.save(transaction);
+    });
   }
 
   async transactionFail(
@@ -71,6 +74,24 @@ export class TransactionService {
   ): Promise<TransactionEntity> {
     return this.transactionRepository.findOne({
       where: { course_id: courseId, user_id: userId },
+    });
+  }
+
+  // CRON JOB per 1 minute
+  @Cron("0 */1 * * * *")
+  async transactionExpire() {
+    const transactions = await this.transactionRepository.find({
+      where: { status: TransactionStatus.PENDING },
+    });
+    const now = new Date();
+    transactions.forEach(async (transaction) => {
+      const created_at = new Date(transaction.created_at);
+      const diff = now.getTime() - created_at.getTime();
+      if (diff > 15 * 60 * 1000) {
+        transaction.status = TransactionStatus.EXPIRED;
+        transaction.failed_reason = "Quá thời gian thanh toán";
+        await this.transactionRepository.save(transaction);
+      }
     });
   }
 }

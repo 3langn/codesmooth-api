@@ -20,12 +20,12 @@ import { SettingModule } from "./modules/admin/setting/setting.module";
 import { JwtModule } from "@nestjs/jwt";
 import { MailerModule } from "./modules/mailer/mailer.module";
 import { PaymentModule } from "./modules/payment/payment.module";
-import { TransactionModule } from "./modules/admin/transaction/transaction.module";
 import { InstructorCategoryModule } from "./modules/category/category.module";
 import { CourseModule } from "./modules/course/course.module";
 import { AdminCourseModule } from "./modules/admin/course/course.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import typeorm from "./config/typeorm";
+import { TransactionModule } from "./modules/transaction/transaction.module";
 
 @Module({
   imports: [

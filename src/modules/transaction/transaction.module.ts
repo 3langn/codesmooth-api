@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
-import { TransactionEntity } from "../../../entities/transaction.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TransactionService } from "./transaction.service";
 import { TransactionController } from "./transaction.controller";
-import { CourseEntity } from "../../../entities/course.entity";
-import { UserEntity } from "../../../entities/user.entity";
-import { CourseModule } from "../../course/course.module";
+import { UserEntity } from "../../entities/user.entity";
+import { CourseEntity } from "../../entities/course.entity";
+import { TransactionEntity } from "../../entities/transaction.entity";
+import { CourseModule } from "../course/course.module";
 
 @Module({
   imports: [TypeOrmModule.forFeature([TransactionEntity, CourseEntity, UserEntity]), CourseModule],
