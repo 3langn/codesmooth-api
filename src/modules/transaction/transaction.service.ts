@@ -85,7 +85,7 @@ export class TransactionService {
     transactions.forEach(async (transaction) => {
       const created_at = new Date(transaction.created_at);
       const diff = now.getTime() - created_at.getTime();
-      if (diff > 15 * 60 * 1000) {
+      if (diff > 17 * 60 * 1000) {
         transaction.status = TransactionStatus.EXPIRED;
         transaction.failed_reason = "Quá thời gian thanh toán";
         await this.transactionRepository.save(transaction);

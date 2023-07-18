@@ -86,9 +86,10 @@ export class AdminCourseService {
         code: StatusCodesList.NotFound,
         statusCode: HttpStatus.NOT_FOUND,
       });
-
+    let p: CourseEntity;
+    // Case 1: Course has published course -> update published course then update status of draft course
     if (course.published_course_id) {
-      const p = await this.courseRepository.findOne({
+      p = await this.courseRepository.findOne({
         where: { id: course.published_course_id },
       });
 
@@ -114,24 +115,25 @@ export class AdminCourseService {
       p.published_at = new Date();
 
       await this.courseRepository.save(p);
-      return;
+    } else {
+      // Case 2: Course has not published course -> create new published course
+      const publishedCourse = {
+        ...course,
+        id: generateId(9),
+        status: CourseStatus.Published,
+        published_at: new Date(),
+      };
+
+      p = await this.courseRepository.save(publishedCourse);
     }
 
-    const publishedCourse = {
-      ...course,
-      id: generateId(9),
-      status: CourseStatus.Published,
-      published_at: new Date(),
-    };
-
-    const p = await this.courseRepository.save(publishedCourse);
     await this.courseRepository.update(
       {
         id,
       },
       {
         published_course_id: p.id,
-        status: CourseStatus.Draft,
+        status: CourseStatus.Published,
       },
     );
   }

@@ -20,9 +20,8 @@ async function bootstrap() {
   // initializeTransactionalContext();
   // patchTypeORMRepositoryWithBaseRepository();
   // all domains have vnpayment.vn as origin
-  const app = await NestFactory.create(AppModule, {
-    cors: true,
-  });
+  const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.use(helmet());
   app.setGlobalPrefix("/api");
 

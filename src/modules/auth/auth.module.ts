@@ -15,8 +15,6 @@ import { MailerModule } from "../mailer/mailer.module";
     PassportModule.register({ defaultStrategy: "jwt" }),
     MailerModule,
     JwtModule,
-
-    JwtModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, PublicStrategy],

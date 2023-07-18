@@ -54,6 +54,7 @@ export class InstructorCourseController {
       }),
     );
   }
+
   @Auth()
   @Get("/count-course")
   async countCourse(@Req() req: any) {
