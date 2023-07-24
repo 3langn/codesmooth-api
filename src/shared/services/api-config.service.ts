@@ -8,6 +8,10 @@ import { EjsAdapter } from "@nestjs-modules/mailer/dist/adapters/ejs.adapter";
 export class ApiConfigService {
   constructor(private configService: ConfigService) {}
 
+  get host(): string {
+    return this.getString("HOST");
+  }
+
   get isDevelopment(): boolean {
     return this.nodeEnv === "development";
   }
@@ -40,7 +44,7 @@ export class ApiConfigService {
     }
   }
 
-  private getString(key: string): string {
+  getString(key: string): string {
     const value = this.get(key);
 
     return value;

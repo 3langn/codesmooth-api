@@ -1,8 +1,10 @@
 import { Controller, Get, Logger } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import axios from "axios";
+import { ApiConfigService } from "../../shared/services/api-config.service";
 @Controller("/health")
 export class HealthController {
+  constructor(private configService: ApiConfigService) {}
   private logger = new Logger(HealthController.name);
   @Get()
   getHello() {
@@ -18,7 +20,7 @@ export class HealthController {
   @Cron("0 */5 * * * *")
   cronHeathCheck() {
     try {
-      axios.get("https://codedrafts.onrender.com/api/health");
+      axios.get(this.configService.host + "/api/health");
     } catch (error) {}
   }
 }
