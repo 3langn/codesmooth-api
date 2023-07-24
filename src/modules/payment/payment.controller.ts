@@ -32,9 +32,52 @@ export class PaymentController {
     return await this.paymentService.vnpayIpn(req);
   }
 
-  @Auth()
+  // @Auth()
   @Post("/calculate")
   async calculate(@Body() body: CalculateRequestDto) {
     return await this.paymentService.calculate(body);
+  }
+
+  // @Auth()
+  @Post("/calculate-number-larger-than-10")
+  async calculateNumberLargerThan10(@Body() body: { number: number }) {
+    const n = body.number;
+
+    if (n < 10) {
+      return {
+        message: "number is smaller than 10",
+      };
+    }
+
+    if (n === 10) {
+      return {
+        message: "number is equal 10",
+      };
+    }
+
+    return {
+      message: "number is larger than 10",
+    };
+  }
+
+  @Post("/incorrect-calculate-number-larger-than-10")
+  async incorrectCalculateNumberLargerThan10(@Body() body: { number: number }) {
+    const n = body.number;
+
+    if (n > 10) {
+      return {
+        message: "number is smaller than 10",
+      };
+    }
+
+    if (n === 10) {
+      return {
+        message: "number is equal 10",
+      };
+    }
+
+    return {
+      message: "number is larger than 10",
+    };
   }
 }
