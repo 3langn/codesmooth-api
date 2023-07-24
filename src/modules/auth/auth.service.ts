@@ -65,16 +65,23 @@ export class AuthService {
   async register(userRegisterDto: UserRegisterDto): Promise<UserEntity> {
     const user = await this.userService.createUser(userRegisterDto);
 
-    this.mailerService.sendMail({
-      template_id: TemplateId.EMAIL_VERIFICATION,
-      data: {
-        content: {
-          token: this.jwtService.generateVerifyEmailToken(user.id),
+    this.mailerService
+      .sendMail({
+        template_id: TemplateId.EMAIL_VERIFICATION,
+        data: {
+          content: {
+            token: this.jwtService.generateVerifyEmailToken(user.id),
+          },
+          subject: "Xác minh email đăng ký tài khoản",
+          to: userRegisterDto.email,
         },
-        subject: "Xác minh email đăng ký tài khoản",
-        to: userRegisterDto.email,
-      },
-    });
+      })
+      .then(() => {
+        this.logger.log("Send email verification successfully");
+      })
+      .catch((error) => {
+        this.logger.error(error);
+      });
 
     return user;
   }

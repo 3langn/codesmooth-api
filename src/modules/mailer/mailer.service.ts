@@ -1,18 +1,22 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { MailerService as NestMailer } from "@nestjs-modules/mailer";
 import { EmailMessageDto } from "./dtos/email.dto";
+import { ApiConfigService } from "../../shared/services/api-config.service";
 
 @Injectable()
 export class MailerService {
   private readonly logger = new Logger(MailerService.name);
 
-  constructor(private readonly nestMailerService: NestMailer) {}
+  constructor(
+    private readonly nestMailerService: NestMailer,
+    private readonly configService: ApiConfigService,
+  ) {}
 
   public async sendMail(data: EmailMessageDto) {
     try {
       await this.nestMailerService.sendMail({
         to: data.data.to,
-        from: "example@gmail.com",
+        from: "noreply@codedrafts.com",
         subject: data.data.subject,
         template: data.template_id,
         context: data.data.content,
