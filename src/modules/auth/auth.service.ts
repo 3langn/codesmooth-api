@@ -36,11 +36,12 @@ export class AuthService {
   // }
 
   async login(userLoginDto: UserLoginDto): Promise<UserEntity> {
-    const role = userLoginDto.requestFrom === Platform.CMS ? UserRole.ADMINSTRATOR : UserRole.USER;
     try {
       const user = await this.userService.findOne({
         email: userLoginDto.email,
-        role,
+        settings: {
+          isEmailVerified: true,
+        },
       });
 
       if (!user) {
@@ -57,7 +58,7 @@ export class AuthService {
       throw new CustomHttpException({
         statusCode: HttpStatus.UNAUTHORIZED,
         code: StatusCodesList.EmailOrPasswordIncorrect,
-        message: error.message,
+        message: "Tài khoản hoặc mật khẩu không đúng",
       });
     }
   }
