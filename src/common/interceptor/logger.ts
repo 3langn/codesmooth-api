@@ -38,8 +38,10 @@ export class HTTPLogger implements NestInterceptor {
           const duration = Date.now() - start;
           const contentLength = response.get("content-length");
 
-          if (exculdedPaths.includes(originalUrl)) {
-            return;
+          for (const path of exculdedPaths) {
+            if ((originalUrl as string).includes(path)) {
+              return;
+            }
           }
 
           log(
