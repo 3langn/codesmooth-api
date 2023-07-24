@@ -26,6 +26,8 @@ import { AdminCourseModule } from "./modules/admin/course/course.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import typeorm from "./config/typeorm";
 import { TransactionModule } from "./modules/transaction/transaction.module";
+import { PrometheusModule } from "@willsoto/nestjs-prometheus";
+import { PromModule } from "./modules/prometheus/prometheus.module";
 
 @Module({
   imports: [
@@ -53,6 +55,7 @@ import { TransactionModule } from "./modules/transaction/transaction.module";
 
     WinstonModule.forRoot(winstonConfig),
     ScheduleModule.forRoot(),
+    PromModule,
     ExcuteModule,
     LessonModule,
     InstructorCourseModule,

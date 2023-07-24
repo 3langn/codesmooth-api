@@ -18,9 +18,9 @@ export class HealthController {
 
   // every 5 minutes
   @Cron("0 */5 * * * *")
-  cronHeathCheck() {
+  async cronHeathCheck() {
     try {
-      axios.get(this.configService.host + "/api/health");
+      await axios.get(this.configService.host + "/api/health");
     } catch (error) {}
   }
 }
