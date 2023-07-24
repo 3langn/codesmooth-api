@@ -1,12 +1,17 @@
 metrics:
   global:
-    scrape_interval: 60s
+    scrape_interval: 15s
   configs:
     - name: hosted-prometheus
       scrape_configs:
         - job_name: node
           static_configs:
             - targets: ["localhost:8080"]
+          metrics_path: "/api/metrics"
+
+        - job_name: promotheus
+          static_configs:
+            - targets: ["localhost:9090"]
       remote_write:
         - url: https://prometheus-prod-37-prod-ap-southeast-1.grafana.net/api/prom/push
           basic_auth:

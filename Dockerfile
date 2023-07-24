@@ -23,7 +23,10 @@ RUN curl -O -L "https://github.com/grafana/agent/releases/latest/download/grafan
 
 WORKDIR /app
 COPY package*.json ./
+COPY agent-config.yaml ./
+COPY start.sh /usr/local/bin/
 
+RUN chmod +x /usr/local/bin/start.sh
 
 RUN npm i
 
@@ -33,4 +36,4 @@ RUN npm run build
 
 EXPOSE 80
 
-CMD ["npm", "start", "&&", "./grafana-agent-linux-amd64", "--config.file=agent-config.yaml"]
+CMD ["/usr/local/bin/start.sh"]
