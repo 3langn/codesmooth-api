@@ -1,20 +1,7 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  Logger,
-  NestInterceptor,
-} from "@nestjs/common";
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from "@nestjs/common";
 import { stringify } from "querystring";
 import { throwError } from "rxjs";
-import {
-  tap,
-  catchError,
-  mergeMap,
-  finalize,
-  map,
-  combineLatestAll,
-} from "rxjs/operators";
+import { tap, catchError, mergeMap, finalize, map, combineLatestAll } from "rxjs/operators";
 
 @Injectable()
 export class HTTPLogger implements NestInterceptor {
@@ -28,17 +15,19 @@ export class HTTPLogger implements NestInterceptor {
     const { originalUrl, method, ip } = request;
 
     const userAgent = request.get("user-agent") || "";
+
+    const exculdedPaths = ["/health", "/metrics", "/favicon.ico"];
     let d;
     return next.handle().pipe(
-      catchError(err => {
-        log = data => this.logger.error(data, err.stack);
+      catchError((err) => {
+        log = (data) => this.logger.error(data, err.stack);
         d = err.response;
         return throwError(() => {
           return err;
         });
       }),
       tap((data: any) => {
-        log = data => this.logger.log(data);
+        log = (data) => this.logger.log(data);
         d = data;
         return data;
       }),
@@ -48,6 +37,11 @@ export class HTTPLogger implements NestInterceptor {
           const { statusCode } = response;
           const duration = Date.now() - start;
           // const contentLength = response.get("content-length");
+
+          if (exculdedPaths.includes(originalUrl)) {
+            return;
+          }
+
           log(
             `Request: {${method} ${originalUrl} ${statusCode} - ${userAgent} ${ip} Response: { ${JSON.stringify(
               d,
