@@ -8,9 +8,14 @@ import { JwtStrategy } from "./jwt.strategy";
 import { PublicStrategy } from "./public.strategy";
 import { JwtModule } from "../jwt/jwt.module";
 import { MailerModule } from "../mailer/mailer.module";
+import { UserSettingsEntity } from "../../entities/user-settings.entity";
+import { UserEntity } from "../../entities/user.entity";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { TokenEntity } from "../../entities/token.entity";
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([UserEntity, UserSettingsEntity, TokenEntity]),
     forwardRef(() => UserModule),
     PassportModule.register({ defaultStrategy: "jwt" }),
     MailerModule,

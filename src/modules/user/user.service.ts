@@ -66,11 +66,10 @@ export class UserService {
     userRegisterDto: UserRegisterDto,
     // file?: IFile,
   ): Promise<UserEntity> {
-    // TODO: check verify email
     const findUser = await this.userRepository.findOne({
       where: {
         email: userRegisterDto.email,
-        role: UserRole.ADMINSTRATOR,
+        role: UserRole.USER,
       },
       relations: ["settings"],
     });

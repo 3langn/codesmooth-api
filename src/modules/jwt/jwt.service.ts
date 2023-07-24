@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ApiConfigService } from "../../shared/services/api-config.service";
 import { JwtService as NestJwtService } from "@nestjs/jwt";
-import { TokenPayloadDto } from "./dtos/TokenPayloadDto";
+import { PayloadDto, TokenPayloadDto } from "./dtos/TokenPayloadDto";
 import { UserEntity } from "../../entities/user.entity";
 import { TokenType } from "../../common/constants/token-type";
 
@@ -44,11 +44,27 @@ export class JwtService {
     return this.generateToken(user_id, TokenType.VERIFY_EMAIL_TOKEN, 3600);
   }
 
+  generateResetPasswordToken(user_id: number) {
+    return this.generateToken(user_id, TokenType.RESET_PASSWORD_TOKEN, 3600);
+  }
+
   generateToken(user_id: number, type: TokenType, expiresIn: number | string) {
     const payload = { sub: user_id, type };
     return this.nestJwtService.sign(payload, {
       expiresIn: expiresIn,
       secret: this.configService.authConfig.jwtSecret,
     });
+  }
+
+  verifyToken(token: string, type: TokenType = TokenType.ACCESS_TOKEN) {
+    const payload = this.nestJwtService.verify<PayloadDto>(token, {
+      secret: this.configService.authConfig.jwtSecret,
+    });
+
+    if (payload.type !== type) {
+      throw new Error("Invalid token");
+    }
+
+    return payload;
   }
 }

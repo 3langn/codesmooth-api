@@ -29,7 +29,7 @@ export class UserEntity extends BaseEntity {
   status: string;
 
   // TODO: Next use rbac
-  @Column({ enum: UserRole, default: UserRole.ADMINSTRATOR })
+  @Column({ enum: UserRole, default: UserRole.USER })
   role: UserRole;
 
   @VirtualColumn()

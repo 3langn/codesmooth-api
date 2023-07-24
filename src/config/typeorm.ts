@@ -22,7 +22,8 @@ const config = {
   database: process.env.DB_NAME,
   // migrationsRun: true,
   migrations: migrations,
-  logging: process.env.ENABLE_ORM_LOGS,
+  logging: process.env.ENABLE_ORM_LOGS === "true",
 };
+
 export default registerAs("typeorm", () => config);
 export const connectionSource = new DataSource(config as DataSourceOptions);

@@ -143,6 +143,10 @@ export class ApiConfigService {
     };
   }
 
+  get frontendUrl() {
+    return this.getString("FRONTEND_URL");
+  }
+
   get VnpayConfig() {
     return {
       vnp_TmnCode: this.getString("VNP_TMN_CODE"),

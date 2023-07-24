@@ -27,4 +27,6 @@ export const StatusCodesList = {
   SettingAlreadyExists: 1026,
   Conflict: 1027,
   EmailIsNotVerified: 1028,
+  UserNotFound: 1029,
+  TokenNotFound: 1030,
 } as const;
