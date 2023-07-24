@@ -10,7 +10,7 @@ import { SettingEntity } from "../../../entities/setting.entity";
 import { generateId } from "../../../common/generate-nanoid";
 
 @Injectable()
-export class SettingService {
+export class AdminSettingsService {
   constructor(
     @InjectRepository(SettingEntity)
     private settingRepository: Repository<SettingEntity>,

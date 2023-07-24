@@ -16,7 +16,8 @@ export class SaveSettingDto {
   @IsString()
   title: string;
 
-  value: any;
+  @IsNotEmpty()
+  values: any;
 }
 
 export class UpdateCategoryDto {

@@ -16,7 +16,7 @@ import { UploadModule } from "./modules/upload/upload.module";
 import { LessonModule } from "./modules/instructor/lesson/lesson.module";
 import { CategoryModule } from "./modules/admin/category/category.module";
 import { SectionModule } from "./modules/admin/section/section.module";
-import { SettingModule } from "./modules/admin/setting/setting.module";
+import { AdminSettingsModule } from "./modules/admin/setting/setting.module";
 import { JwtModule } from "@nestjs/jwt";
 import { MailerModule } from "./modules/mailer/mailer.module";
 import { PaymentModule } from "./modules/payment/payment.module";
@@ -28,6 +28,7 @@ import typeorm from "./config/typeorm";
 import { TransactionModule } from "./modules/transaction/transaction.module";
 import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { PromModule } from "./modules/prometheus/prometheus.module";
+import { SettingsModule } from "./modules/settings/settings.module";
 
 @Module({
   imports: [
@@ -66,7 +67,8 @@ import { PromModule } from "./modules/prometheus/prometheus.module";
     HealthModule,
     UploadModule,
     CategoryModule,
-    SettingModule,
+    AdminSettingsModule,
+    SettingsModule,
     JwtModule,
     PaymentModule,
     MailerModule,

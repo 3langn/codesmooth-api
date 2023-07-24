@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { SaveSettingDto, UpdateCategoryDto } from "./setting.dto";
-import { SettingService } from "./setting.service";
+import { AdminSettingsService } from "./setting.service";
 import { Auth } from "../../../decorators";
 import { UserRole } from "../../../common/enum/user-role";
 import { ResponseDefault } from "../../../common/dto/response_default";
 
 @Controller("admin/setting")
-export class SettingController {
-  constructor(private settingService: SettingService) {}
+export class AdminSettingsController {
+  constructor(private settingService: AdminSettingsService) {}
 
   // @Auth([UserRole.ADMINSTRATOR])
   @Post("/")

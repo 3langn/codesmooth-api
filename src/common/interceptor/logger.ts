@@ -36,16 +36,18 @@ export class HTTPLogger implements NestInterceptor {
         response.on("finish", () => {
           const { statusCode } = response;
           const duration = Date.now() - start;
-          // const contentLength = response.get("content-length");
+          const contentLength = response.get("content-length");
 
           if (exculdedPaths.includes(originalUrl)) {
             return;
           }
 
           log(
-            `Request: {${method} ${originalUrl} ${statusCode} - ${userAgent} ${ip} Response: { ${JSON.stringify(
+            `Request: {${method} ${originalUrl} ${statusCode} - ${JSON.stringify(
+              request.body,
+            )} - ${userAgent} ${ip} Response: { ${JSON.stringify(
               d,
-            )} ${duration}ms }`,
+            )} - ${contentLength} - ${duration}ms }`,
           );
         });
       }),
