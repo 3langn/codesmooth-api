@@ -9,6 +9,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt update -y  \
  && apt install -y sudo
 
+RUN apt  install unzip
 RUN apt install -y curl
 RUN curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - 
 
