@@ -133,9 +133,6 @@ export class ApiConfigService {
           pass: this.getString("EMAIL_PASSWORD"), // generated ethereal password
         },
       },
-      defaults: {
-        from: '"nest-modules" <user@outlook.com>', // outgoing email ID
-      },
       template: {
         dir: `${process.cwd()}/templates`,
         adapter: new EjsAdapter(),

@@ -75,6 +75,7 @@ export class AuthService {
           },
           subject: "Xác minh email đăng ký tài khoản",
           to: userRegisterDto.email,
+          from: "noreply@codedrafts.com",
         },
       })
       .then(() => {

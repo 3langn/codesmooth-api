@@ -16,7 +16,7 @@ export class MailerService {
     try {
       await this.nestMailerService.sendMail({
         to: data.data.to,
-        from: "noreply@codedrafts.com",
+        from: "CodeDrafts" + "<" + this.configService.mailerConfig.transport.auth.user + ">",
         subject: data.data.subject,
         template: data.template_id,
         context: data.data.content,

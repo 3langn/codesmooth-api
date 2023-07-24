@@ -34,6 +34,8 @@ export class VerifyEmailMessage {
 }
 
 export class EmailDataDto {
+  from: string;
+
   to: string;
 
   subject: string;
