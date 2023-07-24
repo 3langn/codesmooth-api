@@ -20,5 +20,5 @@ export class SettingEntity extends BaseEntity {
   title: string;
 
   @Column({ nullable: false, type: "jsonb" })
-  value: any | SettingValue;
+  values: any | SettingValue;
 }
