@@ -32,8 +32,6 @@ async function bootstrap() {
     }),
   );
 
-  // app.useGlobalPipes(new ValidationPipe());
-
   app.use(compression());
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)), new HTTPLogger());

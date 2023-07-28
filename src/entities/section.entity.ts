@@ -8,8 +8,12 @@ import { UserEntity } from "./user.entity";
 @Unique("UQ_SECTION_ORDER", ["order", "course_id"])
 @Entity("sections")
 export class SectionEntity extends BaseEntity {
+  @Column()
+  owner_id: number;
+
   @ManyToOne(() => UserEntity, {
     cascade: true,
+    nullable: false,
   })
   @JoinColumn({ name: "owner_id" })
   owner: UserEntity;

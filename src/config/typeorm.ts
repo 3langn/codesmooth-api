@@ -23,6 +23,7 @@ const config = {
   // migrationsRun: true,
   migrations: migrations,
   logging: process.env.ENABLE_ORM_LOGS === "true",
+  maxQueryExecutionTime: 1000,
 };
 
 export default registerAs("typeorm", () => config);

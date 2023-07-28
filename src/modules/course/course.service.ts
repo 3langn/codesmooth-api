@@ -79,17 +79,25 @@ export class CourseService {
         "owner.username",
         "owner.email",
         "owner.avatar",
-        // "lessons.id",
-        // "lessons.title",
-        // "lessons.isCompleted",
+        "sections.id",
+        "sections.title",
+        "sections.order",
+        "sections.type",
+        "lessons.id",
+        "lessons.title",
+        "lessons.order",
+        "lessons.section_id",
       ])
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
+      .leftJoin("course.sections", "sections")
+      .leftJoin("sections.lessons", "lessons")
       .where("course.status = :status", { status: CourseStatus.Published })
-      // .leftJoin("category.lessons", "lessons")
       .andWhere("course.id = :id", { id })
       .andWhere("course.published_at IS NOT NULL")
       .andWhere("course.deleted_at IS NULL")
+      .orderBy("sections.order", "ASC")
+      .addOrderBy("lessons.order", "ASC")
       .getOne();
     // .orderBy("category.order", "ASC")
     // .addOrderBy("lessons.order", "ASC")

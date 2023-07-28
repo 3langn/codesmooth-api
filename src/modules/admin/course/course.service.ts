@@ -9,6 +9,8 @@ import { queryPagination } from "../../../common/utils";
 import { generateId } from "../../../common/generate-nanoid";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
+import { SectionEntity } from "../../../entities/section.entity";
+import { LessonEntity } from "../../../entities/lesson.entity";
 
 @Injectable()
 export class AdminCourseService {
@@ -17,6 +19,10 @@ export class AdminCourseService {
     private courseRepository: Repository<CourseEntity>,
     @InjectRepository(CategoryEntity)
     private categoryRepository: Repository<CategoryEntity>,
+    @InjectRepository(SectionEntity)
+    private sectionRepository: Repository<SectionEntity>,
+    @InjectRepository(LessonEntity)
+    private lessonRepository: Repository<LessonEntity>,
   ) {}
 
   async getCourses(pageOptionsDto: ListCourseQueryDto): Promise<[CourseEntity[], number]> {
@@ -77,7 +83,7 @@ export class AdminCourseService {
   async publishCourse(id: number) {
     const course = await this.courseRepository.findOne({
       where: { id },
-      relations: ["owner"],
+      relations: ["owner", "sections", "sections.lessons"],
     });
 
     if (!course)
@@ -113,6 +119,30 @@ export class AdminCourseService {
       p.objectives = course.objectives;
       p.short_description = course.short_description;
       p.published_at = new Date();
+      p.owner = course.owner;
+
+      const newCourseSections = course.sections.map(async (section) => {
+        const newSection = { ...section };
+        delete newSection.id;
+        newSection.course_id = p.id;
+        newSection.owner_id = p.owner_id;
+
+        const listLesson = section.lessons.map((lesson) => {
+          const newLesson = { ...lesson };
+          delete newLesson.id;
+          newLesson.section_id = newSection.id;
+          newLesson.owner_id = p.owner_id;
+          return this.lessonRepository.create(newLesson);
+        });
+
+        newSection.lessons = await this.lessonRepository.save(listLesson);
+
+        return this.sectionRepository.create(newSection);
+      });
+
+      const s = await this.sectionRepository.save(await Promise.all(newCourseSections));
+
+      p.sections = s;
 
       await this.courseRepository.save(p);
     } else {

@@ -161,7 +161,6 @@ export class InstructorCourseService {
       .leftJoin("course.owner", "owner")
       .leftJoin("course.sections", "sections")
       .leftJoin("sections.lessons", "lessons")
-      // .leftJoin("category.lessons", "lessons")
       .where("course.id = :id", { id })
       .andWhere("course.owner_id = :user_id", { user_id })
       .andWhere("course.deleted_at IS NULL")
