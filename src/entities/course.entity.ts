@@ -4,6 +4,7 @@ import { SectionEntity } from "./section.entity";
 import { CourseStatus } from "../common/enum/course";
 import { UserEntity } from "./user.entity";
 import { CategoryEntity } from "./category.entity";
+import { LessonEntity } from "./lesson.entity";
 
 @Entity("courses")
 export class CourseEntity extends BaseEntity {
@@ -105,4 +106,9 @@ export class CourseEntity extends BaseEntity {
     cascade: true,
   })
   sections: SectionEntity[];
+
+  @OneToMany(() => LessonEntity, (lesson) => lesson.course, {
+    cascade: true,
+  })
+  lessons: LessonEntity[];
 }

@@ -2,6 +2,7 @@ import {
   BeforeInsert,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -16,9 +17,6 @@ export class BaseEntity {
 
   @UpdateDateColumn()
   updated_at: Date;
-
-  @Column({ nullable: true })
-  deleted_at: Date;
 
   @BeforeInsert()
   generateId() {

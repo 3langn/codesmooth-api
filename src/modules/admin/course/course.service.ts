@@ -124,8 +124,6 @@ export class AdminCourseService {
       const newCourseSections = course.sections.map(async (section) => {
         const newSection = { ...section };
         delete newSection.id;
-        newSection.course_id = p.id;
-        newSection.owner_id = p.owner_id;
 
         const listLesson = section.lessons.map((lesson) => {
           const newLesson = { ...lesson };
@@ -137,7 +135,11 @@ export class AdminCourseService {
 
         newSection.lessons = await this.lessonRepository.save(listLesson);
 
-        return this.sectionRepository.create(newSection);
+        return this.sectionRepository.create({
+          ...newSection,
+          course_id: p.id,
+          owner_id: p.owner_id,
+        });
       });
 
       const s = await this.sectionRepository.save(await Promise.all(newCourseSections));

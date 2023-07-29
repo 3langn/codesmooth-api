@@ -180,7 +180,7 @@ export class InstructorCourseService {
   }
 
   async deleteCourseById(id: number, user_id: number) {
-    await this.courseRepository.softDelete({ id, owner_id: user_id });
+    await this.courseRepository.delete({ id, owner_id: user_id });
   }
 
   async submitCourseForReview(id: number, user_id: number) {
