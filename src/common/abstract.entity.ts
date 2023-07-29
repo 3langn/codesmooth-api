@@ -18,6 +18,9 @@ export class BaseEntity {
   @UpdateDateColumn()
   updated_at: Date;
 
+  @DeleteDateColumn({ nullable: true })
+  deleted_at: Date;
+
   @BeforeInsert()
   generateId() {
     this.id = utils.generateId(9);

@@ -1,23 +1,45 @@
-import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsString, Validate } from "class-validator";
+import { GreaterThanOrEqual } from "../../../../decorators/validates/GreaterThanOrEqual";
 
 export class SaveCourseDto {
-  // @IsNumber({ maxDecimalPlaces: 18 }, { message: "Id must be a number" })
-  // id: number;
-
-  @IsString({ message: "Name must be a string" })
-  @IsNotEmpty({ message: "Name must not be empty" })
+  @IsString({ message: "name phải là string" })
+  @IsNotEmpty({ message: "name không được để trống" })
   name: string;
 
-  @IsNotEmpty({ message: "Description must not be empty" })
-  @IsString({ message: "Description must be a string" })
+  @IsNotEmpty({ message: "description không được để trống" })
+  @IsString({ message: "description phải là string" })
   description: string;
 
-  @IsString({ message: "Short description must be a string" })
-  @IsNotEmpty({ message: "Short description must not be empty" })
+  @IsString({ message: "short_description phải là string" })
+  @IsNotEmpty({ message: "short_description không được để trống" })
   short_description: string;
 
-  @IsNumber()
+  @IsNumber(
+    {
+      maxDecimalPlaces: 18,
+      allowNaN: false,
+      allowInfinity: false,
+    },
+    {
+      message: "price phải là number",
+    },
+  )
   price: number;
+
+  @IsNumber(
+    {
+      maxDecimalPlaces: 18,
+      allowNaN: false,
+      allowInfinity: false,
+    },
+    {
+      message: "base_price phải là number",
+    },
+  )
+  @Validate(GreaterThanOrEqual, ["price"], {
+    message: "base_price phải lớn hơn hoặc bằng price",
+  })
+  base_price: number;
 
   // @IsArray({ message: "Will learn must be an array" })
   // will_learns: string[];
@@ -25,21 +47,21 @@ export class SaveCourseDto {
   // @IsArray({ message: "Skills must be an array" })
   // skills: string[];
 
-  @IsArray({ message: "Category id must be an array" })
+  @IsArray({ message: "category_ids phải là array" })
   category_ids: number[];
 
-  @IsArray({ message: "objectives must be an array" })
+  @IsArray({ message: "objectives phải là array" })
   objectives: string[];
 
-  @IsString({ message: "Target audience must be a string" })
+  @IsString({ message: "target_audience phải là string" })
   target_audience: string;
 
-  @IsArray({ message: "Requirements must be an array" })
+  @IsArray({ message: "requirements phải là array" })
   requirements: string[];
 
-  @IsString({ message: "Feedback Email must be a string" })
+  @IsString({ message: "feedback_email phải là string" })
   feedback_email: string;
 
-  @IsString({ message: "Thumbnail must be a string" })
+  @IsString({ message: "thumbnail phải là string" })
   thumbnail: string;
 }

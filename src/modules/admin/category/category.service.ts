@@ -43,17 +43,15 @@ export class CategoryService {
   }
 
   async updateCategory(id: number, data: UpdateCategoryDto) {
-    const c = await this.categoryRepository.findOne({ where: { id } });
-    if (!c) {
-      throw new CustomHttpException({
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: "Category not found",
-        code: StatusCodesList.CategoryNotFound,
-      });
-    }
-    return await this.categoryRepository.save({
-      ...c,
-      ...data,
-    });
+    return await this.categoryRepository.update(
+      {
+        id,
+      },
+      data,
+    );
+  }
+
+  async deleteCategory(id: number) {
+    return await this.categoryRepository.softDelete({ id });
   }
 }

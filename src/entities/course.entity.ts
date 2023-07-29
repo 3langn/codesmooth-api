@@ -5,6 +5,13 @@ import { CourseStatus } from "../common/enum/course";
 import { UserEntity } from "./user.entity";
 import { CategoryEntity } from "./category.entity";
 import { LessonEntity } from "./lesson.entity";
+class RejectedReason {
+  reason: string;
+
+  rejected_at: Date;
+
+  rejected_by: string;
+}
 
 @Entity("courses")
 export class CourseEntity extends BaseEntity {
@@ -111,4 +118,7 @@ export class CourseEntity extends BaseEntity {
     cascade: true,
   })
   lessons: LessonEntity[];
+
+  @Column({ nullable: true, type: "jsonb" })
+  rejected_reason: RejectedReason;
 }

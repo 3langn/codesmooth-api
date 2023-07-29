@@ -37,7 +37,6 @@ export class InstructorCourseService {
       const course = this.courseRepository.create({
         categories: categories,
         owner_id: user_id,
-        base_price: data.price,
         ...data,
       });
       const c = await this.courseRepository.save(course);
@@ -103,33 +102,46 @@ export class InstructorCourseService {
     }
 
     if (pageOptionsDto.status) {
-      qb.andWhere("course.status = :status", { status: pageOptionsDto.status });
+      if (pageOptionsDto.status === CourseStatus.Published) {
+        qb.andWhere("course.published_course_id IS NOT NULL");
+      } else {
+        qb.andWhere("course.status = :status", { status: pageOptionsDto.status });
+      }
     }
-
-    qb.andWhere("course.deleted_at IS NULL");
 
     return await queryPagination({ query: qb, o: pageOptionsDto });
   }
 
   async countCourse(user_id: number) {
-    const [allCount, publishedCount, reviewingCount, rejectedCount] = await Promise.all([
-      this.courseRepository.count({
-        where: { owner_id: user_id, published_at: IsNull() },
-      }),
-      // this.courseRepository.count({ where: { status: CourseStatus.Draft, owner_id: user_id } }),
-      this.courseRepository.count({
-        where: { status: CourseStatus.Published, owner_id: user_id, published_at: IsNull() },
-      }),
-      this.courseRepository.count({ where: { status: CourseStatus.Reviewing, owner_id: user_id } }),
-      this.courseRepository.count({ where: { status: CourseStatus.Rejected, owner_id: user_id } }),
-    ]);
+    const [allCount, publishedCount, reviewingCount, rejectedCount, draftCount] = await Promise.all(
+      [
+        this.courseRepository.count({
+          where: { owner_id: user_id, status: CourseStatus.Published },
+        }),
+        this.courseRepository.count({
+          where: { status: CourseStatus.Published, owner_id: user_id },
+        }),
+        this.courseRepository.count({
+          where: { status: CourseStatus.Reviewing, owner_id: user_id },
+        }),
+        this.courseRepository.count({
+          where: { status: CourseStatus.Rejected, owner_id: user_id },
+        }),
+        this.courseRepository.count({
+          where: {
+            status: In([CourseStatus.Draft, CourseStatus.DraftHasPublishedCouse]),
+            owner_id: user_id,
+          },
+        }),
+      ],
+    );
 
     return {
       all: allCount,
       [CourseStatus.Published]: publishedCount,
       [CourseStatus.Reviewing]: reviewingCount,
       [CourseStatus.Rejected]: rejectedCount,
-      [CourseStatus.Draft]: allCount - publishedCount - reviewingCount - rejectedCount,
+      [CourseStatus.Draft]: draftCount,
     };
   }
 
@@ -180,6 +192,22 @@ export class InstructorCourseService {
   }
 
   async deleteCourseById(id: number, user_id: number) {
+    const course = await this.courseRepository.findOne({ where: { id, owner_id: user_id } });
+    if (!course) {
+      throw new CustomHttpException({
+        message: "Course not found",
+        code: StatusCodesList.NotFound,
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
+
+    if (course.published_course_id) {
+      throw new CustomHttpException({
+        message: "Không thể xóa khóa học đã được phát hành",
+        code: StatusCodesList.BadRequest,
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
     await this.courseRepository.delete({ id, owner_id: user_id });
   }
 

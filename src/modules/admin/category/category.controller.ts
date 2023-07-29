@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { CreateCategoryDto, UpdateCategoryDto } from "./category.dto";
 import { CategoryService } from "./category.service";
 import { Auth } from "../../../decorators";
@@ -34,5 +34,11 @@ export class CategoryController {
   @Put("/:id")
   async updateCategory(@Param("id") id: number, @Body() body: UpdateCategoryDto) {
     return await this.categoryService.updateCategory(id, body);
+  }
+
+  @Auth([UserRole.ADMINSTRATOR])
+  @Delete("/:id")
+  async deleteCategory(@Param("id") id: number) {
+    return await this.categoryService.deleteCategory(id);
   }
 }

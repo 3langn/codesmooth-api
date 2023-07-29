@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsNotEmptyObject,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from "class-validator";
@@ -26,17 +27,22 @@ export class CreateCategoryDto {
 
 export class UpdateCategoryDto {
   @IsString()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @IsString()
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @IsString()
-  thumbnail: string;
+  @IsOptional()
+  thumbnail?: string;
 
   @IsNumber()
-  order: number;
+  @IsOptional()
+  order?: number;
 
   @IsBoolean()
-  is_active: boolean;
+  @IsOptional()
+  is_active?: boolean;
 }

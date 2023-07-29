@@ -11,6 +11,7 @@ import { CustomHttpException } from "../../../common/exception/custom-http.excep
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { SectionEntity } from "../../../entities/section.entity";
 import { LessonEntity } from "../../../entities/lesson.entity";
+import { UserEntity } from "../../../entities/user.entity";
 
 @Injectable()
 export class AdminCourseService {
@@ -36,9 +37,10 @@ export class AdminCourseService {
     if (pageOptionsDto.status) {
       qb.andWhere("course.status = :status", { status: pageOptionsDto.status });
     } else {
-      qb.andWhere("course.status != :status", { status: CourseStatus.Draft })
-        .andWhere("course.published_course_id IS NULL")
-        .andWhere("course.draft_course_id IS NULL");
+      // not in draft, draft_has_published_course
+      qb.andWhere("course.status NOT IN (:...status)", {
+        status: [CourseStatus.Draft, CourseStatus.DraftHasPublishedCouse],
+      });
     }
 
     if (pageOptionsDto.category_id) {
@@ -92,8 +94,9 @@ export class AdminCourseService {
         code: StatusCodesList.NotFound,
         statusCode: HttpStatus.NOT_FOUND,
       });
+
     let p: CourseEntity;
-    // Case 1: Course has published course -> update published course then update status of draft course
+
     if (course.published_course_id) {
       p = await this.courseRepository.findOne({
         where: { id: course.published_course_id },
@@ -106,10 +109,11 @@ export class AdminCourseService {
           statusCode: HttpStatus.NOT_FOUND,
         });
       }
+
+      // Update the published course fields with the draft course data
       p.base_price = course.base_price;
       p.categories = course.categories;
       p.description = course.description;
-      p.draft_course_id = null;
       p.name = course.name;
       p.price = course.price;
       p.requirements = course.requirements;
@@ -120,64 +124,82 @@ export class AdminCourseService {
       p.short_description = course.short_description;
       p.published_at = new Date();
       p.owner = course.owner;
+      // const listLesson = [];
+      const newCourseSections = await Promise.all(
+        course.sections.map(async (section) => {
+          const newSection = { ...section };
+          delete newSection.id;
 
-      const newCourseSections = course.sections.map(async (section) => {
-        const newSection = { ...section };
-        delete newSection.id;
+          const ls = section.lessons.map((lesson) => {
+            const newLesson = { ...lesson };
+            newLesson.id = generateId(9);
+            newLesson.section_id = newSection.id;
+            newLesson.owner_id = p.owner_id;
 
-        const listLesson = section.lessons.map((lesson) => {
-          const newLesson = { ...lesson };
-          delete newLesson.id;
-          newLesson.section_id = newSection.id;
-          newLesson.owner_id = p.owner_id;
-          return this.lessonRepository.create(newLesson);
-        });
+            return this.lessonRepository.create(newLesson);
+          });
+          newSection.lessons = ls;
 
-        newSection.lessons = await this.lessonRepository.save(listLesson);
-
-        return this.sectionRepository.create({
-          ...newSection,
-          course_id: p.id,
-          owner_id: p.owner_id,
-        });
-      });
-
-      const s = await this.sectionRepository.save(await Promise.all(newCourseSections));
-
-      p.sections = s;
-
+          return this.sectionRepository.create({
+            ...newSection,
+            course_id: p.id,
+            owner_id: p.owner_id,
+          });
+        }),
+      );
       await this.courseRepository.save(p);
+      await this.sectionRepository.save(newCourseSections);
     } else {
-      // Case 2: Course has not published course -> create new published course
+      // Create a new published course
       const publishedCourse = {
         ...course,
         id: generateId(9),
         status: CourseStatus.Published,
         published_at: new Date(),
+        draft_course_id: course.id,
       };
 
       p = await this.courseRepository.save(publishedCourse);
     }
 
+    // Update the draft course's published_course_id and status
     await this.courseRepository.update(
       {
-        id,
+        id: course.id,
       },
       {
         published_course_id: p.id,
-        status: CourseStatus.Published,
+        status: CourseStatus.DraftHasPublishedCouse,
+        rejected_reason: null,
       },
     );
   }
 
   // TODO: Reject note for instructor
-  async rejectCourse(id: number) {
-    await this.courseRepository.update(id, { status: CourseStatus.Rejected });
+  async rejectCourse(id: number, rejected_reason: string, user: UserEntity) {
+    const course = await this.courseRepository.findOneOrFail({ where: { id } });
+    if (course.status !== CourseStatus.Reviewing) {
+      throw new CustomHttpException({
+        message: "Không thể từ chối khóa học này",
+        code: StatusCodesList.BadRequest,
+        statusCode: HttpStatus.BAD_REQUEST,
+      });
+    }
+    await this.courseRepository.update(id, {
+      status: CourseStatus.Rejected,
+      rejected_reason: {
+        reason: rejected_reason,
+        rejected_by: user.email,
+        rejected_at: new Date(),
+      },
+    });
   }
 
   async countCourse() {
-    const [allCount, publishedCount, reviewingCount, rejectedCount] = await Promise.all([
-      this.courseRepository.count({ where: { status: Not(In([CourseStatus.Draft])) } }),
+    const [allCount, publishedCount, reviewingCount] = await Promise.all([
+      this.courseRepository.count({
+        where: { status: Not(In([CourseStatus.Draft, CourseStatus.DraftHasPublishedCouse])) },
+      }),
       this.courseRepository.count({ where: { status: CourseStatus.Published } }),
       this.courseRepository.count({ where: { status: CourseStatus.Reviewing } }),
       this.courseRepository.count({ where: { status: CourseStatus.Rejected } }),
@@ -187,7 +209,7 @@ export class AdminCourseService {
       all: allCount,
       [CourseStatus.Published]: publishedCount,
       [CourseStatus.Reviewing]: reviewingCount,
-      [CourseStatus.Rejected]: rejectedCount,
+      [CourseStatus.Rejected]: reviewingCount,
     };
   }
 }
