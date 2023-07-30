@@ -27,8 +27,8 @@ export class InstructorCourseController {
   @Auth()
   @Post("/")
   async createCourse(@Body() body: SaveCourseDto, @Req() req: any) {
-    await this.courseService.createCourse(body, req.user.id);
-    return new ResponseDefault("Course saved successfully");
+    const r = await this.courseService.createCourse(body, req.user.id);
+    return new ResponseDefault("Course saved successfully", r);
   }
 
   @Auth()

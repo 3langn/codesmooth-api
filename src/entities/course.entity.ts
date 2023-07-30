@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { SectionEntity } from "./section.entity";
-import { CourseStatus } from "../common/enum/course";
+import { CourseLevel, CourseStatus, CourseTargetAudience } from "../common/enum/course";
 import { UserEntity } from "./user.entity";
 import { CategoryEntity } from "./category.entity";
 import { LessonEntity } from "./lesson.entity";
@@ -39,11 +39,15 @@ export class CourseEntity extends BaseEntity {
   // @Column({ type: "text", array: true, default: [] })
   // skills: string[];
 
-  @Column({ default: "" })
-  target_audience: string;
+  @Column({ default: "", enum: CourseTargetAudience })
+  target_audience: CourseTargetAudience;
 
-  // @Column({ type: "text", array: true, default: [] })
-  // tags: string[];
+  @Column({ default: "", enum: CourseLevel })
+  level: CourseLevel;
+
+  @ManyToOne(() => CategoryEntity)
+  @JoinColumn({ name: "main_category_id" })
+  main_category: CategoryEntity;
 
   @Column({ type: "text", array: true, default: [] })
   requirements: string[];

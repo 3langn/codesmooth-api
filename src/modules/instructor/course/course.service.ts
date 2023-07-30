@@ -30,26 +30,26 @@ export class InstructorCourseService {
   ) {}
 
   async createCourse(data: SaveCourseDto, user_id: number) {
-    try {
-      const categories = await this.categoryRepository.find({
-        where: { id: In(data.category_ids) },
-      });
-      const course = this.courseRepository.create({
-        categories: categories,
-        owner_id: user_id,
-        ...data,
-      });
-      const c = await this.courseRepository.save(course);
-      await this.sectionService.createSection(
-        {
-          course_id: c.id,
-          order: 1,
-        },
-        user_id,
-      );
-    } catch (error) {
-      this.logger.error(error, error.stack);
-    }
+    const categories = await this.categoryRepository.find({
+      where: { id: In([...data.category_ids]) },
+    });
+
+    const course = this.courseRepository.create({
+      categories: categories,
+      owner_id: user_id,
+      ...data,
+    });
+    const c = await this.courseRepository.save(course);
+    await this.sectionService.createSection(
+      {
+        course_id: c.id,
+        order: 1,
+      },
+      user_id,
+    );
+    return {
+      course_id: c.id,
+    };
   }
 
   async updateCourse(id: number, data: SaveCourseDto, user_id: number) {
@@ -151,6 +151,8 @@ export class InstructorCourseService {
       .createQueryBuilder("course")
       .select([
         "course",
+        "main_category.id",
+        "main_category.name",
         "categories.id",
         "categories.name",
         "owner.id",
@@ -165,11 +167,9 @@ export class InstructorCourseService {
         "lessons.title",
         "lessons.order",
         "lessons.section_id",
-        // "lessons.id",
-        // "lessons.title",
-        // "lessons.isCompleted",
       ])
       .leftJoin("course.categories", "categories")
+      .leftJoin("course.main_category", "main_category")
       .leftJoin("course.owner", "owner")
       .leftJoin("course.sections", "sections")
       .leftJoin("sections.lessons", "lessons")

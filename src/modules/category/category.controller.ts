@@ -13,7 +13,7 @@ export class CategoryController {
 
   @Get("/")
   async listCategories(
-    @Query(new ValidationPipe({ transform: true }))
+    @Query()
     pageOptionsDto: PageOptionsDto,
   ) {
     const [cats, itemCount] = await this.categoryService.listCategories(pageOptionsDto);

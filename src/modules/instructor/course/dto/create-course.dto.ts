@@ -1,5 +1,8 @@
-import { IsArray, IsNotEmpty, IsNumber, IsString, Validate } from "class-validator";
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, Validate } from "class-validator";
 import { GreaterThanOrEqual } from "../../../../decorators/validates/GreaterThanOrEqual";
+import { CourseLevel, CourseTargetAudience } from "../../../../common/enum/course";
+import { Column } from "typeorm";
+import { IsArrayLengthGreaterThanZero } from "../../../../decorators/validates/ValidatorConstraint";
 
 export class SaveCourseDto {
   @IsString({ message: "name phải là string" })
@@ -41,22 +44,33 @@ export class SaveCourseDto {
   })
   base_price: number;
 
-  // @IsArray({ message: "Will learn must be an array" })
-  // will_learns: string[];
-
-  // @IsArray({ message: "Skills must be an array" })
-  // skills: string[];
-
   @IsArray({ message: "category_ids phải là array" })
+  @IsArrayLengthGreaterThanZero({ message: "category_ids phải có ít nhất 1 phần tử" })
   category_ids: number[];
 
   @IsArray({ message: "objectives phải là array" })
+  @IsArrayLengthGreaterThanZero({ message: "objectives phải có ít nhất 1 phần tử" })
   objectives: string[];
 
-  @IsString({ message: "target_audience phải là string" })
-  target_audience: string;
+  @IsEnum(CourseTargetAudience, {
+    message: `target_audience phải là một trong các giá trị sau: ${Object.values(
+      CourseTargetAudience,
+    ).join(", ")}`,
+  })
+  target_audience: CourseTargetAudience;
+
+  @IsEnum(CourseLevel, {
+    message: `level phải là một trong các giá trị sau: ${Object.values(CourseLevel).join(", ")}`,
+  })
+  level: CourseLevel;
+
+  // @IsNumber(undefined, {
+  //   message: "main_category_id phải là number",
+  // })
+  // main_category_id: number;
 
   @IsArray({ message: "requirements phải là array" })
+  @IsArrayLengthGreaterThanZero({ message: "requirements phải có ít nhất 1 phần tử" })
   requirements: string[];
 
   @IsString({ message: "feedback_email phải là string" })

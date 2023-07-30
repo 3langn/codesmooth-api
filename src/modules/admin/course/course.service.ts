@@ -67,18 +67,21 @@ export class AdminCourseService {
         "categories.id",
         "categories.name",
         "owner",
+        "main_category.id",
+        "main_category.name",
         // "lessons.id",
         // "lessons.title",
         // "lessons.isCompleted",
       ])
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
+      .leftJoin("course.main_category", "main_category")
       .where("course.status = :status", { status: CourseStatus.Published })
       // .leftJoin("category.lessons", "lessons")
       .andWhere("course.id = :id", { id })
       .andWhere("course.deleted_at IS NULL")
-      // .orderBy("category.order", "ASC")
-      // .addOrderBy("lessons.order", "ASC")
+      .orderBy("categories.order", "ASC")
+      .addOrderBy("lessons.order", "ASC")
       .getOne();
   }
 

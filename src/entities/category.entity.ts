@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { CourseEntity } from "./course.entity";
 
@@ -21,4 +21,21 @@ export class CategoryEntity extends BaseEntity {
 
   @ManyToMany(() => CourseEntity, (course) => course.categories)
   courses: CourseEntity[];
+
+  @ManyToMany(() => CategoryEntity, { cascade: true })
+  @JoinTable({
+    name: "category_parent",
+    joinColumn: {
+      name: "child_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "parent_id",
+      referencedColumnName: "id",
+    },
+  })
+  parent_categories: CategoryEntity[];
+
+  @ManyToMany(() => CategoryEntity, (category) => category.parent_categories)
+  child_categories: CategoryEntity[];
 }

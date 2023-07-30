@@ -87,8 +87,11 @@ export class CourseService {
         "lessons.title",
         "lessons.order",
         "lessons.section_id",
+        "main_category.id",
+        "main_category.name",
       ])
       .leftJoin("course.categories", "categories")
+      .leftJoin("course.main_category", "main_category")
       .leftJoin("course.owner", "owner")
       .leftJoin("course.sections", "sections")
       .leftJoin("sections.lessons", "lessons")
