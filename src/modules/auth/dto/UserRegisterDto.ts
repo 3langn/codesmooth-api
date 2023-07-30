@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
+  Length,
   MinLength,
 } from "class-validator";
 import { Column } from "typeorm";
@@ -19,6 +20,9 @@ export class UserRegisterDto {
   // readonly firstName: string;
 
   @IsString()
+  @Length(8, 20, {
+    message: "Tên người dùng phải có độ dài từ 8 đến 20 ký tự",
+  })
   @IsNotEmpty()
   @Trim()
   readonly username: string;
@@ -31,7 +35,7 @@ export class UserRegisterDto {
 
   @IsString()
   @MinLength(6, {
-    message: "Password is too short",
+    message: "Mật khẩu quá ngắn",
   })
   readonly password: string;
 
