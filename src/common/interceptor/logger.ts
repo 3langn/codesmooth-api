@@ -2,7 +2,7 @@ import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } fr
 import { stringify } from "querystring";
 import { throwError } from "rxjs";
 import { tap, catchError, mergeMap, finalize, map, combineLatestAll } from "rxjs/operators";
-
+import { v4 } from "uuid";
 @Injectable()
 export class HTTPLogger implements NestInterceptor {
   private logger: Logger = new Logger(HTTPLogger.name);
@@ -18,6 +18,11 @@ export class HTTPLogger implements NestInterceptor {
 
     const exculdedPaths = ["/health", "/metrics", "/favicon.ico"];
     let d;
+    const requestId = request.headers["x-request-id"] || v4();
+    this.logger.log(
+      `Request: ${method} ${originalUrl} - ${JSON.stringify(request.body)} - ${userAgent} ${ip}`,
+    );
+
     return next.handle().pipe(
       catchError((err) => {
         log = (data) => this.logger.error(data, err.stack);
