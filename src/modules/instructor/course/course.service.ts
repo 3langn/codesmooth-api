@@ -116,7 +116,7 @@ export class InstructorCourseService {
     const [allCount, publishedCount, reviewingCount, rejectedCount, draftCount] = await Promise.all(
       [
         this.courseRepository.count({
-          where: { owner_id: user_id, status: CourseStatus.Published },
+          where: { owner_id: user_id, status: Not(CourseStatus.Published) },
         }),
         this.courseRepository.count({
           where: { status: CourseStatus.Published, owner_id: user_id },
