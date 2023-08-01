@@ -98,7 +98,7 @@ export class AuthService {
         template_id: TemplateId.EMAIL_VERIFICATION,
         data: {
           content: {
-            token: this.configService.frontendUrl + "/verify-email/" + token,
+            token: this.configService.frontendUrl + "/verify-email?token=" + token,
           },
           subject: "Xác minh email đăng ký tài khoản",
           to: userRegisterDto.email,
