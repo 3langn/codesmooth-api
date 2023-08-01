@@ -25,23 +25,4 @@ export class HealthController {
       await axios.get(this.configService.host + "/api/health");
     } catch (error) {}
   }
-  // @Get("/hihi")
-  // async seoCheck() {
-  //   const options: Flags = {
-  //     logLevel: "info",
-  //     output: "html",
-  //     onlyCategories: ["performance"],
-  //     port: 8082,
-  //   };
-
-  //   const runnerResult = await lighthouse("https://codedrafts.com", options);
-
-  //   return {
-  //     props: {
-  //       reportHtml: runnerResult?.report,
-  //       finalDisplayedUrl: runnerResult?.lhr.finalDisplayedUrl,
-  //       performanceScore: runnerResult?.lhr.categories.performance?.score,
-  //     },
-  //   };
-  // }
 }

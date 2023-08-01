@@ -88,11 +88,11 @@ export class ExecuteService {
     const cdPath = `cd ${genPath}/${id};`;
     switch (language) {
       case "typescript":
-        return [`${cdPath} npx ts-node main.${ext}`];
+        return [`${cdPath} bun main.${ext}`];
       case "c++":
         return [`${cdPath} g++ main.${ext} -o main;`, `${cdPath} ./main`];
       default:
-        return [`${cdPath} npx ts-node main.${ext}`];
+        return [`${cdPath} bun main.${ext}`];
     }
   }
 }
