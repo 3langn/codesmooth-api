@@ -135,7 +135,9 @@ export class ApiConfigService {
       },
       template: {
         dir: `${process.cwd()}/templates`,
-        adapter: new EjsAdapter(),
+        adapter: new EjsAdapter({
+          inlineCssEnabled: true,
+        }),
         options: {
           strict: false,
         },

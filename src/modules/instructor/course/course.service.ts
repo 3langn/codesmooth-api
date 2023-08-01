@@ -104,6 +104,10 @@ export class InstructorCourseService {
     if (pageOptionsDto.status) {
       if (pageOptionsDto.status === CourseStatus.Published) {
         qb.andWhere("course.published_course_id IS NOT NULL");
+      } else if (pageOptionsDto.status === CourseStatus.Draft) {
+        qb.andWhere("course.status IN (:...status)", {
+          status: [CourseStatus.Draft, CourseStatus.DraftHasPublishedCouse],
+        });
       } else {
         qb.andWhere("course.status = :status", { status: pageOptionsDto.status });
       }
