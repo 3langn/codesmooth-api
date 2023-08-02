@@ -15,6 +15,12 @@ export class AttachmentData {
 // Content là những field sẽ được render trong template
 export class VerifyEmailContent {
   token: string;
+  username: string;
+}
+
+export class ResetPasswordContent {
+  token: string;
+  username: string;
 }
 
 export class VerifyEmailData {

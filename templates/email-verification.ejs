@@ -2,13 +2,138 @@
 <html>
   <head>
     <title>Verify Email</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+      type="text/css"
+    />
   </head>
   <body>
-    <h1>Verify your email address</h1>
-    <p>
-      Click on the following link to verify your email address:
-      <a href="<%= token %>">Verify Email</a>
-    </p>
-    <p>If you do not click on the link within 5 minutes, you will need to request a new email.</p>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        background-color: #fafafa;
+        padding-left: 50px;
+        padding-right: 50px;
+        padding-top: 50px;
+        padding-bottom: 30px;
+      "
+    >
+      <div style="display: flex; align-items: center; gap: 8px">
+        <img
+          src="https://res.cloudinary.com/titus-nguyen/image/upload/v1690961305/sq93eouq8jjcpeexwqek.svg"
+          alt=""
+        />
+        <p
+          style="
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.4);
+          "
+        >
+          CodeDrafts
+        </p>
+      </div>
+      <div style="width: 100%; background-color: white">
+        <div
+          style="
+            display: flex;
+            height: 150px;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            background-image: url('https://res.cloudinary.com/titus-nguyen/image/upload/v1690959529/fmgrqs7j8iifmeuuslqf.svg');
+          "
+        >
+          <p
+            style="
+              font-family: 'Montserrat', sans-serif;
+              font-size: 25px;
+              font-weight: bold;
+              color: rgba(255, 255, 255, 0.9);
+            "
+          >
+            Welcome To CodeDrafts !
+          </p>
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-left: 40px;
+            padding-right: 40px;
+          "
+        >
+          <div style="display: flex; width: 100%; justify-content: center; padding-top: 40px">
+            <img
+              src="https://res.cloudinary.com/titus-nguyen/image/upload/v1690961344/u3d6b5voqti0mwpaqprh.svg"
+              alt=""
+            />
+          </div>
+          <p style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: bold">
+            Chào <%= username %>,
+          </p>
+          <p style="font-family: 'Inter', sans-serif; font-size: 18px; color: #4c4e64">
+            Cảm ơn bạn đã lựa chọn CodeDrafts là điểm đến để học tập và phát triển bản thân. Chúng
+            tôi rất vui mừng khi bạn tham gia cộng đồng của chúng tôi!
+          </p>
+          <p style="font-family: 'Inter', sans-serif; font-size: 18px; color: #4c4e64">
+            Trước khi chúng ta bắt đầu, chúng tôi cần xác nhận địa chỉ email của bạn để đảm bảo an
+            toàn cho tài khoản của bạn và giúp bạn nhận thông tin cập nhật quan trọng cũng như các
+            ưu đãi độc quyền.
+          </p>
+          <div
+            style="display: flex; justify-content: center; padding-bottom: 30px; padding-top: 30px"
+          >
+            <a
+              style="
+                cursor: pointer;
+                display: flex;
+                height: 50px;
+                width: 192px;
+                align-items: center;
+                justify-content: center;
+                border-radius: 5px;
+                background-color: #1363df;
+                text-decoration: none;
+              "
+              href="<%= token %>"
+            >
+              <p
+                style="
+                  font-family: 'Lexend Deca', sans-serif;
+                  font-size: 16px;
+                  font-weight: bold;
+                  line-height: 1.25;
+                  color: white;
+                "
+              >
+                Xác thực email
+              </p>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: #4c4e64">
+          Được gửi bởi CodeDrafts
+        </p>
+      </div>
+    </div>
   </body>
 </html>

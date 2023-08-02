@@ -99,6 +99,7 @@ export class AuthService {
         data: {
           content: {
             token: this.configService.frontendUrl + "/verify-email?token=" + token,
+            username: user.username,
           },
           subject: "Xác minh email đăng ký tài khoản",
           to: userRegisterDto.email,
@@ -199,8 +200,9 @@ export class AuthService {
           content: {
             token:
               this.configService.frontendUrl +
-              "/reset-password/" +
+              "/reset-password?token=" +
               this.jwtService.generateResetPasswordToken(user.id),
+            username: user.username,
           },
           subject: "Cài đặt lại mật khẩu",
           to: body.email,
