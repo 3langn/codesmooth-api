@@ -24,6 +24,7 @@ import { UserRole } from "../../common/enum/user-role";
 import { MailerService } from "../mailer/mailer.service";
 import { TemplateId } from "../mailer/enum/template-id";
 import { JwtService } from "../jwt/jwt.service";
+import { generateHash } from "../../common/utils";
 
 @Injectable()
 export class UserService {
@@ -72,9 +73,10 @@ export class UserService {
       },
       relations: ["settings"],
     });
+    const hashPassword = generateHash(userRegisterDto.password);
 
     if (!findUser) {
-      const user = this.userRepository.create(userRegisterDto);
+      const user = this.userRepository.create({ ...userRegisterDto, password: hashPassword });
 
       const userRecord = await this.userRepository.save(user);
       // if (file && !this.validatorService.isImage(file.mimetype)) {
@@ -98,6 +100,11 @@ export class UserService {
         statusCode: HttpStatus.BAD_REQUEST,
         message: `Email ${userRegisterDto.email} đã tồn tại`,
         code: StatusCodesList.EmailAlreadyExists,
+      });
+    } else {
+      await this.userRepository.update(findUser.id, {
+        ...userRegisterDto,
+        password: hashPassword,
       });
     }
 

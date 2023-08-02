@@ -38,10 +38,10 @@ export class UserEntity extends BaseEntity {
   @OneToOne(() => UserSettingsEntity, (userSettings) => userSettings.user)
   settings?: UserSettingsEntity;
 
-  @BeforeInsert()
-  hashPassword() {
-    this.password = generateHash(this.password);
-  }
+  // @BeforeInsert()
+  // hashPassword() {
+  //   this.password = generateHash(this.password);
+  // }
 
   toDto(): UserDto {
     delete this.password;
