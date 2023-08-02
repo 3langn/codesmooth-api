@@ -31,12 +31,18 @@ export class CourseService {
         "owner.username",
         "owner.email",
         "owner.avatar",
+        "categories.id",
+        "categories.name",
       ])
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
       .where("course.status = :status", { status: CourseStatus.Published })
       .andWhere("course.published_at IS NOT NULL")
       .andWhere("course.deleted_at IS NULL");
+
+    if (pageOptionsDto.category_id) {
+      qb.andWhere("categories.id = :category_id", { category_id: pageOptionsDto.category_id });
+    }
 
     return await queryPagination({ query: qb, o: pageOptionsDto });
   }

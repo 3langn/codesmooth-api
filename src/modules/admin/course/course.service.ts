@@ -88,7 +88,7 @@ export class AdminCourseService {
   async publishCourse(id: number) {
     const course = await this.courseRepository.findOne({
       where: { id },
-      relations: ["owner", "sections", "sections.lessons"],
+      relations: ["owner", "sections", "sections.lessons", "categories"],
     });
 
     if (!course)

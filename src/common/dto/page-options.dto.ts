@@ -46,4 +46,7 @@ export class PageOptionsDto {
 
   @StringFieldOptional()
   readonly q?: string;
+
+  @NumberFieldOptional()
+  category_id?: number;
 }

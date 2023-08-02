@@ -69,7 +69,6 @@ export class UserService {
     const findUser = await this.userRepository.findOne({
       where: {
         email: userRegisterDto.email,
-        role: UserRole.USER,
       },
       relations: ["settings"],
     });
@@ -97,7 +96,7 @@ export class UserService {
     if (findUser.settings.isEmailVerified) {
       throw new CustomHttpException({
         statusCode: HttpStatus.BAD_REQUEST,
-        message: `Email ${userRegisterDto.email} already exists`,
+        message: `Email ${userRegisterDto.email} đã tồn tại`,
         code: StatusCodesList.EmailAlreadyExists,
       });
     }

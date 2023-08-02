@@ -1,6 +1,7 @@
 import { ArrayMinSize, IsIn, IsOptional } from "class-validator";
 import { PageOptionsDto } from "../../../../common/dto/page-options.dto";
 import { CourseStatus } from "../../../../common/enum/course";
+import { NumberFieldOptional } from "../../../../decorators";
 
 class InstructorGetCoursePageOptionsDto extends PageOptionsDto {
   @IsIn(["price", "created_at"], {
