@@ -37,6 +37,7 @@ export class InstructorCourseService {
     const course = this.courseRepository.create({
       categories: categories,
       owner_id: user_id,
+      main_category: categories[0], // TODO: fix this
       ...data,
     });
     const c = await this.courseRepository.save(course);

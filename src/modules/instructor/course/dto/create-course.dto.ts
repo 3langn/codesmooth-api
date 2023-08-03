@@ -1,20 +1,25 @@
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, Validate } from "class-validator";
+import {
+  IsArray,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Validate,
+} from "class-validator";
 import { GreaterThanOrEqual } from "../../../../decorators/validates/GreaterThanOrEqual";
 import { CourseLevel, CourseTargetAudience } from "../../../../common/enum/course";
 import { Column } from "typeorm";
 import { IsArrayLengthGreaterThanZero } from "../../../../decorators/validates/ValidatorConstraint";
 
 export class SaveCourseDto {
-  @IsString({ message: "name phải là string" })
-  @IsNotEmpty({ message: "name không được để trống" })
+  @IsString({ message: "Tên khóa học phải là một chuỗi" })
   name: string;
 
-  @IsNotEmpty({ message: "description không được để trống" })
-  @IsString({ message: "description phải là string" })
+  @IsString({ message: "Mô tả phải là một chuỗi" })
   description: string;
 
-  @IsString({ message: "short_description phải là string" })
-  @IsNotEmpty({ message: "short_description không được để trống" })
+  @IsString({ message: "Mô tả ngắn phải là một chuỗi" })
   short_description: string;
 
   @IsNumber(
@@ -24,7 +29,7 @@ export class SaveCourseDto {
       allowInfinity: false,
     },
     {
-      message: "price phải là number",
+      message: "Giá khóa học phải là một số",
     },
   )
   price: number;
@@ -36,31 +41,31 @@ export class SaveCourseDto {
       allowInfinity: false,
     },
     {
-      message: "base_price phải là number",
+      message: "Giá gốc khoá học phải là một số",
     },
   )
   @Validate(GreaterThanOrEqual, ["price"], {
-    message: "base_price phải lớn hơn hoặc bằng price",
+    message: "Gía gốc phải lớn hơn hoặc bằng giá khóa học",
   })
   base_price: number;
 
-  @IsArray({ message: "category_ids phải là array" })
-  @IsArrayLengthGreaterThanZero({ message: "category_ids phải có ít nhất 1 phần tử" })
+  @IsArray({ message: "Kĩ năng phải là một mảng" })
+  @IsArrayLengthGreaterThanZero({ message: "Kĩ năng phải có ít nhất 1 phần tử" })
   category_ids: number[];
 
-  @IsArray({ message: "objectives phải là array" })
-  @IsArrayLengthGreaterThanZero({ message: "objectives phải có ít nhất 1 phần tử" })
+  @IsArray({ message: "Mục tiêu khóa học phải là một mảng" })
+  @IsArrayLengthGreaterThanZero({ message: "Mục tiêu khóa học phải có ít nhất 1 phần tử" })
   objectives: string[];
 
   @IsEnum(CourseTargetAudience, {
-    message: `target_audience phải là một trong các giá trị sau: ${Object.values(
+    message: `Đối tượng khóa học phải là một trong các giá trị sau: ${Object.values(
       CourseTargetAudience,
     ).join(", ")}`,
   })
   target_audience: CourseTargetAudience;
 
   @IsEnum(CourseLevel, {
-    message: `level phải là một trong các giá trị sau: ${Object.values(CourseLevel).join(", ")}`,
+    message: `Cấp độ phải là một trong các giá trị sau: ${Object.values(CourseLevel).join(", ")}`,
   })
   level: CourseLevel;
 
@@ -69,13 +74,18 @@ export class SaveCourseDto {
   // })
   // main_category_id: number;
 
-  @IsArray({ message: "requirements phải là array" })
-  @IsArrayLengthGreaterThanZero({ message: "requirements phải có ít nhất 1 phần tử" })
+  @IsArray({ message: "Yêu cầu phải là một mảng" })
+  @IsArrayLengthGreaterThanZero({ message: "Yêu cầu phải có ít nhất 1 phần tử" })
   requirements: string[];
 
-  @IsString({ message: "feedback_email phải là string" })
+  @IsEmail(
+    {},
+    {
+      message: "feedback email không hợp lệ",
+    },
+  )
   feedback_email: string;
 
-  @IsString({ message: "thumbnail phải là string" })
+  @IsString({ message: "thumbnail phải là chuỗi" })
   thumbnail: string;
 }

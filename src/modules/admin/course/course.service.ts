@@ -88,7 +88,7 @@ export class AdminCourseService {
   async publishCourse(id: number) {
     const course = await this.courseRepository.findOne({
       where: { id },
-      relations: ["owner", "sections", "sections.lessons", "categories"],
+      relations: ["owner", "sections", "sections.lessons", "categories", "main_category"],
     });
 
     if (!course)
@@ -127,7 +127,8 @@ export class AdminCourseService {
       p.short_description = course.short_description;
       p.published_at = new Date();
       p.owner = course.owner;
-      // const listLesson = [];
+      p.main_category = course.main_category;
+
       const newCourseSections = await Promise.all(
         course.sections.map(async (section) => {
           const newSection = { ...section };
