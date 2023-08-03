@@ -11,6 +11,7 @@ import { GreaterThanOrEqual } from "../../../../decorators/validates/GreaterThan
 import { CourseLevel, CourseTargetAudience } from "../../../../common/enum/course";
 import { Column } from "typeorm";
 import { IsArrayLengthGreaterThanZero } from "../../../../decorators/validates/ValidatorConstraint";
+import { GreaterThanOrEqualSpecific } from "../../../../decorators/validates/GreaterThanOrEqualSpecific";
 
 export class SaveCourseDto {
   @IsString({ message: "Tên khóa học phải là một chuỗi" })
@@ -32,6 +33,9 @@ export class SaveCourseDto {
       message: "Giá khóa học phải là một số",
     },
   )
+  @Validate(GreaterThanOrEqualSpecific, [0, 15000], {
+    message: "Giá khóa học phải bằng 0 hoặc lớn hơn hoặc bằng 15000",
+  })
   price: number;
 
   @IsNumber(
