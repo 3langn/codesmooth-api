@@ -19,121 +19,122 @@
     />
   </head>
   <body>
-    <div
-      style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        background-color: #fafafa;
-        padding-left: 50px;
-        padding-right: 50px;
-        padding-top: 50px;
-        padding-bottom: 30px;
-      "
-    >
-      <div style="display: flex; align-items: center; gap: 8px">
-        <img
-          src="https://res.cloudinary.com/titus-nguyen/image/upload/v1690961305/sq93eouq8jjcpeexwqek.svg"
-          alt=""
-        />
-        <p
-          style="
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px;
-            font-weight: bold;
-            color: rgba(0, 0, 0, 0.4);
-          "
-        >
-          CodeDrafts
-        </p>
-      </div>
-      <div style="width: 100%; background-color: white">
-        <div
-          style="
-            display: flex;
-            height: 150px;
-            width: 100%;
-            align-items: center;
-            justify-content: center;
-            background-image: url('https://res.cloudinary.com/titus-nguyen/image/upload/v1690959529/fmgrqs7j8iifmeuuslqf.svg');
-          "
-        >
-          <p
-            style="
-              font-family: 'Montserrat', sans-serif;
-              font-size: 25px;
-              font-weight: bold;
-              color: rgba(255, 255, 255, 0.9);
-            "
-          >
-            Welcome To CodeDrafts !
-          </p>
-        </div>
-        <div
-          style="
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding-left: 40px;
-            padding-right: 40px;
-          "
-        >
-          <div style="display: flex; width: 100%; justify-content: center; padding-top: 40px">
-            <img
-              src="https://res.cloudinary.com/titus-nguyen/image/upload/v1690961344/u3d6b5voqti0mwpaqprh.svg"
-              alt=""
-            />
-          </div>
-          <p style="font-family: 'Inter', sans-serif; font-size: 20px; font-weight: bold">
-            Chào <%= username %>,
-          </p>
-          <p style="font-family: 'Inter', sans-serif; font-size: 18px; color: #4c4e64">
-            Cảm ơn bạn đã lựa chọn CodeDrafts là điểm đến để học tập và phát triển bản thân. Chúng
-            tôi rất vui mừng khi bạn tham gia cộng đồng của chúng tôi!
-          </p>
-          <p style="font-family: 'Inter', sans-serif; font-size: 18px; color: #4c4e64">
-            Trước khi chúng ta bắt đầu, chúng tôi cần xác nhận địa chỉ email của bạn để đảm bảo an
-            toàn cho tài khoản của bạn và giúp bạn nhận thông tin cập nhật quan trọng cũng như các
-            ưu đãi độc quyền.
-          </p>
-          <div
-            style="display: flex; justify-content: center; padding-bottom: 30px; padding-top: 30px"
-          >
-            <a
-              style="
-                cursor: pointer;
-                display: flex;
-                height: 50px;
-                width: 192px;
-                align-items: center;
-                justify-content: center;
-                border-radius: 5px;
-                background-color: #1363df;
-                text-decoration: none;
-              "
-              href="<%= token %>"
-            >
+    <table style="width: 100%; background-color: #fafafa; padding-bottom: 10px">
+      <tbody>
+        <tr>
+          <td style="background-color: #fafafa; padding-top: 4px; text-align: center">
+            <div style="display: inline-block">
+              <div style="display: flex; height: 52px">
+                <img
+                  src="https://res.cloudinary.com/titus-nguyen/image/upload/v1691037957/unkrev1ery3xchgo28uv.png"
+                  alt=""
+                  style="display: inline-block"
+                />
+                <p
+                  style="
+                    font-family: Montserrat, sans-serif;
+                    font-size: 20px;
+                    font-weight: bold;
+                    line-height: 52px;
+                    color: rgba(0, 0, 0, 0.4);
+                    margin: 0;
+                  "
+                >
+                  CodeDrafts
+                </p>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; padding: 0">
+            <div style="display: inline-block; width: 612px; max-width: 700px">
               <p
                 style="
-                  font-family: 'Lexend Deca', sans-serif;
-                  font-size: 16px;
+                  background-image: url('https://res.cloudinary.com/titus-nguyen/image/upload/v1691041572/Frame_427319243_2_wihvwc.png');
+                  font-family: Montserrat;
+                  font-size: 25px;
                   font-weight: bold;
-                  line-height: 1.25;
+                  line-height: 126px;
                   color: white;
+                  font-family: Montserrat, sans-serif;
+                  margin: 0;
                 "
               >
-                Xác thực email
+                Welcome To CodeDrafts !
               </p>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div>
-        <p style="font-family: 'Inter', sans-serif; font-size: 14px; color: #4c4e64">
-          Được gửi bởi CodeDrafts
-        </p>
-      </div>
-    </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; padding: 0">
+            <div
+              style="
+                display: inline-block;
+                width: 532px;
+                background-color: white;
+                text-align: left;
+                padding-left: 40px;
+                padding-right: 40px;
+              "
+            >
+              <div style="display: inline-block; width: 100%; padding-top: 5px; text-align: center">
+                <img
+                  src="https://res.cloudinary.com/titus-nguyen/image/upload/v1691037893/gksifijztbotgqvty85k.png"
+                  alt=""
+                  style="display: inline-block"
+                />
+              </div>
+              <p style="padding-top: 3px; font-size: 20px; font-weight: bold; margin: 0">
+                Chào Minh Nguyên,
+              </p>
+              <p style="padding-top: 3px; font-size: 18px; color: #4c4e64; margin: 0">
+                Cảm ơn bạn đã lựa chọn CodeDrafts là điểm đến để học tập và phát triển bản thân.
+                Chúng tôi rất vui mừng khi bạn tham gia cộng đồng của chúng tôi!
+              </p>
+              <p style="padding-top: 3px; font-size: 18px; color: #4c4e64; margin: 0">
+                Trước khi chúng ta bắt đầu, chúng tôi cần xác nhận địa chỉ email của bạn. Vui lòng
+                nhấp vào nút bên dưới.
+              </p>
+              <div
+                style="
+                  display: inline-block;
+                  width: 100%;
+                  padding-top: 25px;
+                  padding-bottom: 25px;
+                  text-align: center;
+                "
+              >
+                <a
+                  style="
+                    display: inline-block;
+                    height: 50px;
+                    width: 192px;
+                    cursor: pointer;
+                    border-radius: 5px;
+                    background-color: #1363df;
+                    text-align: center;
+                    color: white;
+                    text-decoration: none;
+                  "
+                  href="<%= token %>"
+                >
+                  <p style="font-size: 16px; font-weight: bold; line-height: 50px; margin: 0">
+                    Xác thực email
+                  </p>
+                </a>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center">
+            <div style="display: inline-block; margin-top: 20px; margin-bottom: 20px">
+              <p style="font-size: 14px; color: #4c4e64; margin: 0">Được gửi bởi CodeDrafts</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </body>
 </html>
