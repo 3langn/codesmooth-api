@@ -12,5 +12,5 @@ export function generateId(
 export function generateTransactionId(): string {
   const alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const nano = nanoid.customAlphabet(alphabet, 8);
-  return "SMOOTH-" + nano();
+  return "CD-" + nano();
 }
