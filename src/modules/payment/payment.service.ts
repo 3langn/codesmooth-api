@@ -114,7 +114,7 @@ export class PaymentService {
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
     const transaction = await this.transactionService.getTransactionById(transactionId);
-    if (secureHash === signed && transaction.gen_secure_hash !== secureHash) {
+    if (secureHash === signed && transaction?.gen_secure_hash !== secureHash) {
       if (transaction) {
         if (vnpAmount / 100 === transaction.amount) {
           if (transaction.status === TransactionStatus.PENDING) {
