@@ -99,7 +99,6 @@ export class AdminCourseService {
       });
 
     let p: CourseEntity;
-
     if (course.published_course_id) {
       p = await this.courseRepository.findOne({
         where: { id: course.published_course_id },
@@ -128,35 +127,13 @@ export class AdminCourseService {
       p.published_at = new Date();
       p.owner = course.owner;
       p.main_category = course.main_category;
-
-      const newCourseSections = await Promise.all(
-        course.sections.map(async (section) => {
-          const newSection = { ...section };
-          delete newSection.id;
-
-          const ls = section.lessons.map((lesson) => {
-            const newLesson = { ...lesson };
-            newLesson.id = generateId(9);
-            newLesson.section_id = newSection.id;
-            newLesson.owner_id = p.owner_id;
-
-            return this.lessonRepository.create(newLesson);
-          });
-          newSection.lessons = ls;
-
-          return this.sectionRepository.create({
-            ...newSection,
-            course_id: p.id,
-            owner_id: p.owner_id,
-          });
-        }),
-      );
-      await this.courseRepository.save(p);
-      await this.sectionRepository.save(newCourseSections);
+      p = await this.courseRepository.save(p);
     } else {
       // Create a new published course
+
       const publishedCourse = {
         ...course,
+        sections: [],
         id: generateId(9),
         status: CourseStatus.Published,
         published_at: new Date(),
@@ -166,6 +143,7 @@ export class AdminCourseService {
       p = await this.courseRepository.save(publishedCourse);
     }
 
+    await this.saveSessionForPublishCourse(course, p);
     // Update the draft course's published_course_id and status
     await this.courseRepository.update(
       {
@@ -177,6 +155,32 @@ export class AdminCourseService {
         rejected_reason: null,
       },
     );
+  }
+
+  private async saveSessionForPublishCourse(course: CourseEntity, p: CourseEntity) {
+    const newCourseSections = await Promise.all(
+      course.sections.map(async (section) => {
+        const newSection = { ...section };
+        delete newSection.id;
+
+        const ls = section.lessons.map((lesson) => {
+          const newLesson = { ...lesson };
+          newLesson.id = generateId(9);
+          newLesson.section_id = newSection.id;
+          newLesson.owner_id = p.owner_id;
+
+          return this.lessonRepository.create(newLesson);
+        });
+        newSection.lessons = ls;
+
+        return this.sectionRepository.create({
+          ...newSection,
+          course_id: p.id,
+          owner_id: p.owner_id,
+        });
+      }),
+    );
+    await this.sectionRepository.save(newCourseSections);
   }
 
   // TODO: Reject note for instructor
