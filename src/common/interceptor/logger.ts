@@ -28,9 +28,11 @@ export class HTTPLogger implements NestInterceptor {
     return next.handle().pipe(
       catchError((err) => {
         log = (data) => this.logger.error(data);
-        d = { ...err.response, stack: err.response.error.stack };
+        d = { ...err.response, stack: err.response?.error?.stack };
 
-        delete err.response.error;
+        if (err.response?.error) {
+          delete err.response.error;
+        }
         return throwError(() => {
           return err;
         });
