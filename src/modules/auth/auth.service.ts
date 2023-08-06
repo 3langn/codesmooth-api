@@ -208,7 +208,7 @@ export class AuthService {
       {
         id: generateId(9),
         user_id: user.id,
-        type: TokenType.REFRESH_TOKEN,
+        type: TokenType.RESET_PASSWORD_TOKEN,
         token: this.jwtService.generateResetPasswordToken(user.id),
         expires_at: new Date(new Date().getTime() + 3600 * 1000),
       },
