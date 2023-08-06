@@ -17,8 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(args: { sub: number; type: TokenType }): Promise<UserEntity> {
-    console.log(args);
-
     if (args.type !== TokenType.ACCESS_TOKEN) {
       throw new UnauthorizedException();
     }

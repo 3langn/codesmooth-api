@@ -7,7 +7,7 @@ import { CustomHttpException } from "../../common/exception/custom-http.exceptio
 import { generateHash, validateHash } from "../../common/utils";
 import { ApiConfigService } from "../../shared/services/api-config.service";
 
-import { UserEntity } from "../../entities/user.entity";
+import { Social, UserEntity } from "../../entities/user.entity";
 import { UserService } from "../user/user.service";
 import { PayloadDto, TokenPayloadDto } from "../jwt/dtos/TokenPayloadDto";
 import type { UserLoginDto } from "./dto/UserLoginDto";
@@ -23,6 +23,7 @@ import { ResetPasswordDto } from "./dto/ResetPasswordDto";
 import { TokenEntity } from "../../entities/token.entity";
 import { generateId } from "../../common/generate-nanoid";
 import { UserSettingsEntity } from "../../entities/user-settings.entity";
+import { GoogleAuthService, SocialService } from "./social.service";
 
 @Injectable()
 export class AuthService {
@@ -31,6 +32,7 @@ export class AuthService {
     private userService: UserService,
     private mailerService: MailerService,
     private jwtService: JwtService,
+    private googleAuthService: GoogleAuthService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(UserSettingsEntity)
@@ -76,6 +78,28 @@ export class AuthService {
         message: "Tài khoản hoặc mật khẩu không đúng",
       });
     }
+  }
+
+  socialSerivce(social: Social): SocialService {
+    switch (social) {
+      case "google":
+        return this.googleAuthService;
+      default:
+        return null;
+    }
+  }
+
+  async loginSocial(token: string, social: Social): Promise<UserEntity> {
+    const socialService = this.socialSerivce(social);
+    const user = await socialService.login(token);
+    if (!user) {
+      throw new CustomHttpException({
+        statusCode: HttpStatus.UNAUTHORIZED,
+        code: StatusCodesList.InvalidCredentials,
+        message: "Thông tin đăng nhập không hợp lệ",
+      });
+    }
+    return user;
   }
 
   async register(userRegisterDto: UserRegisterDto): Promise<UserEntity> {

@@ -1,4 +1,5 @@
 export const StatusCodesList = {
+  ErrorOccured: 1000,
   Success: 1001,
   ValidationError: 1002,
   InternalServerError: 1003,

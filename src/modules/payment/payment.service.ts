@@ -223,8 +223,6 @@ export class PaymentService {
 
     const r = await axios.post(this.configService.VnpayConfig.vnp_VNPayUrl, dataObj);
 
-    console.log(r.data);
-
     // request({
     //     url: vnp_Api,
     //     method: "POST",

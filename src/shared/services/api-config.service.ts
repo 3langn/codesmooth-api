@@ -162,4 +162,11 @@ export class ApiConfigService {
       vnp_RefundUrl: this.getString("VNP_REFUND_URL"),
     };
   }
+
+  get GoogleConfig() {
+    return {
+      APP_ID: this.getString("GOOGLE_APP_ID"),
+      APP_SECRET: this.getString("GOOGLE_APP_SECRET"),
+    };
+  }
 }

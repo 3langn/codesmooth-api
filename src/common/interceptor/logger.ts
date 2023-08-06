@@ -20,13 +20,17 @@ export class HTTPLogger implements NestInterceptor {
     let d;
     const requestId = request.headers["x-request-id"] || v4();
     this.logger.log(
-      `Request: ${method} ${originalUrl} - ${JSON.stringify(request.body)} - ${userAgent} ${ip}`,
+      `Request: ${requestId} ${method} ${originalUrl} - ${JSON.stringify(
+        request.body,
+      )} - ${userAgent} ${ip}`,
     );
 
     return next.handle().pipe(
       catchError((err) => {
-        log = (data) => this.logger.error(data, err.stack);
-        d = err.response;
+        log = (data) => this.logger.error(data);
+        d = { ...err.response, stack: err.response.error.stack };
+
+        delete err.response.error;
         return throwError(() => {
           return err;
         });
@@ -50,11 +54,11 @@ export class HTTPLogger implements NestInterceptor {
           }
 
           log(
-            `Request: {${method} ${originalUrl} ${statusCode} - ${JSON.stringify(
+            `Request: ${requestId} {${method} ${originalUrl} ${statusCode} - ${JSON.stringify(
               request.body,
-            )} - ${userAgent} ${ip} Response: { ${JSON.stringify(
-              d,
-            )} - ${contentLength} - ${duration}ms }`,
+            )} - ${userAgent} ${ip} Response: { ${JSON.stringify({
+              ...d,
+            })} - ${contentLength} - ${duration}ms }`,
           );
         });
       }),

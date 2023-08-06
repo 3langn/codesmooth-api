@@ -15,7 +15,7 @@ import { PageDto } from "../../common/dto/page.dto";
 import { UserRegisterDto } from "../auth/dto/UserRegisterDto";
 import type { UserDto } from "./dtos/user.dto";
 import type { UsersPageOptionsDto } from "./dtos/users-page-options.dto";
-import { UserEntity } from "../../entities/user.entity";
+import { Social, UserEntity } from "../../entities/user.entity";
 import { UserSettingsEntity } from "../../entities/user-settings.entity";
 import { PageMetaDto } from "../../common/dto/page-meta.dto";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
@@ -62,11 +62,7 @@ export class UserService {
     return queryBuilder.getOne();
   }
 
-  // @Transactional()
-  async createUser(
-    userRegisterDto: UserRegisterDto,
-    // file?: IFile,
-  ): Promise<UserEntity> {
+  async createUser(userRegisterDto: UserRegisterDto): Promise<UserEntity> {
     const findUser = await this.userRepository.findOne({
       where: {
         email: userRegisterDto.email,
@@ -109,6 +105,25 @@ export class UserService {
     }
 
     return findUser;
+  }
+
+  async createUserSocial(user: {
+    email: string;
+    username: string;
+    avatar: string;
+    social: Social;
+  }): Promise<UserEntity> {
+    const u = this.userRepository.create({ ...user });
+
+    const userRecord = await this.userRepository.save(u);
+
+    const userSettings = this.userSettingRepository.create({
+      isEmailVerified: true,
+      user_id: userRecord.id,
+    });
+
+    u.settings = await this.userSettingRepository.save(userSettings);
+    return u;
   }
 
   async getUsers(pageOptionsDto: UsersPageOptionsDto): Promise<PageDto<UserDto>> {

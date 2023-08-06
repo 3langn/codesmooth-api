@@ -8,6 +8,7 @@ import { UserSettingsEntity } from "./user-settings.entity";
 import { CourseEntity } from "./course.entity";
 import { TransactionEntity } from "./transaction.entity";
 
+export type Social = "google" | "facebook" | "github";
 @Entity({ name: "users" })
 export class UserEntity extends BaseEntity {
   @Column()
@@ -31,6 +32,9 @@ export class UserEntity extends BaseEntity {
   // TODO: Next use rbac
   @Column({ enum: UserRole, default: UserRole.USER })
   role: UserRole;
+
+  @Column({ nullable: true })
+  social: Social;
 
   @VirtualColumn()
   fullName?: string;
