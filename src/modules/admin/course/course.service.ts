@@ -127,6 +127,10 @@ export class AdminCourseService {
       p.published_at = new Date();
       p.owner = course.owner;
       p.main_category = course.main_category;
+
+      await this.sectionRepository.delete({
+        course_id: p.id,
+      });
       p = await this.courseRepository.save(p);
     } else {
       // Create a new published course

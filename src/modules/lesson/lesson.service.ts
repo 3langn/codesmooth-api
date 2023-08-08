@@ -1,11 +1,12 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { In, MoreThanOrEqual, Repository } from "typeorm";
+import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
+import { DataSource, In, MoreThanOrEqual, Repository } from "typeorm";
 import { LessonEntity } from "../../entities/lesson.entity";
 import { SectionEntity } from "../../entities/section.entity";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 import { CourseEntity } from "../../entities/course.entity";
+import { UserEntity } from "../../entities/user.entity";
 @Injectable()
 export class LessonService {
   constructor(
@@ -15,6 +16,7 @@ export class LessonService {
     private sectionRepository: Repository<SectionEntity>,
     @InjectRepository(CourseEntity)
     private courseRepository: Repository<CourseEntity>,
+    @InjectDataSource() private readonly datasource: DataSource,
   ) {}
 
   async findOneLessonOrFail(lesson_id: number, user_id: number) {
@@ -32,9 +34,12 @@ export class LessonService {
     return lessonExist;
   }
 
-  async markLessonAsCompleted(lesson_id: number, isCompleted: boolean) {
+  async checkPermission(lesson_id: number, user_id: number, loadCompletedUsers = false) {
     const lesson = await this.lessonRepository.findOne({
       where: { id: lesson_id },
+      relations: {
+        completedUsers: loadCompletedUsers,
+      },
     });
 
     if (!lesson) {
@@ -42,22 +47,6 @@ export class LessonService {
         code: StatusCodesList.LessonNotFound,
         message: `Lesson ${lesson_id} not found`,
         statusCode: HttpStatus.NOT_FOUND,
-      });
-    }
-
-    lesson.isCompleted = isCompleted;
-    return await this.lessonRepository.save(lesson);
-  }
-
-  async getLesson(lesson_id: number, user_id: number) {
-    const lesson = await this.lessonRepository.findOne({
-      where: { id: lesson_id },
-    });
-    if (!lesson) {
-      throw new CustomHttpException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `Lesson ${lesson_id} not found`,
-        code: StatusCodesList.LessonNotFound,
       });
     }
 
@@ -79,7 +68,36 @@ export class LessonService {
       });
     }
 
-    return lesson;
+    return { lesson, course: c };
+  }
+
+  async markLessonAsCompleted(lesson_id: number, isCompleted: boolean, user: UserEntity) {
+    const { lesson, course } = await this.checkPermission(lesson_id, user.id, true);
+
+    if (!lesson.completedUsers) {
+      lesson.completedUsers = [];
+    }
+    if (isCompleted) {
+      lesson.completedUsers.push(user);
+    } else {
+      lesson.completedUsers = lesson.completedUsers.filter((u) => u.id !== user.id);
+    }
+    await this.lessonRepository.save(lesson);
+  }
+
+  async getLesson(lesson_id: number, user_id: number) {
+    const { lesson, course } = await this.checkPermission(lesson_id, user_id);
+
+    // check user has completed this lesson
+    const count = await this.datasource.query(
+      `SELECT COUNT(*) FROM userscompleted_lessons WHERE lesson_id = ${lesson_id} AND user_id = ${user_id}`,
+    );
+    delete lesson.completedUsers;
+
+    return {
+      ...lesson,
+      isCompleted: count[0].count > 0,
+    };
   }
 
   async getLessonsBySectionId(section_id: number, userId: number) {

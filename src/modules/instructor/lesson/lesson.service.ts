@@ -82,23 +82,6 @@ export class LessonService {
     return lesson;
   }
 
-  async markLessonAsCompleted(lesson_id: number, isCompleted: boolean) {
-    const lesson = await this.lessonRepository.findOne({
-      where: { id: lesson_id },
-    });
-
-    if (!lesson) {
-      throw new CustomHttpException({
-        code: StatusCodesList.LessonNotFound,
-        message: `Lesson ${lesson_id} not found`,
-        statusCode: HttpStatus.NOT_FOUND,
-      });
-    }
-
-    lesson.isCompleted = isCompleted;
-    return await this.lessonRepository.save(lesson);
-  }
-
   async getLessons(lesson_id: number, user_id: number) {
     const lesson = await this.lessonRepository.findOne({
       where: { id: lesson_id, owner_id: user_id },

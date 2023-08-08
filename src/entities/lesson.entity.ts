@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, Unique } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, Unique } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { LessonComponentType } from "../common/enum/lesson-component-type";
 import { SectionEntity } from "./section.entity";
@@ -48,9 +48,6 @@ export class LessonEntity extends BaseEntity {
   @Column()
   title: string;
 
-  @Column({ default: false })
-  isCompleted: boolean;
-
   @Column({ default: 0 })
   order: number;
 
@@ -70,4 +67,15 @@ export class LessonEntity extends BaseEntity {
   })
   @JoinColumn({ name: "section_id" })
   section: SectionEntity;
+
+  @Column({ nullable: true })
+  parent_id: number;
+
+  @ManyToMany(() => UserEntity, (user) => user.completedLessons)
+  @JoinTable({
+    name: "userscompleted_lessons",
+    joinColumn: { name: "lesson_id" },
+    inverseJoinColumn: { name: "user_id" },
+  })
+  completedUsers: UserEntity[];
 }

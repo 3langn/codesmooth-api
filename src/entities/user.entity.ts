@@ -7,6 +7,7 @@ import { UserDto } from "../modules/user/dtos/user.dto";
 import { UserSettingsEntity } from "./user-settings.entity";
 import { CourseEntity } from "./course.entity";
 import { TransactionEntity } from "./transaction.entity";
+import { LessonEntity } from "./lesson.entity";
 
 export type Social = "google" | "facebook" | "github";
 @Entity({ name: "users" })
@@ -63,4 +64,10 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => TransactionEntity, (transaction) => transaction.user)
   transactions: TransactionEntity[];
+
+  // @ManyToMany(() => CourseEntity, (course) => course.wishList)
+  // wishList: CourseEntity[];
+
+  @ManyToMany(() => LessonEntity, (lesson) => lesson.completedUsers)
+  completedLessons: LessonEntity[];
 }

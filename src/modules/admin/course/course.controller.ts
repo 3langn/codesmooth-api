@@ -7,6 +7,7 @@ import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 import { Auth } from "../../../decorators";
 import { UserRole } from "../../../common/enum/user-role";
 import { ResponseDefault } from "../../../common/dto/response_default";
+import { RejectRequest } from "./dto";
 
 @Controller("admin/course")
 export class AdminCourseController {
@@ -41,7 +42,7 @@ export class AdminCourseController {
 
   @Auth([UserRole.ADMINSTRATOR])
   @Patch("/rejected/:id")
-  async rejected(@Param("id") id: number, @Body() body: { rejected_reason: string }, @Req() req) {
+  async rejected(@Param("id") id: number, @Body() body: RejectRequest, @Req() req) {
     await this.courseService.rejectCourse(id, body.rejected_reason, req.user);
     return new ResponseDefault("Success");
   }
