@@ -31,8 +31,8 @@ export class LessonController {
 
   @Auth()
   @Get("/:lesson_id")
-  async getLessons(@Param("lesson_id") lesson_id: number) {
-    const res = await this.lessonService.getLessons(lesson_id);
+  async getLessons(@Param("lesson_id") lesson_id: number, @Req() req: any) {
+    const res = await this.lessonService.getLessons(lesson_id, req.user.id);
     return new ResponseDefault("Success", res);
   }
 

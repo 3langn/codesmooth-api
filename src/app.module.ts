@@ -13,7 +13,7 @@ import { UserModule } from "./modules/user/user.module";
 import { ExcuteModule } from "./modules/execute/execute.module";
 import { HealthModule } from "./modules/health/health.module";
 import { UploadModule } from "./modules/upload/upload.module";
-import { LessonModule } from "./modules/instructor/lesson/lesson.module";
+import { InstructorLessonModule } from "./modules/instructor/lesson/lesson.module";
 import { CategoryModule } from "./modules/admin/category/category.module";
 import { SectionModule } from "./modules/admin/section/section.module";
 import { AdminSettingsModule } from "./modules/admin/setting/setting.module";
@@ -29,6 +29,7 @@ import { TransactionModule } from "./modules/transaction/transaction.module";
 import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { PromModule } from "./modules/prometheus/prometheus.module";
 import { SettingsModule } from "./modules/settings/settings.module";
+import { LessonModule } from "./modules/lesson/lesson.module";
 
 @Module({
   imports: [
@@ -58,7 +59,7 @@ import { SettingsModule } from "./modules/settings/settings.module";
     ScheduleModule.forRoot(),
     PromModule,
     ExcuteModule,
-    LessonModule,
+    InstructorLessonModule,
     InstructorCourseModule,
     SectionModule,
     SampleModule,
@@ -76,6 +77,7 @@ import { SettingsModule } from "./modules/settings/settings.module";
     InstructorCategoryModule,
     InstructorCourseModule,
     CourseModule,
+    LessonModule,
     AdminCourseModule,
   ],
   // providers: [

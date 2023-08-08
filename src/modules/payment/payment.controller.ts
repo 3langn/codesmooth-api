@@ -25,6 +25,8 @@ export class PaymentController {
   @Auth()
   @Post("/calculate")
   async calculate(@Body() body: CalculateRequestDto) {
-    return await this.paymentService.calculate(body);
+    const r = await this.paymentService.calculate(body);
+
+    return new ResponseDefault("Tính toán thành công", r);
   }
 }

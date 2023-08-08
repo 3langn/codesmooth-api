@@ -36,6 +36,9 @@ export class LessonEntity extends BaseEntity {
   course: CourseEntity;
 
   @Column()
+  course_id: number;
+
+  @Column()
   owner_id: number;
 
   @ManyToOne(() => UserEntity)

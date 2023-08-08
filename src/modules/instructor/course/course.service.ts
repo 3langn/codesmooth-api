@@ -226,7 +226,11 @@ export class InstructorCourseService {
       });
     }
 
-    if (c.status !== CourseStatus.Draft && !c.published_course_id) {
+    if (
+      c.status !== CourseStatus.Draft &&
+      c.status !== CourseStatus.Rejected &&
+      !c.published_course_id
+    ) {
       throw new CustomHttpException({
         message: "Course is not draft",
         code: StatusCodesList.BadRequest,

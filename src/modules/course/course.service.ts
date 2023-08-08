@@ -122,6 +122,8 @@ export class CourseService {
       });
     }
 
+    console.log("User id: ", user_id);
+
     if (!c)
       throw new CustomHttpException({
         message: "Không tìm thấy khóa học",

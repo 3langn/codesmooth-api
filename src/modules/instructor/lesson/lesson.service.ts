@@ -3,11 +3,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { In, MoreThanOrEqual, Repository } from "typeorm";
 import { LessonEntity } from "../../../entities/lesson.entity";
 import { AddLessonDto, SaveLessonDto, UpdateLessonsOrder } from "./lesson.dto";
-import { NotFoundException } from "src/common/exception/not-found.exception";
-import { ExceptionTitleList } from "src/common/constants/exception-title-list.constants";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { SectionEntity } from "../../../entities/section.entity";
+import { CourseEntity } from "../../../entities/course.entity";
 @Injectable()
 export class LessonService {
   constructor(
@@ -15,6 +14,8 @@ export class LessonService {
     private lessonRepository: Repository<LessonEntity>,
     @InjectRepository(SectionEntity)
     private sectionRepository: Repository<LessonEntity>,
+    @InjectRepository(CourseEntity)
+    private courseRepository: Repository<CourseEntity>,
   ) {}
 
   async findOneLessonOrFail(lesson_id: number, user_id: number) {
@@ -98,9 +99,9 @@ export class LessonService {
     return await this.lessonRepository.save(lesson);
   }
 
-  async getLessons(lesson_id: number) {
+  async getLessons(lesson_id: number, user_id: number) {
     const lesson = await this.lessonRepository.findOne({
-      where: { id: lesson_id },
+      where: { id: lesson_id, owner_id: user_id },
     });
     if (!lesson) {
       throw new CustomHttpException({
