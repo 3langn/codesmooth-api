@@ -74,44 +74,75 @@ export class CourseService {
   }
 
   async getCourseById(id: number, user_id?: number): Promise<CourseReponseDto> {
-    // select id, title from lessons
-    const c = await this.courseRepository
-      .createQueryBuilder("course")
+    // check lesson is completed by user
+    const qb = this.courseRepository.createQueryBuilder("course");
+    const result = await qb
       .select([
         "course",
-        "categories.id",
-        "categories.name",
-        "owner.id",
-        "owner.username",
-        "owner.email",
-        "owner.avatar",
-        "sections.id",
-        "sections.title",
-        "sections.order",
-        "sections.type",
-        "lessons.id",
-        "lessons.title",
-        "lessons.order",
-        "lessons.section_id",
-        "main_category.id",
-        "main_category.name",
+        "sections",
+        "lessons",
+        "COUNT(completed_lessons.lesson_id) AS count_completed",
       ])
       .leftJoin("course.categories", "categories")
       .leftJoin("course.main_category", "main_category")
       .leftJoin("course.owner", "owner")
       .leftJoin("course.sections", "sections")
       .leftJoin("sections.lessons", "lessons")
+      .leftJoin(
+        "userscompleted_lessons",
+        "completed_lessons",
+        "completed_lessons.lesson_id = lessons.id AND completed_lessons.user_id = :userId",
+        { userId: user_id },
+      )
       .where("course.status = :status", { status: CourseStatus.Published })
       .andWhere("course.id = :id", { id })
       .andWhere("course.published_at IS NOT NULL")
       .andWhere("course.deleted_at IS NULL")
+      .groupBy("course.id, categories.id, owner.id, sections.id, lessons.id")
       .orderBy("sections.order", "ASC")
       .addOrderBy("lessons.order", "ASC")
-      .getOne();
-    // .orderBy("category.order", "ASC")
-    // .addOrderBy("lessons.order", "ASC")
+      .getRawMany();
 
-    // query count from join table where user_id = 1 and course_id = 1
+    // Xử lý dữ liệu để trả về định dạng yêu cầu
+    let formattedResult: CourseReponseDto;
+    let currentCourse = null;
+    let currentSection = null;
+
+    for (const row of result) {
+      if (!currentCourse || currentCourse.id !== row.course_id) {
+        currentCourse = {
+          sections: [],
+        };
+
+        for (const key in row) {
+          if (key.includes("course_")) currentCourse[key.split("_")[1]] = row[key];
+        }
+        formattedResult = currentCourse;
+        currentSection = null;
+      }
+
+      if (!currentSection || currentSection.id !== row.sections_id) {
+        currentSection = {
+          lessons: [],
+        };
+        for (const key in row) {
+          if (key.includes("sections_")) currentSection[key.split("_")[1]] = row[key];
+        }
+        currentCourse.sections.push(currentSection);
+      }
+
+      currentSection.lessons.push({
+        id: row.lessons_id,
+        title: row.lessons_title,
+        summary: row.lessons_summary,
+        section_id: row.lessons_section_id,
+        course_id: row.lessons_course_id,
+        order: parseInt(row.lessons_order),
+        components: row.lessons_components,
+        is_completed: parseInt(row.count_completed) > 0,
+      });
+    }
+
     let count = 0;
     if (user_id) {
       count = await this.datasource.createEntityManager().count("course_student", {
@@ -122,7 +153,7 @@ export class CourseService {
       });
     }
 
-    if (!c)
+    if (!formattedResult)
       throw new CustomHttpException({
         message: "Không tìm thấy khóa học",
         statusCode: HttpStatus.NOT_FOUND,
@@ -130,7 +161,7 @@ export class CourseService {
       });
 
     return {
-      ...c,
+      ...formattedResult,
       is_bought: count > 0,
     };
   }

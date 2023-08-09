@@ -89,14 +89,17 @@ export class LessonService {
     const { lesson, course } = await this.checkPermission(lesson_id, user_id);
 
     // check user has completed this lesson
-    const count = await this.datasource.query(
-      `SELECT COUNT(*) FROM userscompleted_lessons WHERE lesson_id = ${lesson_id} AND user_id = ${user_id}`,
-    );
+    const count = await this.datasource.createEntityManager().count("userscompleted_lessons", {
+      where: {
+        lesson_id: lesson_id,
+        user_id: user_id,
+      },
+    });
     delete lesson.completedUsers;
 
     return {
       ...lesson,
-      is_completed: count[0].count > 0,
+      is_completed: count > 0,
     };
   }
 
