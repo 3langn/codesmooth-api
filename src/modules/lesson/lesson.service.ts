@@ -34,55 +34,64 @@ export class LessonService {
     return lessonExist;
   }
 
-  async checkPermission(lesson_id: number, user_id: number, loadCompletedUsers = false) {
-    const lesson = await this.lessonRepository.findOne({
-      where: { id: lesson_id },
-      relations: {
-        completed_users: loadCompletedUsers,
-      },
+  // async checkPermission(lesson_id: number, user_id: number, loadCompletedUsers = false) {
+  //   const lesson = await this.lessonRepository.findOne({
+  //     where: { id: lesson_id },
+  //     relations: {
+  //       completed_users: loadCompletedUsers,
+  //     },
+  //   });
+
+  //   if (!lesson) {
+  //     throw new CustomHttpException({
+  //       code: StatusCodesList.LessonNotFound,
+  //       message: `Lesson ${lesson_id} not found`,
+  //       statusCode: HttpStatus.NOT_FOUND,
+  //     });
+  //   }
+
+  //   const c = await this.courseRepository.findOne({
+  //     where: [
+  //       { id: lesson.course_id, students: { id: user_id } },
+  //       {
+  //         id: lesson.course_id,
+  //         owner: { id: user_id },
+  //       },
+  //     ],
+  //   });
+
+  //   if (!c) {
+  //     throw new CustomHttpException({
+  //       statusCode: HttpStatus.FORBIDDEN,
+  //       message: `Không có quyền truy cập`,
+  //       code: StatusCodesList.Forbidden,
+  //     });
+  //   }
+
+  //   return { lesson, course: c };
+  // }
+
+  async checkPermission(course_id: number, user_id: number, loadCompletedUsers = false) {
+    const c = await this.courseRepository.count({
+      where: { id: course_id, students: { id: user_id } },
     });
 
-    if (!lesson) {
-      throw new CustomHttpException({
-        code: StatusCodesList.LessonNotFound,
-        message: `Lesson ${lesson_id} not found`,
-        statusCode: HttpStatus.NOT_FOUND,
-      });
-    }
-
-    const c = await this.courseRepository.findOne({
-      where: [
-        { id: lesson.course_id, students: { id: user_id } },
-        {
-          id: lesson.course_id,
-          owner: { id: user_id },
-        },
-      ],
-    });
-
-    if (!c) {
+    if (c === 0) {
       throw new CustomHttpException({
         statusCode: HttpStatus.FORBIDDEN,
         message: `Không có quyền truy cập`,
         code: StatusCodesList.Forbidden,
       });
     }
-
-    return { lesson, course: c };
   }
 
-  async markLessonAsCompleted(lesson_id: number, isCompleted: boolean, user: UserEntity) {
-    // const { lesson, course } = await this.checkPermission(lesson_id, user.id);
-
-    // if (!lesson.completed_users) {
-    //   lesson.completed_users = [];
-    // }
-    // if (isCompleted) {
-    //   lesson.completed_users.push(user);
-    // } else {
-    //   lesson.completed_users = lesson.completed_users.filter((u) => u.id !== user.id);
-    // }
-    // await this.lessonRepository.save(lesson);
+  async markLessonAsCompleted(
+    lesson_id: number,
+    course_id: number,
+    isCompleted: boolean,
+    user: UserEntity,
+  ) {
+    await this.checkPermission(course_id, user.id);
 
     if (isCompleted) {
       await this.datasource.getRepository("userscompleted_lessons").insert({
@@ -97,14 +106,21 @@ export class LessonService {
     }
   }
 
-  async getLesson(lesson_id: number, user_id: number) {
-    const { lesson, course } = await this.checkPermission(lesson_id, user_id);
+  async getLesson(lesson_id: number, course_id: number, user_id: number) {
+    await this.checkPermission(course_id, user_id);
 
     // check user has completed this lesson
     const count = await this.datasource.createEntityManager().count("userscompleted_lessons", {
       where: {
         lesson_id: lesson_id,
         user_id: user_id,
+      },
+    });
+
+    const lesson = await this.lessonRepository.findOne({
+      where: { id: lesson_id },
+      relations: {
+        completed_users: true,
       },
     });
 

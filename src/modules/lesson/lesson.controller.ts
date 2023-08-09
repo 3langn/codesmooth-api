@@ -8,9 +8,13 @@ import { MarkLessonAsCompletedDto } from "../instructor/lesson/lesson.dto";
 export class LessonController {
   constructor(private lessonService: LessonService) {}
   @Auth()
-  @Get("/:lesson_id")
-  async getLesson(@Param("lesson_id") lesson_id: number, @Req() req: any) {
-    const res = await this.lessonService.getLesson(lesson_id, req.user.id);
+  @Get("/:lesson_id/:course_id")
+  async getLesson(
+    @Param("lesson_id") lesson_id: number,
+    @Param("course_id") course_id: number,
+    @Req() req: any,
+  ) {
+    const res = await this.lessonService.getLesson(lesson_id, course_id, req.user.id);
     return new ResponseDefault("Success", res);
   }
 
@@ -30,6 +34,7 @@ export class LessonController {
   ) {
     const res = await this.lessonService.markLessonAsCompleted(
       body.lesson_id,
+      body.course_id,
       body.isCompleted,
       req.user,
     );

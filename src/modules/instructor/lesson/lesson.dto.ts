@@ -44,6 +44,9 @@ export class MarkLessonAsCompletedDto {
   @IsBoolean({ message: "isCompleted phải là một boolean" })
   @IsNotEmpty({ message: "isCompleted không được để trống" })
   isCompleted: boolean;
+
+  @IsNumber(undefined, { message: "course_id phải là một số" })
+  course_id: number;
 }
 
 class SwapOrderRequestDto {
