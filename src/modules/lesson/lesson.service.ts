@@ -96,7 +96,7 @@ export class LessonService {
 
     return {
       ...lesson,
-      isCompleted: count[0].count > 0,
+      is_completed: count[0].count > 0,
     };
   }
 
