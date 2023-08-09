@@ -182,6 +182,7 @@ export class AdminCourseService {
           delete newSection.id;
         }
         newSection.parent_id = section.id;
+        newSection.course_id = coursePublish.id;
 
         const ls = section.lessons.map((lesson) => {
           const newLesson = { ...lesson };
@@ -193,6 +194,7 @@ export class AdminCourseService {
             delete newLesson.id;
           }
           newLesson.parent_id = lesson.id;
+          newLesson.course_id = coursePublish.id;
 
           newLesson.section_id = newSection.id;
           return this.lessonRepository.create(newLesson);

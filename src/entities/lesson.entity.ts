@@ -28,7 +28,7 @@ export class LessonComponent {
   @IsEnum(LessonComponentType, { message: "Type must be a valid type" })
   type: LessonComponentType;
 }
-@Unique("UQ_LESSON_ORDER", ["order", "section_id"])
+@Unique("UQ_LESSON_ORDER", ["order", "course_id"])
 @Entity("lessons")
 export class LessonEntity extends BaseEntity {
   @ManyToOne(() => CourseEntity)

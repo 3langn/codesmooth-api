@@ -72,17 +72,29 @@ export class LessonService {
   }
 
   async markLessonAsCompleted(lesson_id: number, isCompleted: boolean, user: UserEntity) {
-    const { lesson, course } = await this.checkPermission(lesson_id, user.id, true);
+    // const { lesson, course } = await this.checkPermission(lesson_id, user.id);
 
-    if (!lesson.completed_users) {
-      lesson.completed_users = [];
-    }
+    // if (!lesson.completed_users) {
+    //   lesson.completed_users = [];
+    // }
+    // if (isCompleted) {
+    //   lesson.completed_users.push(user);
+    // } else {
+    //   lesson.completed_users = lesson.completed_users.filter((u) => u.id !== user.id);
+    // }
+    // await this.lessonRepository.save(lesson);
+
     if (isCompleted) {
-      lesson.completed_users.push(user);
+      await this.datasource.getRepository("userscompleted_lessons").insert({
+        lesson_id,
+        user_id: user.id,
+      });
     } else {
-      lesson.completed_users = lesson.completed_users.filter((u) => u.id !== user.id);
+      await this.datasource.getRepository("userscompleted_lessons").delete({
+        lesson_id,
+        user_id: user.id,
+      });
     }
-    await this.lessonRepository.save(lesson);
   }
 
   async getLesson(lesson_id: number, user_id: number) {
@@ -95,11 +107,19 @@ export class LessonService {
         user_id: user_id,
       },
     });
+
+    const countLesson = await this.lessonRepository.count({
+      where: {
+        course_id: lesson.course_id,
+      },
+    });
     delete lesson.completed_users;
 
     return {
       ...lesson,
       is_completed: count > 0,
+      is_first: lesson.order === 1,
+      is_last: lesson.order === countLesson,
     };
   }
 

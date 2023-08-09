@@ -21,10 +21,17 @@ export class SectionService {
   ) {}
 
   async createSection(data: CreateSectionDto, user_id: number) {
+    const countLesson = await this.lessonRepository.count({
+      where: {
+        course: {
+          id: data.course_id,
+        },
+      },
+    });
     const lesson = this.lessonRepository.create({
       title: "New Lesson",
       components: [],
-      order: 1,
+      order: countLesson + 1,
       course: {
         id: data.course_id,
       },
