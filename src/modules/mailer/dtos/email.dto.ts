@@ -13,6 +13,8 @@ export class AttachmentData {
 // }
 
 // Content là những field sẽ được render trong template
+
+export type Content = VerifyEmailContent | ResetPasswordContent | ContactContent;
 export class VerifyEmailContent {
   token: string;
   username: string;
@@ -23,34 +25,28 @@ export class ResetPasswordContent {
   username: string;
 }
 
-export class VerifyEmailData {
-  content: VerifyEmailContent;
+export class ContactContent {
+  name: string;
 
-  subject: string;
+  email: string;
 
-  to: string[];
+  message: string;
+
+  phone: string;
 }
 
-export class VerifyEmailMessage {
-  data: VerifyEmailData;
-
-  template_id: string;
-
-  notificationId: string;
-}
-
-export class EmailDataDto {
+export class EmailDataDto<T = Content> {
   from: string;
 
   to: string;
 
   subject: string;
 
-  content: VerifyEmailContent;
+  content: T;
 }
 
-export class EmailMessageDto {
-  data: EmailDataDto;
+export class EmailMessageDto<T = Content> {
+  data: EmailDataDto<T>;
 
   template_id: string;
 }

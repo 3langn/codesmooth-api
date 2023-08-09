@@ -117,25 +117,7 @@ export class AuthService {
         conflictPaths: ["user_id", "type"],
       },
     );
-    this.mailerService
-      .sendMail({
-        template_id: TemplateId.EMAIL_VERIFICATION,
-        data: {
-          content: {
-            token: this.configService.frontendUrl + "/verify-email?token=" + token,
-            username: user.username,
-          },
-          subject: "Xác minh email đăng ký tài khoản",
-          to: userRegisterDto.email,
-          from: "noreply@codedrafts.com",
-        },
-      })
-      .then(() => {
-        this.logger.log("Send email verification successfully");
-      })
-      .catch((error) => {
-        this.logger.error(error);
-      });
+    this.mailerService.sendMailVerify(user.email, user.username, user.id);
 
     return user;
   }
@@ -217,25 +199,7 @@ export class AuthService {
       },
     );
 
-    this.mailerService
-      .sendMail({
-        template_id: TemplateId.RESET_PASSWORD,
-        data: {
-          content: {
-            token:
-              this.configService.frontendUrl +
-              "/reset-password?token=" +
-              this.jwtService.generateResetPasswordToken(user.id),
-            username: user.username,
-          },
-          subject: "Cài đặt lại mật khẩu",
-          to: body.email,
-          from: "noreply@codedrafts.com",
-        },
-      })
-      .then(() => {
-        this.logger.log("Send email reset password successfully");
-      });
+    this.mailerService.sendMailResetPassword(user.username, user.email, user.id);
   }
 
   async resetPassword(body: ResetPasswordDto): Promise<void> {
