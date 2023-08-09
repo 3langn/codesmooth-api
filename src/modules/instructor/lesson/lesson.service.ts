@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, MoreThanOrEqual, Repository } from "typeorm";
 import { LessonEntity } from "../../../entities/lesson.entity";
@@ -7,8 +7,10 @@ import { StatusCodesList } from "../../../common/constants/status-codes-list.con
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { SectionEntity } from "../../../entities/section.entity";
 import { CourseEntity } from "../../../entities/course.entity";
+import { LessonComponentType } from "../../../common/enum/lesson-component-type";
 @Injectable()
 export class LessonService {
+  private readonly logger = new Logger(LessonService.name);
   constructor(
     @InjectRepository(LessonEntity)
     private lessonRepository: Repository<LessonEntity>,
@@ -34,8 +36,45 @@ export class LessonService {
   }
 
   async saveLesson(data: SaveLessonDto, user_id: number) {
-    await this.findOneLessonOrFail(data.id, user_id);
+    const lesson = await this.findOneLessonOrFail(data.id, user_id);
     await this.lessonRepository.save(data);
+
+    this.calculateReadingTime(lesson);
+  }
+
+  private calculateReadingTime(lesson: LessonEntity) {
+    this.lessonRepository
+      .find({
+        where: { course_id: lesson.course_id },
+      })
+      .then(async (lessons) => {
+        // calculate total read time based on the lessons
+        let total_read_time = 0;
+        lessons.forEach((lesson) => {
+          lesson.components.forEach((component) => {
+            if (component.type === LessonComponentType.Text) {
+              total_read_time += Math.ceil(component.content.split(" ").length / 200);
+            }
+            if (component.type === LessonComponentType.Videl) {
+              // total_read_time +=
+            }
+            if (component.type === LessonComponentType.Code) {
+              total_read_time += 10;
+            }
+          });
+        });
+
+        // update course
+        await this.courseRepository.update(
+          { id: lesson.course_id },
+          {
+            reading_time: total_read_time,
+          },
+        );
+      })
+      .catch((err) => {
+        this.logger.error(err);
+      });
   }
 
   async addLesson(data: AddLessonDto, user_id: number) {

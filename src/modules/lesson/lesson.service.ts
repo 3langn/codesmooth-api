@@ -38,7 +38,7 @@ export class LessonService {
     const lesson = await this.lessonRepository.findOne({
       where: { id: lesson_id },
       relations: {
-        completedUsers: loadCompletedUsers,
+        completed_users: loadCompletedUsers,
       },
     });
 
@@ -74,13 +74,13 @@ export class LessonService {
   async markLessonAsCompleted(lesson_id: number, isCompleted: boolean, user: UserEntity) {
     const { lesson, course } = await this.checkPermission(lesson_id, user.id, true);
 
-    if (!lesson.completedUsers) {
-      lesson.completedUsers = [];
+    if (!lesson.completed_users) {
+      lesson.completed_users = [];
     }
     if (isCompleted) {
-      lesson.completedUsers.push(user);
+      lesson.completed_users.push(user);
     } else {
-      lesson.completedUsers = lesson.completedUsers.filter((u) => u.id !== user.id);
+      lesson.completed_users = lesson.completed_users.filter((u) => u.id !== user.id);
     }
     await this.lessonRepository.save(lesson);
   }
@@ -95,7 +95,7 @@ export class LessonService {
         user_id: user_id,
       },
     });
-    delete lesson.completedUsers;
+    delete lesson.completed_users;
 
     return {
       ...lesson,
@@ -104,11 +104,24 @@ export class LessonService {
   }
 
   async getLessonsBySectionId(section_id: number, userId: number) {
-    const lessons = await this.lessonRepository.find({
-      select: ["id", "title", "order", "section_id"],
-      where: { section: { id: section_id }, owner: { id: userId } },
-      order: { order: "ASC" },
-    });
+    const lessons = await this.lessonRepository
+      .createQueryBuilder("lesson")
+      .select([
+        "lesson.id",
+        "lesson.title",
+        "lesson.order",
+        "lesson.section_id",
+        "lesson.course_id",
+      ])
+      .where("lesson.section_id = :section_id", { section_id })
+      .loadRelationCountAndMap(
+        "lesson.completed_count",
+        "lesson.completed_users",
+        "completed_users",
+        (qb) => qb.where("completed_users.id = :userId", { userId }),
+      )
+      .orderBy("lesson.order", "ASC")
+      .getMany();
     return lessons;
   }
 }

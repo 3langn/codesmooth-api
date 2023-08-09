@@ -9,4 +9,4 @@ import { SectionService } from "./section.service";
   controllers: [SectionController],
   providers: [SectionService],
 })
-export class SectionModule {}
+export class InstructorSectionModule {}

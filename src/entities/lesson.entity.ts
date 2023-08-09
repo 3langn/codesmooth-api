@@ -77,5 +77,7 @@ export class LessonEntity extends BaseEntity {
     joinColumn: { name: "lesson_id" },
     inverseJoinColumn: { name: "user_id" },
   })
-  completedUsers: UserEntity[];
+  completed_users: UserEntity[];
+
+  completed_count: number = 0;
 }

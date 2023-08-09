@@ -16,9 +16,9 @@ export class CourseReponseDto extends BaseDto {
   feedback_email: string;
   total_enrollment: number;
   categories: any[];
+  sections: any[];
   owner: Owner;
   is_bought: boolean;
-  main_category_id: number;
   main_category: CategoryEntity;
 }
 export interface Owner {

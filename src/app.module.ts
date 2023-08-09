@@ -15,7 +15,7 @@ import { HealthModule } from "./modules/health/health.module";
 import { UploadModule } from "./modules/upload/upload.module";
 import { InstructorLessonModule } from "./modules/instructor/lesson/lesson.module";
 import { CategoryModule } from "./modules/admin/category/category.module";
-import { SectionModule } from "./modules/admin/section/section.module";
+import { InstructorSectionModule } from "./modules/admin/section/section.module";
 import { AdminSettingsModule } from "./modules/admin/setting/setting.module";
 import { JwtModule } from "@nestjs/jwt";
 import { MailerModule } from "./modules/mailer/mailer.module";
@@ -30,6 +30,7 @@ import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { PromModule } from "./modules/prometheus/prometheus.module";
 import { SettingsModule } from "./modules/settings/settings.module";
 import { LessonModule } from "./modules/lesson/lesson.module";
+import { SectionModule } from "./modules/section/section.module";
 
 @Module({
   imports: [
@@ -61,7 +62,7 @@ import { LessonModule } from "./modules/lesson/lesson.module";
     ExcuteModule,
     InstructorLessonModule,
     InstructorCourseModule,
-    SectionModule,
+    InstructorSectionModule,
     SampleModule,
     AuthModule,
     UserModule,
@@ -78,6 +79,7 @@ import { LessonModule } from "./modules/lesson/lesson.module";
     InstructorCourseModule,
     CourseModule,
     LessonModule,
+    SectionModule,
     AdminCourseModule,
   ],
   // providers: [

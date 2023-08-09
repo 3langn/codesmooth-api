@@ -125,4 +125,7 @@ export class CourseEntity extends BaseEntity {
 
   @Column({ nullable: true, type: "jsonb" })
   rejected_reason: RejectedReason;
+
+  @Column({ nullable: true })
+  reading_time: number;
 }

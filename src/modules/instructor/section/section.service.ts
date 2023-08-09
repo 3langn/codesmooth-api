@@ -59,6 +59,7 @@ export class SectionService {
         lessons: {
           id: true,
           order: true,
+          section_id: true,
           title: true,
         },
       },

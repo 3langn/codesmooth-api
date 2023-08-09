@@ -85,3 +85,16 @@ export function splitAndReturnSecondPart(input: string): string {
   parts.shift();
   return parts.join("_");
 }
+
+export function countWords(text: string): number {
+  const words = text.split(/\s+/).filter((word) => word !== "").length;
+  return words;
+}
+
+export function calculateReadingTime(words: number, readingSpeed: number = 200): number {
+  // Định nghĩa tốc độ đọc trung bình mặc định là 200 từ/phút
+  // Bạn có thể điều chỉnh tốc độ đọc theo nhu cầu
+  const timeInMinutes = words / readingSpeed;
+  // Làm tròn lên đến phút gần nhất
+  return Math.ceil(timeInMinutes);
+}
