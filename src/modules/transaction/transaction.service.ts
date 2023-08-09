@@ -78,6 +78,7 @@ export class TransactionService {
   // CRON JOB per 1 minute
   @Cron("0 */1 * * * *")
   async transactionExpire() {
+    if (process.env.NODE_ENV === "local") return;
     const transactions = await this.transactionRepository.find({
       where: { status: TransactionStatus.PENDING },
     });

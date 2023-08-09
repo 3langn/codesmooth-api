@@ -36,6 +36,9 @@ export class SectionEntity extends BaseEntity {
   @JoinColumn({ name: "course_id" })
   course: CourseEntity;
 
+  @Column({ nullable: true })
+  parent_id: number;
+
   @OneToMany(() => LessonEntity, (lesson) => lesson.section, {
     cascade: true,
   })

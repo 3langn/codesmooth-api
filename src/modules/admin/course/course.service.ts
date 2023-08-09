@@ -102,6 +102,7 @@ export class AdminCourseService {
     if (course.published_course_id) {
       p = await this.courseRepository.findOne({
         where: { id: course.published_course_id },
+        relations: ["owner", "sections", "sections.lessons"],
       });
 
       if (!p) {
@@ -128,9 +129,6 @@ export class AdminCourseService {
       p.owner = course.owner;
       p.main_category = course.main_category;
 
-      await this.sectionRepository.delete({
-        course_id: p.id,
-      });
       p = await this.courseRepository.save(p);
     } else {
       // Create a new published course
@@ -147,7 +145,7 @@ export class AdminCourseService {
       p = await this.courseRepository.save(publishedCourse);
     }
 
-    await this.saveSessionForPublishCourse(course, p);
+    await this.saveSectionForPublishCourse(course, p);
     // Update the draft course's published_course_id and status
     await this.courseRepository.update(
       {
@@ -161,26 +159,50 @@ export class AdminCourseService {
     );
   }
 
-  private async saveSessionForPublishCourse(course: CourseEntity, p: CourseEntity) {
+  private async saveSectionForPublishCourse(
+    courseDraft: CourseEntity,
+    coursePublish: CourseEntity,
+  ) {
+    const plMap = {};
+    const psMap = {};
+
+    coursePublish.sections.forEach((section) => {
+      psMap[section.parent_id] = section;
+      section.lessons.forEach((lesson) => {
+        plMap[lesson.parent_id] = lesson;
+      });
+    });
+
     const newCourseSections = await Promise.all(
-      course.sections.map(async (section) => {
+      courseDraft.sections.map(async (section) => {
         const newSection = { ...section };
-        delete newSection.id;
+        if (psMap[section.id]) {
+          newSection.id = psMap[section.id].id;
+        } else {
+          delete newSection.id;
+        }
+        newSection.parent_id = section.id;
 
         const ls = section.lessons.map((lesson) => {
           const newLesson = { ...lesson };
-          newLesson.id = generateId(9);
-          newLesson.section_id = newSection.id;
-          newLesson.owner_id = p.owner_id;
 
+          // nếu khóa học đã được publish rồi thì sẽ sử dụng lại id của lesson cũ tránh mất thông tin
+          if (plMap[lesson.id]) {
+            newLesson.id = plMap[lesson.id].id;
+          } else {
+            delete newLesson.id;
+          }
+          newLesson.parent_id = lesson.id;
+
+          newLesson.section_id = newSection.id;
           return this.lessonRepository.create(newLesson);
         });
         newSection.lessons = ls;
 
         return this.sectionRepository.create({
           ...newSection,
-          course_id: p.id,
-          owner_id: p.owner_id,
+          course_id: coursePublish.id,
+          owner_id: coursePublish.owner_id,
         });
       }),
     );
