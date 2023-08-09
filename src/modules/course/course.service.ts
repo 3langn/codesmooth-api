@@ -3,7 +3,7 @@ import { InjectConnection, InjectDataSource, InjectRepository } from "@nestjs/ty
 import { DataSource, In, Repository } from "typeorm";
 import { CourseEntity } from "../../entities/course.entity";
 import { CategoryEntity } from "../../entities/category.entity";
-import { queryPagination } from "../../common/utils";
+import { queryPagination, splitAndReturnSecondPart } from "../../common/utils";
 import { PageOptionsDto } from "../../common/dto/page-options.dto";
 import { CourseStatus } from "../../common/enum/course";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
@@ -81,6 +81,8 @@ export class CourseService {
         "course",
         "sections",
         "lessons",
+        "categories",
+        "owner",
         "COUNT(completed_lessons.lesson_id) AS count_completed",
       ])
       .leftJoin("course.categories", "categories")
@@ -112,11 +114,23 @@ export class CourseService {
       if (!currentCourse || currentCourse.id !== row.course_id) {
         currentCourse = {
           sections: [],
+          owner: {},
+          categories: [],
         };
 
         for (const key in row) {
-          if (key.includes("course_")) currentCourse[key.split("_")[1]] = row[key];
+          if (key.includes("course_")) currentCourse[splitAndReturnSecondPart(key)] = row[key];
+          if (key.includes("owner_")) {
+            currentCourse.owner["id"] = row["owner_id"];
+            currentCourse.owner["username"] = row["owner_username"];
+            currentCourse.owner["email"] = row["owner_email"];
+            currentCourse.owner["avatar"] = row["owner_avatar"];
+            console.log(currentCourse.owner);
+          }
+          if (key.includes("categories_"))
+            currentCourse.categories[splitAndReturnSecondPart(key)] = row[key];
         }
+
         formattedResult = currentCourse;
         currentSection = null;
       }
@@ -126,7 +140,7 @@ export class CourseService {
           lessons: [],
         };
         for (const key in row) {
-          if (key.includes("sections_")) currentSection[key.split("_")[1]] = row[key];
+          if (key.includes("sections_")) currentSection[splitAndReturnSecondPart(key)] = row[key];
         }
         currentCourse.sections.push(currentSection);
       }
@@ -160,8 +174,13 @@ export class CourseService {
         code: StatusCodesList.NotFound,
       });
 
+    const main_category = await this.categoryRepository.findOne({
+      where: { id: formattedResult.main_category_id },
+    });
+
     return {
       ...formattedResult,
+      main_category,
       is_bought: count > 0,
     };
   }

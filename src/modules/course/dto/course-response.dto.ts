@@ -1,4 +1,5 @@
 import { BaseDto } from "../../../common/abstract.dto";
+import { CategoryEntity } from "../../../entities/category.entity";
 import { CourseEntity } from "../../../entities/course.entity";
 
 export class CourseReponseDto extends BaseDto {
@@ -17,6 +18,8 @@ export class CourseReponseDto extends BaseDto {
   categories: any[];
   owner: Owner;
   is_bought: boolean;
+  main_category_id: number;
+  main_category: CategoryEntity;
 }
 export interface Owner {
   id: number;

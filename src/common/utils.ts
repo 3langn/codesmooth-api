@@ -77,3 +77,11 @@ export function sortObject(obj) {
   }
   return sorted;
 }
+
+export function splitAndReturnSecondPart(input: string): string {
+  const parts = input.split("_");
+
+  // remove first element
+  parts.shift();
+  return parts.join("_");
+}

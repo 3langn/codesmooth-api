@@ -76,6 +76,7 @@ export class InstructorCourseService {
       course[key] = update[key];
     }
     await this.courseRepository.save(course);
+    return course;
   }
 
   async getCourses(

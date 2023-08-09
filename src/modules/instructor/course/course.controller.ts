@@ -34,8 +34,8 @@ export class InstructorCourseController {
   @Auth()
   @Put("/:id")
   async updateCourse(@Param("id") id: number, @Body() body: SaveCourseDto, @Req() req: any) {
-    await this.courseService.updateCourse(id, body, req.user.id);
-    return new ResponseDefault("Course updated successfully");
+    const r = await this.courseService.updateCourse(id, body, req.user.id);
+    return new ResponseDefault("Course updated successfully", { id: r.id });
   }
 
   @Auth()
