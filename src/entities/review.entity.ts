@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { UserEntity } from "./user.entity";
 import { CourseEntity } from "./course.entity";
@@ -27,4 +27,38 @@ export class ReviewEntity extends BaseEntity {
 
   @Column()
   comment: string;
+
+  @ManyToMany(() => UserEntity)
+  @JoinTable({
+    name: "review_like_users",
+    joinColumn: {
+      name: "review_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "user_id",
+      referencedColumnName: "id",
+    },
+  })
+  like_users: UserEntity[];
+
+  @ManyToMany(() => UserEntity)
+  @JoinTable({
+    name: "review_dislike_users",
+    joinColumn: {
+      name: "review_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "user_id",
+      referencedColumnName: "id",
+    },
+  })
+  dislike_users: UserEntity[];
+
+  like_count: number;
+  dislike_count: number;
+
+  is_like_count: number;
+  is_dislike_count: number;
 }

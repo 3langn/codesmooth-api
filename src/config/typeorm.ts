@@ -23,7 +23,7 @@ const config = {
   // migrationsRun: true,
   migrations: migrations,
   logging: process.env.ENABLE_ORM_LOGS === "true",
-  maxQueryExecutionTime: -1,
+  // maxQueryExecutionTime: -1,
   cache: true,
 };
 
