@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { DataSource, In, Repository } from "typeorm";
 
@@ -10,14 +10,15 @@ import { CourseStatus } from "../../../common/enum/course";
 import { queryPagination } from "../../../common/utils";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
+import { ReviewService } from "../../review/review.service";
 
 @Injectable()
 export class CourseService {
   constructor(
     @InjectRepository(CourseEntity)
     private courseRepository: Repository<CourseEntity>,
-    @InjectRepository(CategoryEntity)
-    private categoryRepository: Repository<CategoryEntity>,
+    @Inject(forwardRef(() => ReviewService))
+    private readonly reviewService: ReviewService,
     @InjectDataSource() private readonly datasource: DataSource,
   ) {}
 
@@ -37,6 +38,8 @@ export class CourseService {
       ])
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
+      .leftJoin("course.reviews", "review")
+      .addSelect("AVG(review.rating)", "course_rating")
       .where("course.status = :status", { status: CourseStatus.Published })
       .andWhere("course.published_at IS NOT NULL")
       .andWhere("course.deleted_at IS NULL");
@@ -45,7 +48,9 @@ export class CourseService {
       qb.andWhere("categories.id = :category_id", { category_id: pageOptionsDto.category_id });
     }
 
-    return await queryPagination({ query: qb, o: pageOptionsDto });
+    qb.groupBy("course.id, categories.id, owner.id").orderBy("course.id", "ASC");
+    const r = await queryPagination({ query: qb, o: pageOptionsDto });
+    return r;
   }
 
   async getMyCourses(
@@ -92,11 +97,14 @@ export class CourseService {
       .leftJoin("course.categories", "categories")
       .leftJoin("course.main_category", "main_category")
       .leftJoin("course.owner", "owner")
+      .leftJoin("course.reviews", "review")
+      .addSelect("AVG(review.rating)", "course_rating")
       .where("course.status = :status", { status: CourseStatus.Published })
       .andWhere("course.id = :id", { id })
       .andWhere("course.published_at IS NOT NULL")
       .andWhere("course.deleted_at IS NULL")
       .getOne();
+
     let count = 0;
     if (user_id) {
       count = await this.datasource.createEntityManager().count("course_student", {
@@ -119,5 +127,16 @@ export class CourseService {
       ...c,
       is_bought: count > 0,
     };
+  }
+
+  async isEnrolled(course_id: number, user_id: number): Promise<boolean> {
+    const count = await this.datasource.createEntityManager().count("course_student", {
+      where: {
+        student_id: user_id,
+        course_id,
+      },
+    });
+
+    return count > 0;
   }
 }

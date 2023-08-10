@@ -5,10 +5,12 @@ import { PageDto } from "../../../common/dto/page.dto";
 import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 import { Auth } from "../../../decorators";
 import { ResponseDefault } from "../../../common/dto/response_default";
+import { ReviewService } from "../../review/review.service";
+import { ReviewCourseRequest } from "../../review/review.dto";
 
 @Controller("course")
 export class CourseController {
-  constructor(private courseService: CourseService) {}
+  constructor(private courseService: CourseService, private reviewService: ReviewService) {}
 
   @Get("/")
   async getCourses(@Query() pageOptionsDto: PageOptionsDto) {

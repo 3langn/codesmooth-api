@@ -59,9 +59,6 @@ export class AdminCourseService {
   }
 
   async getCourseById(id: number) {
-    console.log("id", id);
-
-    // select id, title from lessons
     return await this.courseRepository
       .createQueryBuilder("course")
       .select([
@@ -71,13 +68,12 @@ export class AdminCourseService {
         "owner",
         "main_category.id",
         "main_category.name",
-        // "lessons.id",
-        // "lessons.title",
-        // "lessons.isCompleted",
       ])
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
       .leftJoin("course.main_category", "main_category")
+      .leftJoin("course.reviews", "review")
+      .addSelect("AVG(review.rating)", "course_rating")
       .andWhere("course.id = :id", { id })
       .getOne();
   }

@@ -22,6 +22,7 @@ import { OtherModule } from "./modules/other/other.module";
 import { AdminModule } from "./modules/admin/admin.module";
 import { InstructorModule } from "./modules/instructor/instructor.module";
 import { CustomerModule } from "./modules/customer/customer.module";
+import { ReviewModule } from "./modules/review/review.module";
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { CustomerModule } from "./modules/customer/customer.module";
 
     WinstonModule.forRoot(winstonConfig),
     ScheduleModule.forRoot(),
+    ReviewModule,
     PromModule,
     ExcuteModule,
     AuthModule,

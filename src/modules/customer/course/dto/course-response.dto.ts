@@ -18,6 +18,7 @@ export class CourseReponseDto extends BaseDto {
   sections: any[];
   owner: Owner;
   is_bought: boolean;
+  rating: number;
   main_category: CategoryEntity;
 }
 export interface Owner {

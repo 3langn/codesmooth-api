@@ -180,6 +180,8 @@ export class InstructorCourseService {
       .leftJoin("course.owner", "owner")
       .leftJoin("course.sections", "sections")
       .leftJoin("sections.lessons", "lessons")
+      .leftJoin("course.reviews", "review")
+      .addSelect("AVG(review.rating)", "course_rating")
       .where("course.id = :id", { id })
       .andWhere("course.owner_id = :user_id", { user_id })
       .andWhere("course.deleted_at IS NULL")

@@ -5,6 +5,7 @@ import { CourseLevel, CourseStatus, CourseTargetAudience } from "../common/enum/
 import { UserEntity } from "./user.entity";
 import { CategoryEntity } from "./category.entity";
 import { LessonEntity } from "./lesson.entity";
+import { ReviewEntity } from "./review.entity";
 class RejectedReason {
   reason: string;
 
@@ -144,4 +145,10 @@ export class CourseEntity extends BaseEntity {
     },
   })
   completedStudents: UserEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.course)
+  reviews: ReviewEntity[];
+
+  @Column({ nullable: true, select: false })
+  rating: number;
 }
