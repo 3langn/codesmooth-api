@@ -31,6 +31,7 @@ import { PromModule } from "./modules/prometheus/prometheus.module";
 import { SettingsModule } from "./modules/settings/settings.module";
 import { LessonModule } from "./modules/lesson/lesson.module";
 import { SectionModule } from "./modules/section/section.module";
+import { OtherModule } from "./modules/other/other.module";
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { SectionModule } from "./modules/section/section.module";
     CourseModule,
     LessonModule,
     SectionModule,
+    OtherModule,
     AdminCourseModule,
   ],
   // providers: [

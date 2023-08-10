@@ -44,31 +44,29 @@ export class LessonService {
 
   private calculateReadingTime(lesson: LessonEntity) {
     this.lessonRepository
-      .find({
+      .findOne({
         where: { course_id: lesson.course_id },
       })
       .then(async (lessons) => {
         // calculate total read time based on the lessons
         let total_read_time = 0;
-        lessons.forEach((lesson) => {
-          lesson.components.forEach((component) => {
-            if (component.type === LessonComponentType.Text) {
-              total_read_time += Math.ceil(component.content.split(" ").length / 200);
-            }
-            if (component.type === LessonComponentType.Videl) {
-              // total_read_time +=
-            }
-            if (component.type === LessonComponentType.Code) {
-              total_read_time += 10;
-            }
-          });
+        lesson.components.forEach((component) => {
+          if (component.type === LessonComponentType.Text) {
+            total_read_time += Math.ceil(component.content.split(" ").length / 200);
+          }
+          if (component.type === LessonComponentType.Videl) {
+            // total_read_time +=
+          }
+          if (component.type === LessonComponentType.Code) {
+            total_read_time += 10;
+          }
         });
 
         // update course
         await this.courseRepository.update(
           { id: lesson.course_id },
           {
-            reading_time: total_read_time,
+            reading_time: total_read_time || 0,
           },
         );
       })
