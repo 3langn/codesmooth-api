@@ -31,7 +31,9 @@ export class LessonComponent {
 @Unique("UQ_LESSON_ORDER", ["order", "course_id"])
 @Entity("lessons")
 export class LessonEntity extends BaseEntity {
-  @ManyToOne(() => CourseEntity)
+  @ManyToOne(() => CourseEntity, (course) => course.lessons, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn({ name: "course_id" })
   course: CourseEntity;
 
@@ -71,7 +73,9 @@ export class LessonEntity extends BaseEntity {
   @Column({ nullable: true })
   parent_id: number;
 
-  @ManyToMany(() => UserEntity, (user) => user.completedLessons)
+  @ManyToMany(() => UserEntity, (user) => user.completedLessons, {
+    onDelete: "CASCADE",
+  })
   @JoinTable({
     name: "userscompleted_lessons",
     joinColumn: { name: "lesson_id" },
