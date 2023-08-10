@@ -51,8 +51,6 @@ export class ReviewService {
 
     const reviews = await qb.getRawMany();
 
-    console.log(reviews);
-
     return reviews.map((review) => ({
       id: review.review_id,
       rating: review.review_rating,
