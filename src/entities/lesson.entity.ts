@@ -22,9 +22,13 @@ export class ContentCode {
   timeLimit: number;
   allowDownload: false;
 }
+
+export class ContentText {
+  html: string;
+}
 export class LessonComponent {
   @IsNotEmpty({ message: "Content must be not empty" })
-  content: ContentCode | any;
+  content: ContentCode | ContentText | any;
   @IsEnum(LessonComponentType, { message: "Type must be a valid type" })
   type: LessonComponentType;
 }

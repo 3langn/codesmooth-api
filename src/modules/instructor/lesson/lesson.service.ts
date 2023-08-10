@@ -23,7 +23,9 @@ export class LessonService {
   async findOneLessonOrFail(lesson_id: number, user_id: number) {
     const lessonExist = await this.lessonRepository.findOne({
       where: { id: lesson_id, owner: { id: user_id } },
-      relations: ["section"],
+      relations: {
+        section: true,
+      },
     });
     if (!lessonExist) {
       throw new CustomHttpException({
@@ -42,37 +44,36 @@ export class LessonService {
     this.calculateReadingTime(lesson);
   }
 
-  private calculateReadingTime(lesson: LessonEntity) {
-    this.lessonRepository
-      .findOne({
-        where: { course_id: lesson.course_id },
-      })
-      .then(async (lessons) => {
-        // calculate total read time based on the lessons
-        let total_read_time = 0;
-        lesson.components.forEach((component) => {
-          if (component.type === LessonComponentType.Text) {
-            total_read_time += Math.ceil(component.content.split(" ").length / 200);
-          }
-          if (component.type === LessonComponentType.Videl) {
-            // total_read_time +=
-          }
-          if (component.type === LessonComponentType.Code) {
-            total_read_time += 10;
-          }
-        });
+  private async calculateReadingTime(lesson: LessonEntity) {
+    // calculate total read time based on the lessons
+    const ls = await this.lessonRepository.find({
+      where: { course_id: lesson.course_id },
+    });
+    let total_read_time = 0;
 
-        // update course
-        await this.courseRepository.update(
-          { id: lesson.course_id },
-          {
-            reading_time: total_read_time || 0,
-          },
-        );
-      })
-      .catch((err) => {
-        this.logger.error(err);
+    ls.forEach((l) => {
+      l.components.forEach((component) => {
+        if (component.type === LessonComponentType.Text) {
+          const textContent = component.content.html.replace(/<[^>]+>/g, "");
+          const words = textContent.split(/\s+/).filter((word) => word !== "").length;
+          total_read_time += words / 200;
+        }
+        if (component.type === LessonComponentType.Videl) {
+          // total_read_time +=
+        }
+        if (component.type === LessonComponentType.Code) {
+          total_read_time += 10;
+        }
       });
+    });
+
+    // update course
+    this.courseRepository.update(
+      { id: lesson.course_id },
+      {
+        reading_time: Math.ceil(total_read_time),
+      },
+    );
   }
 
   async addLesson(data: AddLessonDto, user_id: number) {
