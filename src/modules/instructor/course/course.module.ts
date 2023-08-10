@@ -7,10 +7,17 @@ import { CategoryEntity } from "../../../entities/category.entity";
 import { LessonEntity } from "../../../entities/lesson.entity";
 import { SectionEntity } from "../../../entities/section.entity";
 import { InstructorSectionModule } from "../section/section.module";
+import { ReviewEntity } from "../../../entities/review.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CourseEntity, LessonEntity, SectionEntity, CategoryEntity]),
+    TypeOrmModule.forFeature([
+      CourseEntity,
+      LessonEntity,
+      SectionEntity,
+      CategoryEntity,
+      ReviewEntity,
+    ]),
     forwardRef(() => InstructorSectionModule),
   ],
   controllers: [InstructorCourseController],

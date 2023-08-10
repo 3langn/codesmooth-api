@@ -8,7 +8,7 @@ let migrations = [__dirname + "/../migrations/*{.ts,.js}"];
 
 const config = {
   entities,
-  synchronize: true, // NOTE: NEVER USE THIS
+  // synchronize: true, // NOTE: NEVER USE THIS
   autoLoadEntities: true, // TODO: remove this on production
   // migrations,
   // keepConnectionAlive: !this.isTest,

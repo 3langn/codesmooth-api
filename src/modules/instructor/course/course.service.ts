@@ -16,6 +16,7 @@ import { InstructorGetCoursePageOptionsDto } from "./dto";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { SectionService } from "../section/section.service";
+import { ReviewEntity } from "../../../entities/review.entity";
 
 @Injectable()
 export class InstructorCourseService {
@@ -28,6 +29,8 @@ export class InstructorCourseService {
     private categoryRepository: Repository<CategoryEntity>,
     @Inject(forwardRef(() => SectionService))
     private sectionService: SectionService,
+    @InjectRepository(ReviewEntity)
+    private reviewRepository: Repository<ReviewEntity>,
   ) {}
 
   async createCourse(data: SaveCourseDto, user_id: number) {
@@ -198,7 +201,13 @@ export class InstructorCourseService {
       });
     }
 
-    return c;
+    const review_count = await this.reviewRepository.count({ where: { course_id: id } });
+
+    c.rating = c.rating || 0;
+    return {
+      ...c,
+      review_count,
+    };
   }
 
   async deleteCourseById(id: number, user_id: number) {

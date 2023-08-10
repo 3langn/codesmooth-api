@@ -46,7 +46,7 @@ export class InstructorCourseController {
     @Req() req: any,
   ) {
     const [courses, total] = await this.courseService.getCourses(pageOptionsDto, req.user.id);
-    return new PageDto<InstructorCourseReponseDto>(
+    return new PageDto(
       courses,
       new PageMetaDto({
         itemCount: total,

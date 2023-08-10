@@ -12,4 +12,5 @@ export class InstructorCourseReponseDto extends BaseDto {
   thumbnail: string;
   status: string;
   owner_id: number;
+  review_count: number;
 }
