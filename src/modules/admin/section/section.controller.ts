@@ -4,7 +4,7 @@ import { ResponseDefault } from "../../../common/dto/response_default";
 import { UserRole } from "../../../common/enum/user-role";
 import { Auth } from "../../../decorators";
 
-@Controller("section")
+@Controller("admin/section")
 export class SectionController {
   constructor(private sectionService: SectionService) {}
 

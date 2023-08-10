@@ -58,7 +58,9 @@ export class AdminCourseService {
     return await queryPagination({ query: qb, o: pageOptionsDto });
   }
 
-  async getCourseById(id: number, user_id: number): Promise<any> {
+  async getCourseById(id: number) {
+    console.log("id", id);
+
     // select id, title from lessons
     return await this.courseRepository
       .createQueryBuilder("course")
@@ -76,12 +78,7 @@ export class AdminCourseService {
       .leftJoin("course.categories", "categories")
       .leftJoin("course.owner", "owner")
       .leftJoin("course.main_category", "main_category")
-      .where("course.status = :status", { status: CourseStatus.Published })
-      // .leftJoin("category.lessons", "lessons")
       .andWhere("course.id = :id", { id })
-      .andWhere("course.deleted_at IS NULL")
-      .orderBy("categories.order", "ASC")
-      .addOrderBy("lessons.order", "ASC")
       .getOne();
   }
 

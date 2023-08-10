@@ -26,7 +26,7 @@ export class LessonService {
     return lessonExist;
   }
 
-  async getLesson(lesson_id: number, course_id: number) {
+  async getLesson(lesson_id: number) {
     const lesson = await this.lessonRepository.findOne({
       where: { id: lesson_id },
     });

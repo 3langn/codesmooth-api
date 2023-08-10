@@ -4,13 +4,13 @@ import { Auth } from "../../../decorators";
 import { ResponseDefault } from "../../../common/dto/response_default";
 import { UserRole } from "../../../common/enum/user-role";
 
-@Controller("lesson")
+@Controller("admin/lesson")
 export class LessonController {
   constructor(private lessonService: LessonService) {}
   @Auth([UserRole.ADMINSTRATOR])
-  @Get("/:lesson_id/:course_id")
-  async getLesson(@Param("lesson_id") lesson_id: number, @Param("course_id") course_id: number) {
-    const res = await this.lessonService.getLesson(lesson_id, course_id);
+  @Get("/:lesson_id")
+  async getLesson(@Param("lesson_id") lesson_id: number) {
+    const res = await this.lessonService.getLesson(lesson_id);
     return new ResponseDefault("Success", res);
   }
 

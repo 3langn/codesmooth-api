@@ -46,4 +46,10 @@ export class AdminCourseController {
     await this.courseService.rejectCourse(id, body.rejected_reason, req.user);
     return new ResponseDefault("Success");
   }
+
+  @Auth([UserRole.ADMINSTRATOR])
+  @Get(":id")
+  async getCourseById(@Param("id") id: number) {
+    return new ResponseDefault("Success", await this.courseService.getCourseById(id));
+  }
 }
