@@ -75,6 +75,7 @@ export class AdminCourseService {
       .leftJoin("course.reviews", "review")
       .addSelect("AVG(review.rating)", "course_rating")
       .andWhere("course.id = :id", { id })
+      .groupBy("course.id, categories.id, owner.id,main_category.id")
       .getOne();
   }
 

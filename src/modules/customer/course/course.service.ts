@@ -48,7 +48,7 @@ export class CourseService {
       qb.andWhere("categories.id = :category_id", { category_id: pageOptionsDto.category_id });
     }
 
-    qb.groupBy("course.id, categories.id, owner.id").orderBy("course.id", "ASC");
+    qb.groupBy("course.id, categories.id, owner.id");
     const r = await queryPagination({ query: qb, o: pageOptionsDto });
     return r;
   }
@@ -103,6 +103,7 @@ export class CourseService {
       .andWhere("course.id = :id", { id })
       .andWhere("course.published_at IS NOT NULL")
       .andWhere("course.deleted_at IS NULL")
+      .groupBy("course.id, categories.id, owner.id,main_category.id")
       .getOne();
 
     let count = 0;
