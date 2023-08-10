@@ -56,29 +56,26 @@ export class SectionService {
   }
 
   async getSections(course_id: number, user_id: number) {
-    return await this.sectionRepository.find({
-      select: {
-        id: true,
-        course_id: true,
-        order: true,
-        title: true,
-        type: true,
-        lessons: {
-          id: true,
-          order: true,
-          section_id: true,
-          title: true,
-        },
-      },
-      where: {
-        course_id,
-        owner: {
-          id: user_id,
-        },
-      },
-      relations: ["lessons"],
-      order: { order: "ASC" },
-    });
+    const sections = await this.sectionRepository
+      .createQueryBuilder("section")
+      .select([
+        "section.id",
+        "section.course_id",
+        "section.order",
+        "section.title",
+        "section.type",
+        "lesson.id",
+        "lesson.order",
+        "lesson.section_id",
+        "lesson.title",
+      ])
+      .where("section.course_id = :course_id", { course_id })
+      .andWhere("section.owner_id = :user_id", { user_id })
+      .leftJoin("section.lessons", "lesson")
+      .orderBy("section.order", "ASC")
+      .addOrderBy("lesson.order", "ASC")
+      .getMany();
+    return sections;
   }
 
   async addSection(course_id: number, order: number, user_id: number) {

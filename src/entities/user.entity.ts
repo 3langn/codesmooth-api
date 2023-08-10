@@ -70,4 +70,7 @@ export class UserEntity extends BaseEntity {
 
   @ManyToMany(() => LessonEntity, (lesson) => lesson.completed_users)
   completedLessons: LessonEntity[];
+
+  @ManyToMany(() => CourseEntity, (course) => course.completedStudents)
+  completedCourses: CourseEntity[];
 }

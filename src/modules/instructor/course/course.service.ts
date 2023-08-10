@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, Logger } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger, forwardRef } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, IsNull, Not, Repository } from "typeorm";
 import { ResponseDefault } from "../../../common/dto/response_default";
@@ -26,6 +26,7 @@ export class InstructorCourseService {
     private courseRepository: Repository<CourseEntity>,
     @InjectRepository(CategoryEntity)
     private categoryRepository: Repository<CategoryEntity>,
+    @Inject(forwardRef(() => SectionService))
     private sectionService: SectionService,
   ) {}
 

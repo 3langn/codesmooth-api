@@ -15,4 +15,4 @@ import { LessonEntity } from "../../../entities/lesson.entity";
   providers: [SectionService],
   exports: [SectionService],
 })
-export class SectionModule {}
+export class InstructorSectionModule {}

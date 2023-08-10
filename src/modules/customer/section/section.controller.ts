@@ -1,19 +1,18 @@
 import { Controller, Get, Param, Req } from "@nestjs/common";
 import { SectionService } from "./section.service";
-import { ResponseDefault } from "../../../common/dto/response_default";
-import { UserRole } from "../../../common/enum/user-role";
 import { Auth } from "../../../decorators";
+import { ResponseDefault } from "../../../common/dto/response_default";
 
 @Controller("section")
 export class SectionController {
   constructor(private sectionService: SectionService) {}
 
-  @Auth([UserRole.ADMINSTRATOR])
+  @Auth([], { public: true })
   @Get("/:course_id")
-  async getSections(@Param("course_id") course_id: number) {
+  async getSections(@Param("course_id") course_id: number, @Req() req: any) {
     return new ResponseDefault(
       "success",
-      await this.sectionService.getSectionsWithLesson(course_id),
+      await this.sectionService.getSectionsWithLesson(course_id, req.user?.id),
     );
   }
 }

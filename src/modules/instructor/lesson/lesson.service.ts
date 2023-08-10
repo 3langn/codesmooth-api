@@ -122,16 +122,21 @@ export class LessonService {
 
   async getLessons(lesson_id: number, user_id: number) {
     const lesson = await this.lessonRepository.findOne({
-      where: { id: lesson_id, owner_id: user_id },
+      where: { id: lesson_id, owner: { id: user_id } },
     });
-    if (!lesson) {
-      throw new CustomHttpException({
-        statusCode: HttpStatus.NOT_FOUND,
-        message: `Lesson ${lesson_id} not found`,
-        code: StatusCodesList.LessonNotFound,
-      });
-    }
-    return lesson;
+
+    const countLesson = await this.lessonRepository.count({
+      where: {
+        course_id: lesson.course_id,
+      },
+    });
+    delete lesson.completed_users;
+
+    return {
+      ...lesson,
+      is_first: lesson.order === 1,
+      is_last: lesson.order === countLesson,
+    };
   }
 
   async swapOrder(lesson1_id: number, lesson2_id: number) {

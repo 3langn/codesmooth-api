@@ -1,8 +1,8 @@
+import { HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { MoreThan, MoreThanOrEqual, Repository } from "typeorm";
 import { SectionEntity } from "../../../entities/section.entity";
 import { LessonEntity } from "../../../entities/lesson.entity";
-import { Repository } from "typeorm";
-import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class SectionService {
@@ -38,7 +38,7 @@ export class SectionService {
     });
   }
 
-  async getSectionsWithLesson(course_id: number) {
+  async getSectionsWithLesson(course_id: number, user_id?: number) {
     return await this.sectionRepository
       .createQueryBuilder("section")
       .select([
@@ -54,6 +54,12 @@ export class SectionService {
       ])
       .where("section.course_id = :course_id", { course_id })
       .leftJoin("section.lessons", "lesson")
+      .loadRelationCountAndMap(
+        "lesson.completed_count",
+        "lesson.completed_users",
+        "completed_users",
+        (qb) => qb.where("completed_users.id = :user_id", { user_id }),
+      )
       .orderBy("section.order", "ASC")
       .orderBy("lesson.order", "ASC")
       .getMany();

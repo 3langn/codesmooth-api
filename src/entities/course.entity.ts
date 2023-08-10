@@ -128,4 +128,20 @@ export class CourseEntity extends BaseEntity {
 
   @Column({ nullable: true })
   reading_time: number;
+
+  @ManyToMany(() => UserEntity, (user) => user.completedCourses, {
+    onDelete: "CASCADE",
+  })
+  @JoinTable({
+    name: "student_course_completed",
+    joinColumn: {
+      name: "course_id",
+      referencedColumnName: "id",
+    },
+    inverseJoinColumn: {
+      name: "student_id",
+      referencedColumnName: "id",
+    },
+  })
+  completedStudents: UserEntity[];
 }
