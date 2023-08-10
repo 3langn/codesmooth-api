@@ -67,9 +67,7 @@ export class MailerService {
         to: "contact@codedrafts.com",
         from: "CodeDrafts" + "<" + this.configService.mailerConfig.transport.auth.user + ">",
         template: TemplateId.CONTACT,
-        context: {
-          content,
-        },
+        context: content,
         subject,
       });
     } catch (error) {
