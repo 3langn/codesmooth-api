@@ -37,6 +37,18 @@ export class UserEntity extends BaseEntity {
   @Column({ nullable: true })
   social: Social;
 
+  @Column({ nullable: true })
+  facebook_url?: string;
+
+  @Column({ nullable: true })
+  twitter_url?: string;
+
+  @Column({ nullable: true })
+  linkedin_url?: string;
+
+  @Column({ nullable: true })
+  youtube_url?: string;
+
   @VirtualColumn()
   fullName?: string;
 
@@ -49,6 +61,14 @@ export class UserEntity extends BaseEntity {
   // }
 
   toDto(): UserDto {
+    delete this.password;
+    return {
+      ...this,
+      fullName: this.fullName,
+    };
+  }
+
+  toJson(): UserDto {
     delete this.password;
     return {
       ...this,

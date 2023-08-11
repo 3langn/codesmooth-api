@@ -36,8 +36,13 @@ export class UserService {
     private userRepository: Repository<UserEntity>, // private validatorService: ValidatorService,
   ) {}
 
-  findOne(findData: FindOptionsWhere<UserEntity>): Promise<UserEntity | null> {
-    return this.userRepository.findOne({ where: findData, relations: ["settings"] });
+  async findOne(findData: FindOptionsWhere<UserEntity>): Promise<UserEntity | null> {
+    const u = await this.userRepository.findOne({
+      where: findData,
+      relations: ["settings"],
+    });
+    delete u.password;
+    return u;
   }
 
   deleteUserById(id: number) {
@@ -182,5 +187,19 @@ export class UserService {
     return {
       ...userEntity,
     };
+  }
+
+  async updateUser(userId: number, updateUserDto: Partial<UserDto>) {
+    try {
+      const updatedUser = await this.userRepository.update(userId, {
+        ...updateUserDto,
+      });
+    } catch (error) {
+      throw new CustomHttpException({
+        code: StatusCodesList.UserNotFound,
+        statusCode: HttpStatus.NOT_FOUND,
+        message: "Có lỗi xảy ra",
+      });
+    }
   }
 }
