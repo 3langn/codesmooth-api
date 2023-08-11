@@ -31,8 +31,7 @@ export class AdminCourseService {
       .createQueryBuilder("course")
       .select(["course", "categories.id", "categories.name"])
       .leftJoinAndSelect("course.categories", "categories")
-      .leftJoinAndSelect("course.owner", "owner")
-      .where("course.deleted_at IS NULL");
+      .leftJoinAndSelect("course.owner", "owner");
 
     if (pageOptionsDto.status) {
       qb.andWhere("course.status = :status", { status: pageOptionsDto.status });

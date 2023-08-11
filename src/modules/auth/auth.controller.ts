@@ -4,7 +4,7 @@ import { ApiOkResponse } from "@nestjs/swagger";
 import { UserDto } from "../user/dtos/user.dto";
 import { UserService } from "../user/user.service";
 import { AuthService } from "./auth.service";
-import { LoginGoogleRequest as LoginSocialRequest, LoginPayloadDto } from "./dto/LoginPayloadDto";
+import { LoginSocialRequest as LoginSocialRequest, LoginPayloadDto } from "./dto/LoginPayloadDto";
 import { UserLoginDto } from "./dto/UserLoginDto";
 import { UserRegisterDto } from "./dto/UserRegisterDto";
 import { JwtService } from "../jwt/jwt.service";
@@ -13,7 +13,6 @@ import { ResponseDefault } from "../../common/dto/response_default";
 import { ChangePasswordDto } from "./dto/ChangePasswordDto";
 import { Auth } from "../../decorators";
 import { ResetPasswordDto } from "./dto/ResetPasswordDto";
-import { GoogleAuthService } from "./social.service";
 
 @Controller("auth")
 export class AuthController {
@@ -32,7 +31,7 @@ export class AuthController {
 
   @Post("login-social")
   async loginGoogle(@Body() body: LoginSocialRequest): Promise<LoginPayloadDto> {
-    const userEntity = await this.authService.loginSocial(body.token, body.social);
+    const userEntity = await this.authService.loginSocial(body);
     const token = await this.jwtService.generateAuthToken(userEntity);
     return new LoginPayloadDto(userEntity.toDto(), token);
   }

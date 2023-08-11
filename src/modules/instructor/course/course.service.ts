@@ -187,7 +187,6 @@ export class InstructorCourseService {
       .addSelect("AVG(review.rating)", "course_rating")
       .where("course.id = :id", { id })
       .andWhere("course.owner_id = :user_id", { user_id })
-      .andWhere("course.deleted_at IS NULL")
       .orderBy("sections.order", "ASC")
       .addOrderBy("lessons.order", "ASC")
       .groupBy("course.id, categories.id, owner.id,main_category.id, sections.id, lessons.id")

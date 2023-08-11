@@ -14,7 +14,7 @@ export class CategoryService {
 
   async listCategories(pageOptionsDto: PageOptionsDto): Promise<[CategoryEntity[], number]> {
     const qb = this.categoryRepository.createQueryBuilder("category");
-    qb.where("category.deleted_at IS NULL").andWhere("category.is_active = true");
+    qb.andWhere("category.is_active = true");
     return await queryPagination({
       query: qb,
       o: pageOptionsDto,

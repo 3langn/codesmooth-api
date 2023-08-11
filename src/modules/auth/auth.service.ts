@@ -24,6 +24,7 @@ import { TokenEntity } from "../../entities/token.entity";
 import { generateId } from "../../common/generate-nanoid";
 import { UserSettingsEntity } from "../../entities/user-settings.entity";
 import { GoogleAuthService, SocialService } from "./social.service";
+import { LoginSocialRequest } from "./dto/LoginPayloadDto";
 
 @Injectable()
 export class AuthService {
@@ -80,7 +81,7 @@ export class AuthService {
     }
   }
 
-  socialSerivce(social: Social): SocialService {
+  factorySocialService(social: Social): SocialService {
     switch (social) {
       case "google":
         return this.googleAuthService;
@@ -89,9 +90,9 @@ export class AuthService {
     }
   }
 
-  async loginSocial(token: string, social: Social): Promise<UserEntity> {
-    const socialService = this.socialSerivce(social);
-    const user = await socialService.login(token);
+  async loginSocial(data: LoginSocialRequest): Promise<UserEntity> {
+    const socialService = this.factorySocialService(data.social);
+    const user = await socialService.login(data.token);
     if (!user) {
       throw new CustomHttpException({
         statusCode: HttpStatus.UNAUTHORIZED,

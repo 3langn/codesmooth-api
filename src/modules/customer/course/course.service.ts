@@ -41,8 +41,7 @@ export class CourseService {
       .leftJoin("course.reviews", "review")
       .addSelect("AVG(review.rating)", "course_rating")
       .where("course.status = :status", { status: CourseStatus.Published })
-      .andWhere("course.published_at IS NOT NULL")
-      .andWhere("course.deleted_at IS NULL");
+      .andWhere("course.published_at IS NOT NULL");
 
     if (pageOptionsDto.category_id) {
       qb.andWhere("categories.id = :category_id", { category_id: pageOptionsDto.category_id });
@@ -73,8 +72,7 @@ export class CourseService {
       .leftJoin("course.students", "students")
       .where("course.status = :status", { status: CourseStatus.Published })
       .andWhere("students.id = :user_id", { user_id })
-      .andWhere("course.published_at IS NOT NULL")
-      .andWhere("course.deleted_at IS NULL");
+      .andWhere("course.published_at IS NOT NULL");
 
     return await queryPagination({ query: qb, o: pageOptionsDto });
   }
@@ -102,7 +100,6 @@ export class CourseService {
       .where("course.status = :status", { status: CourseStatus.Published })
       .andWhere("course.id = :id", { id })
       .andWhere("course.published_at IS NOT NULL")
-      .andWhere("course.deleted_at IS NULL")
       .groupBy("course.id, categories.id, owner.id,main_category.id")
       .getOne();
 
