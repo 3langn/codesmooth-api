@@ -172,23 +172,6 @@ export class UserService {
     );
   }
 
-  async getUser(userId: string): Promise<UserDto> {
-    const queryBuilder = this.userRepository.createQueryBuilder("user");
-
-    queryBuilder.where("user.id = :userId", { userId });
-
-    const userEntity = await queryBuilder.getOne();
-
-    if (!userEntity) {
-      this.logger.error(`User with id ${userId} not found`);
-      throw new InternalServerErrorException();
-    }
-
-    return {
-      ...userEntity,
-    };
-  }
-
   async updateUser(userId: number, updateUserDto: Partial<UserUpdateRequest>) {
     try {
       const updatedUser = await this.userRepository.update(userId, {

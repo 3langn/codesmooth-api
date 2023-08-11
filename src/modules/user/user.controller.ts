@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Put,
   Query,
   ValidationPipe,
@@ -37,8 +38,8 @@ export class UserController {
   }
 
   @Get("/info/:id")
-  async getUserInfo(@UUIDParam("id") id: string) {
-    const user = await this.userService.getUser(id);
+  async getUserInfo(@Param("id") id: number) {
+    const user = await this.userService.findOne({ id });
 
     return new ResponseDefault("Lấy thông tin thành công", user);
   }
