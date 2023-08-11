@@ -32,3 +32,11 @@ export interface Data {
   url: string;
   width: number;
 }
+
+export interface GithubGetUserInfoResponse {
+  avatar_url: string;
+  id: number;
+  login: string;
+  name: string;
+  email: string;
+}

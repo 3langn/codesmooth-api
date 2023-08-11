@@ -12,7 +12,7 @@ import { UserSettingsEntity } from "../../entities/user-settings.entity";
 import { UserEntity } from "../../entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TokenEntity } from "../../entities/token.entity";
-import { FacebookAuthService, GoogleAuthService } from "./social.service";
+import { FacebookAuthService, GithubAuthService, GoogleAuthService } from "./social.service";
 
 @Module({
   imports: [
@@ -23,7 +23,14 @@ import { FacebookAuthService, GoogleAuthService } from "./social.service";
     JwtModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, PublicStrategy, GoogleAuthService, FacebookAuthService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    PublicStrategy,
+    GoogleAuthService,
+    FacebookAuthService,
+    GithubAuthService,
+  ],
   exports: [JwtModule, AuthService],
 })
 export class AuthModule {}

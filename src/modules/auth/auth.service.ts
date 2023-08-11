@@ -23,7 +23,12 @@ import { ResetPasswordDto } from "./dto/ResetPasswordDto";
 import { TokenEntity } from "../../entities/token.entity";
 import { generateId } from "../../common/generate-nanoid";
 import { UserSettingsEntity } from "../../entities/user-settings.entity";
-import { FacebookAuthService, GoogleAuthService, SocialService } from "./social.service";
+import {
+  FacebookAuthService,
+  GithubAuthService,
+  GoogleAuthService,
+  SocialService,
+} from "./social.service";
 import { LoginSocialRequest } from "./dto/LoginPayloadDto";
 
 @Injectable()
@@ -35,6 +40,7 @@ export class AuthService {
     private jwtService: JwtService,
     private googleAuthService: GoogleAuthService,
     private facebookAuthService: FacebookAuthService,
+    private githubAuthService: GithubAuthService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(UserSettingsEntity)
@@ -88,6 +94,8 @@ export class AuthService {
         return this.googleAuthService;
       case "facebook":
         return this.facebookAuthService;
+      case "github":
+        return this.githubAuthService;
       default:
         return null;
     }

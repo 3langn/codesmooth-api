@@ -6,7 +6,7 @@ import { CustomHttpException } from "../../common/exception/custom-http.exceptio
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 import { UserEntity } from "../../entities/user.entity";
 import axios from "axios";
-import { FBGetUserInfoResponse } from "./dto/UserLoginDto";
+import { FBGetUserInfoResponse, GithubGetUserInfoResponse } from "./dto/UserLoginDto";
 
 export interface SocialService {
   login: (accessToken: string, social_user_id?: string) => Promise<UserEntity>;
@@ -109,6 +109,66 @@ export class FacebookAuthService implements SocialService {
       return user;
     } catch (error) {
       this.logger.error(error);
+      throw new CustomHttpException({
+        statusCode: HttpStatus.UNAUTHORIZED,
+        code: StatusCodesList.InvalidCredentials,
+        message: "Có lỗi xảy ra",
+        error,
+      });
+    }
+  }
+}
+
+@Injectable()
+export class GithubAuthService implements SocialService {
+  private readonly logger: Logger = new Logger(GithubAuthService.name);
+
+  constructor(private readonly userService: UserService) {}
+
+  async getUser(accessToken: string) {
+    const r = await axios.get<GithubGetUserInfoResponse>("https://api.github.com/user", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (r.data.email === null) {
+      throw new CustomHttpException({
+        statusCode: HttpStatus.UNAUTHORIZED,
+        code: StatusCodesList.InvalidCredentials,
+        message: "Bạn phải để public email trên github",
+      });
+    }
+
+    return r.data;
+  }
+
+  async login(token: string, social_user_id?: string) {
+    try {
+      const GHuser = await this.getUser(token);
+
+      let user = await this.userService.findOne({
+        email: GHuser.email,
+      });
+
+      if (!user?.settings?.isEmailVerified) {
+        await this.userService.deleteUserById(user.id);
+      }
+
+      if (!user || !user?.settings?.isEmailVerified) {
+        user = await this.userService.createUserSocial({
+          email: GHuser.email,
+          avatar: GHuser.avatar_url,
+          social: "github",
+          username: GHuser.name,
+        });
+      }
+      return user;
+    } catch (error) {
+      if (error instanceof CustomHttpException) {
+        throw error;
+      }
+
       throw new CustomHttpException({
         statusCode: HttpStatus.UNAUTHORIZED,
         code: StatusCodesList.InvalidCredentials,
