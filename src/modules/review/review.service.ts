@@ -160,4 +160,15 @@ export class ReviewService {
       });
     }
   }
+
+  async isReviewed(course_id: number, user_id: number) {
+    const review = await this.reviewRepository.findOne({
+      where: {
+        course_id,
+        user_id,
+      },
+    });
+
+    return !!review;
+  }
 }

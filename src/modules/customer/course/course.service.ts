@@ -104,6 +104,7 @@ export class CourseService {
       .getOne();
 
     let count = 0;
+    let is_reviewed = false;
     if (user_id) {
       count = await this.datasource.createEntityManager().count("course_student", {
         where: {
@@ -111,6 +112,7 @@ export class CourseService {
           course_id: id,
         },
       });
+      is_reviewed = await this.reviewService.isReviewed(id, user_id);
     }
 
     if (!c) {
@@ -124,6 +126,7 @@ export class CourseService {
     return {
       ...c,
       is_bought: count > 0,
+      is_reviewed,
     };
   }
 

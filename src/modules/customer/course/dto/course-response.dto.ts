@@ -20,6 +20,7 @@ export class CourseReponseDto extends BaseDto {
   is_bought: boolean;
   rating: number;
   main_category: CategoryEntity;
+  is_reviewed: boolean;
 }
 export interface Owner {
   id: number;
