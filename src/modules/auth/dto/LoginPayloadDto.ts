@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 import { UserDto } from "../../user/dtos/user.dto";
 import { TokenPayloadDto } from "../../jwt/dtos/TokenPayloadDto";
-import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Social } from "../../../entities/user.entity";
 
 export class LoginPayloadDto {
@@ -21,10 +21,14 @@ export class LoginSocialRequest {
   @IsNotEmpty()
   token: string;
 
-  @IsEnum(["facebook", "google", "github"])
+  @IsEnum(["facebook", "google", "github"], {
+    message: "Social type không hợp lệ",
+  })
   social: Social;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({
+    message: "Social user id phải là string",
+  })
+  @IsOptional()
   social_user_id: string;
 }

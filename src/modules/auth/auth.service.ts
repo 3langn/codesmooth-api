@@ -23,7 +23,7 @@ import { ResetPasswordDto } from "./dto/ResetPasswordDto";
 import { TokenEntity } from "../../entities/token.entity";
 import { generateId } from "../../common/generate-nanoid";
 import { UserSettingsEntity } from "../../entities/user-settings.entity";
-import { GoogleAuthService, SocialService } from "./social.service";
+import { FacebookAuthService, GoogleAuthService, SocialService } from "./social.service";
 import { LoginSocialRequest } from "./dto/LoginPayloadDto";
 
 @Injectable()
@@ -34,6 +34,7 @@ export class AuthService {
     private mailerService: MailerService,
     private jwtService: JwtService,
     private googleAuthService: GoogleAuthService,
+    private facebookAuthService: FacebookAuthService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(UserSettingsEntity)
@@ -85,6 +86,8 @@ export class AuthService {
     switch (social) {
       case "google":
         return this.googleAuthService;
+      case "facebook":
+        return this.facebookAuthService;
       default:
         return null;
     }
@@ -92,7 +95,7 @@ export class AuthService {
 
   async loginSocial(data: LoginSocialRequest): Promise<UserEntity> {
     const socialService = this.factorySocialService(data.social);
-    const user = await socialService.login(data.token);
+    const user = await socialService.login(data.token, data.social_user_id);
     if (!user) {
       throw new CustomHttpException({
         statusCode: HttpStatus.UNAUTHORIZED,

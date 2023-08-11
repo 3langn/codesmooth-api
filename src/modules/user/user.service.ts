@@ -37,7 +37,11 @@ export class UserService {
   ) {}
 
   findOne(findData: FindOptionsWhere<UserEntity>): Promise<UserEntity | null> {
-    return this.userRepository.findOneBy(findData);
+    return this.userRepository.findOne({ where: findData, relations: ["settings"] });
+  }
+
+  deleteUserById(id: number) {
+    return this.userRepository.delete(id);
   }
 
   async findByUsernameOrEmail(

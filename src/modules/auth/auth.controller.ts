@@ -30,7 +30,7 @@ export class AuthController {
   }
 
   @Post("login-social")
-  async loginGoogle(@Body() body: LoginSocialRequest): Promise<LoginPayloadDto> {
+  async loginSocial(@Body() body: LoginSocialRequest): Promise<LoginPayloadDto> {
     const userEntity = await this.authService.loginSocial(body);
     const token = await this.jwtService.generateAuthToken(userEntity);
     return new LoginPayloadDto(userEntity.toDto(), token);
