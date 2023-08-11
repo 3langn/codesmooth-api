@@ -22,7 +22,11 @@ export class ReviewService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async getReviews(course_id: number, pageOptionsDto: PageOptionsDto, user_id?: number) {
+  async getReviews(
+    course_id: number,
+    pageOptionsDto: PageOptionsDto,
+    user_id?: number,
+  ): Promise<[any[], number]> {
     const { skip, take } = pageOptionsDto;
 
     const qb = this.reviewRepository
@@ -51,7 +55,13 @@ export class ReviewService {
 
     const reviews = await qb.getRawMany();
 
-    return reviews.map((review) => ({
+    const count = await this.reviewRepository.count({
+      where: {
+        course_id,
+      },
+    });
+
+    const r = reviews.map((review) => ({
       id: review.review_id,
       rating: review.review_rating,
       comment: review.review_comment,
@@ -68,6 +78,8 @@ export class ReviewService {
       is_like_count: Number(review.is_like_count),
       is_dislike_count: Number(review.is_dislike_count),
     }));
+
+    return [r, count];
   }
 
   async reviewCourse(data: ReviewCourseRequest, user_id: number) {

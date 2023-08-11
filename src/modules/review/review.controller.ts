@@ -4,6 +4,8 @@ import { Auth } from "../../decorators";
 import { ResponseDefault } from "../../common/dto/response_default";
 import { ReviewCourseRequest } from "./review.dto";
 import { PageOptionsDto } from "../../common/dto/page-options.dto";
+import { PageMetaDto } from "../../common/dto/page-meta.dto";
+import { PageDto } from "../../common/dto/page.dto";
 
 @Controller("review")
 export class ReviewController {
@@ -25,8 +27,14 @@ export class ReviewController {
     @Query() query: PageOptionsDto,
     @Req() req: any,
   ) {
-    const data = await this.reviewService.getReviews(course_id, query, req.user?.id);
-    return new ResponseDefault("Success", data);
+    const [result, count] = await this.reviewService.getReviews(course_id, query, req.user?.id);
+    return new PageDto<any>(
+      result,
+      new PageMetaDto({
+        itemCount: count,
+        pageOptionsDto: query,
+      }),
+    );
   }
 
   @Auth()
