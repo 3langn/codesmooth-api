@@ -1,8 +1,17 @@
-import { Controller, Get, HttpCode, HttpStatus, Put, Query, ValidationPipe } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Put,
+  Query,
+  ValidationPipe,
+} from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { ApiPageOkResponse, Auth, AuthUser, UUIDParam } from "../../decorators";
-import { UserDto } from "./dtos/user.dto";
+import { UserDto, UserUpdateRequest } from "./dtos/user.dto";
 import { UsersPageOptionsDto } from "./dtos/users-page-options.dto";
 import { UserEntity } from "../../entities/user.entity";
 import { UserService } from "./user.service";
@@ -21,7 +30,7 @@ export class UserController {
 
   @Auth()
   @Put("/")
-  async updateCurrentUser(@AuthUser() user: UserEntity, @Query() data: UserDto) {
+  async updateCurrentUser(@AuthUser() user: UserEntity, @Body() data: UserUpdateRequest) {
     await this.userService.updateUser(user.id, data);
 
     return new ResponseDefault("Cập nhật thành công");

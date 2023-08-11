@@ -13,7 +13,7 @@ import { Repository } from "typeorm";
 import { PageDto } from "../../common/dto/page.dto";
 // import { ValidatorService } from '../../shared/services/validator.service';
 import { UserRegisterDto } from "../auth/dto/UserRegisterDto";
-import type { UserDto } from "./dtos/user.dto";
+import type { UserDto, UserUpdateRequest } from "./dtos/user.dto";
 import type { UsersPageOptionsDto } from "./dtos/users-page-options.dto";
 import { Social, UserEntity } from "../../entities/user.entity";
 import { UserSettingsEntity } from "../../entities/user-settings.entity";
@@ -189,7 +189,7 @@ export class UserService {
     };
   }
 
-  async updateUser(userId: number, updateUserDto: Partial<UserDto>) {
+  async updateUser(userId: number, updateUserDto: Partial<UserUpdateRequest>) {
     try {
       const updatedUser = await this.userRepository.update(userId, {
         ...updateUserDto,
@@ -199,6 +199,7 @@ export class UserService {
         code: StatusCodesList.UserNotFound,
         statusCode: HttpStatus.NOT_FOUND,
         message: "Có lỗi xảy ra",
+        error,
       });
     }
   }

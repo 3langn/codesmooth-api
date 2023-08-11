@@ -38,6 +38,12 @@ export class UserEntity extends BaseEntity {
   social: Social;
 
   @Column({ nullable: true })
+  bio?: string;
+
+  @Column({ nullable: true })
+  title?: string;
+
+  @Column({ nullable: true })
   facebook_url?: string;
 
   @Column({ nullable: true })

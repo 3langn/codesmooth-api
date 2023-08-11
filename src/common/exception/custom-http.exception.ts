@@ -22,7 +22,7 @@ export class CustomHttpException extends HttpException {
       message: payload.message || ExceptionTitleList.InternalServerError,
       code: payload.code || StatusCodesList.InternalServerError,
       statusCode: payload.statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
-      error: payload.error || "Something went wrong",
+      error: payload.error || "Có lỗi xảy ra",
       data: payload.data,
       args: payload.args,
     };

@@ -55,7 +55,7 @@ async function bootstrap() {
 
         let msg = getErrorMsg(errors[0]);
         return new CustomHttpException({
-          message: msg,
+          message: msg || "Validation failed",
           code: StatusCodesList.ValidationError,
           statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
         });
