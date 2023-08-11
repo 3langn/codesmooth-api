@@ -165,6 +165,8 @@ export class LessonService {
 
   async deleteLessonById(lesson_id: number, userId: number) {
     const lesson = await this.findOneLessonOrFail(lesson_id, userId);
+    await this.lessonRepository.delete(lesson_id);
+
     await this.lessonRepository.decrement(
       {
         section: {
@@ -178,7 +180,6 @@ export class LessonService {
       "order",
       1,
     );
-    await this.lessonRepository.delete(lesson_id);
   }
 
   async getLessonsBySectionId(section_id: number, userId: number) {
