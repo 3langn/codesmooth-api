@@ -140,4 +140,18 @@ export class CourseService {
 
     return count > 0;
   }
+
+  async getCoursesByInstructorId(
+    pageOptionsDto: PageOptionsDto,
+    instructor_id: number,
+  ): Promise<[CourseEntity[], number]> {
+    const qb = this.courseRepository
+      .createQueryBuilder("course")
+      .select(["course", "owner.id", "owner.username", "owner.email", "owner.avatar"])
+      .leftJoin("course.owner", "owner")
+      .where("course.status = :status", { status: CourseStatus.Published })
+      .andWhere("owner.id = :instructor_id", { instructor_id });
+
+    return await queryPagination({ query: qb, o: pageOptionsDto });
+  }
 }
