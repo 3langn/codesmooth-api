@@ -10,7 +10,7 @@ export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Auth()
-  @Post("/review")
+  @Post("/")
   async reviewCourse(@Body() body: ReviewCourseRequest, @Req() req: any) {
     const data = await this.reviewService.reviewCourse(body, req.user.id);
     return new ResponseDefault("Success", data);
