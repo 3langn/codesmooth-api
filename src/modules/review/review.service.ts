@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { ReviewEntity } from "../../entities/review.entity";
-import { DataSource, Repository } from "typeorm";
+import { DataSource, In, Repository } from "typeorm";
 import { CourseEntity } from "../../entities/course.entity";
 import { CourseService } from "../customer/course/course.service";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
@@ -31,22 +31,8 @@ export class ReviewService {
 
     const qb = this.reviewRepository
       .createQueryBuilder("review")
-      .select([
-        "review",
-        "user.id",
-        "user.username",
-        "user.avatar",
-        "user.email",
-        "COUNT(DISTINCT like_users.id) AS like_count",
-        "COUNT(DISTINCT dislike_users.id) AS dislike_count",
-        "SUM(CASE WHEN is_like.id = :user_id THEN 1 ELSE 0 END) AS is_like_count",
-        "SUM(CASE WHEN is_dislike.id = :user_id THEN 1 ELSE 0 END) AS is_dislike_count",
-      ])
-      .leftJoin("review.like_users", "like_users")
-      .leftJoin("review.dislike_users", "dislike_users")
+      .select(["review", "user.id", "user.username", "user.avatar", "user.email"])
       .leftJoin("review.user", "user")
-      .leftJoin("review.like_users", "is_like", "is_like.id = :user_id", { user_id })
-      .leftJoin("review.dislike_users", "is_dislike", "is_dislike.id = :user_id", { user_id })
       .where("review.course_id = :course_id", { course_id })
       .groupBy("review.id, user.id")
       .orderBy("review.created_at")
@@ -61,23 +47,67 @@ export class ReviewService {
       },
     });
 
-    const r = reviews.map((review) => ({
-      id: review.review_id,
-      rating: review.review_rating,
-      comment: review.review_comment,
-      created_at: review.review_created_at,
-      updated_at: review.review_updated_at,
-      user: {
-        id: review.user_id,
-        username: review.user_username,
-        avatar: review.user_avatar,
-        email: review.user_email,
-      },
-      like_count: Number(review.like_count),
-      dislike_count: Number(review.dislike_count),
-      is_like_count: Number(review.is_like_count),
-      is_dislike_count: Number(review.is_dislike_count),
-    }));
+    const reviewIds = reviews.map((review) => review.review_id);
+
+    const usersLike = await this.dataSource
+      .getRepository("review_like_users")
+      .createQueryBuilder("like")
+      .select(["like.review_id as review_id", "like.user_id as user_id"])
+      .where("like.review_id IN (:...ids)", { ids: reviewIds })
+      .getRawMany();
+
+    const usersDislike = await this.dataSource
+      .getRepository("review_dislike_users")
+      .createQueryBuilder("dislike")
+      .select(["dislike.review_id as review_id", "dislike.user_id as user_id"])
+      .where("dislike.review_id IN (:...ids)", { ids: reviewIds })
+      .getRawMany();
+
+    const mapUserLike = usersLike.reduce((acc, cur) => {
+      if (!acc[cur.review_id]) {
+        acc[cur.review_id] = {
+          count: 1,
+        };
+      } else {
+        acc[cur.review_id].count++;
+      }
+
+      acc[cur.review_id].is_like = cur.user_id === user_id;
+      return acc;
+    }, {});
+
+    const mapUserDislike = usersDislike.reduce((acc, cur) => {
+      if (!acc[cur.review_id]) {
+        acc[cur.review_id] = {
+          count: 1,
+        };
+      } else {
+        acc[cur.review_id].count++;
+      }
+
+      acc[cur.review_id].is_dislike = cur.user_id === user_id;
+      return acc;
+    }, {});
+
+    const r = reviews.map((review) => {
+      return {
+        id: review.review_id,
+        rating: review.review_rating,
+        comment: review.review_comment,
+        created_at: review.review_created_at,
+        updated_at: review.review_updated_at,
+        user: {
+          id: review.user_id,
+          username: review.user_username,
+          avatar: review.user_avatar,
+          email: review.user_email,
+        },
+        like_count: mapUserLike[review.review_id]?.count || 0,
+        dislike_count: mapUserDislike[review.review_id]?.count || 0,
+        is_like: mapUserLike[review.review_id]?.is_like || false,
+        is_dislike: mapUserDislike[review.review_id]?.is_dislike || false,
+      };
+    });
 
     return [r, count];
   }
@@ -132,14 +162,20 @@ export class ReviewService {
   }
 
   async dislikeReview(review_id: number, user_id: number) {
-    const d = await this.dataSource.getRepository("review_dislike_users").findOne({
-      where: {
+    const [d] = await Promise.all([
+      this.dataSource.getRepository("review_dislike_users").count({
+        where: {
+          review_id,
+          user_id,
+        },
+      }),
+      this.dataSource.getRepository("review_like_users").delete({
         review_id,
         user_id,
-      },
-    });
+      }),
+    ]);
 
-    if (d) {
+    if (d > 0) {
       await this.dataSource.getRepository("review_dislike_users").delete({
         review_id,
         user_id,
@@ -153,14 +189,20 @@ export class ReviewService {
   }
 
   async likeReview(review_id: number, user_id: number) {
-    const d = await this.dataSource.getRepository("review_like_users").findOne({
-      where: {
+    const [d] = await Promise.all([
+      this.dataSource.getRepository("review_like_users").count({
+        where: {
+          review_id,
+          user_id,
+        },
+      }),
+      this.dataSource.getRepository("review_dislike_users").delete({
         review_id,
         user_id,
-      },
-    });
+      }),
+    ]);
 
-    if (d) {
+    if (d > 0) {
       await this.dataSource.getRepository("review_like_users").delete({
         review_id,
         user_id,

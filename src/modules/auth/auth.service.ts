@@ -76,8 +76,6 @@ export class AuthService {
         throw new Error("User not found");
       }
 
-      console.log(userLoginDto.password, user.password);
-
       const isPasswordValid = await validateHash(userLoginDto.password, user.password);
 
       if (!isPasswordValid) {
