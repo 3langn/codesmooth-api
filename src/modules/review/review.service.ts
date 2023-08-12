@@ -49,9 +49,9 @@ export class ReviewService {
       .leftJoin("review.dislike_users", "is_dislike", "is_dislike.id = :user_id", { user_id })
       .where("review.course_id = :course_id", { course_id })
       .groupBy("review.id, user.id")
-      .addOrderBy("like_count", "DESC") // Sắp xếp theo like_count giảm dần
-      .skip(skip)
-      .take(take);
+      .orderBy("review.created_at")
+      .offset(skip)
+      .limit(take);
 
     const reviews = await qb.getRawMany();
 
