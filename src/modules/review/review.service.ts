@@ -72,7 +72,10 @@ export class ReviewService {
         acc[cur.review_id].count++;
       }
 
-      acc[cur.review_id].is_like = cur.user_id === user_id;
+      if (cur.user_id === user_id) {
+        acc[cur.review_id].is_like = cur.user_id === user_id;
+      }
+
       return acc;
     }, {});
 
@@ -85,7 +88,9 @@ export class ReviewService {
         acc[cur.review_id].count++;
       }
 
-      acc[cur.review_id].is_dislike = cur.user_id === user_id;
+      if (cur.user_id === user_id) {
+        acc[cur.review_id].is_dislike = true;
+      }
       return acc;
     }, {});
 
