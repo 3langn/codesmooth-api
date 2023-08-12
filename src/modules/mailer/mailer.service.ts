@@ -41,17 +41,15 @@ export class MailerService {
       .sendMail({
         template: TemplateId.RESET_PASSWORD,
         context: {
-          content: {
-            token:
-              this.configService.frontendUrl +
-              "/reset-password?token=" +
-              this.jwtService.generateResetPasswordToken(user_id),
-            username: username,
-          },
-          subject: "Cài đặt lại mật khẩu",
-          to: to,
-          from: "CodeDrafts" + "<" + this.configService.mailerConfig.transport.auth.user + ">",
+          token:
+            this.configService.frontendUrl +
+            "/reset-password?token=" +
+            this.jwtService.generateResetPasswordToken(user_id),
+          username: username,
         },
+        subject: "Cài đặt lại mật khẩu",
+        to: to,
+        from: "CodeDrafts" + "<" + this.configService.mailerConfig.transport.auth.user + ">",
       })
       .then(() => {
         this.logger.log("Send email reset password successfully");

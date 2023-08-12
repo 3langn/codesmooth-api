@@ -20,10 +20,6 @@ import { UserSettingsEntity } from "../../entities/user-settings.entity";
 import { PageMetaDto } from "../../common/dto/page-meta.dto";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
-import { UserRole } from "../../common/enum/user-role";
-import { MailerService } from "../mailer/mailer.service";
-import { TemplateId } from "../mailer/enum/template-id";
-import { JwtService } from "../jwt/jwt.service";
 import { generateHash } from "../../common/utils";
 
 @Injectable()
@@ -36,12 +32,24 @@ export class UserService {
     private userRepository: Repository<UserEntity>, // private validatorService: ValidatorService,
   ) {}
 
-  async findOne(findData: FindOptionsWhere<UserEntity>): Promise<UserEntity | null> {
+  async findOne(
+    findData: FindOptionsWhere<UserEntity>,
+    password: boolean = false,
+  ): Promise<UserEntity | null> {
     const u = await this.userRepository.findOne({
       where: findData,
       relations: ["settings"],
     });
-    delete u.password;
+
+    if (!password) delete u.password;
+
+    if (!u) {
+      throw new CustomHttpException({
+        code: StatusCodesList.UserNotFound,
+        message: "Không tìm thấy người dùng",
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
     return u;
   }
 

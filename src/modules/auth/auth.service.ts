@@ -62,16 +62,22 @@ export class AuthService {
 
   async login(userLoginDto: UserLoginDto): Promise<UserEntity> {
     try {
-      const user = await this.userService.findOne({
-        email: userLoginDto.email,
-        settings: {
-          isEmailVerified: true,
+      const user = await this.userService.findOne(
+        {
+          email: userLoginDto.email,
+          settings: {
+            isEmailVerified: true,
+          },
         },
-      });
+        true,
+      );
 
       if (!user) {
         throw new Error("User not found");
       }
+
+      console.log(userLoginDto.password, user.password);
+
       const isPasswordValid = await validateHash(userLoginDto.password, user.password);
 
       if (!isPasswordValid) {
