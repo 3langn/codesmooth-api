@@ -1,4 +1,4 @@
-import { Contains, IsString, IsUrl, Length } from "class-validator";
+import { Contains, IsOptional, IsString, IsUrl, Length } from "class-validator";
 import { BaseDto } from "../../../common/abstract.dto";
 
 export class UserDto extends BaseDto {
@@ -26,10 +26,14 @@ export class UserUpdateRequest extends BaseDto {
   @Length(1, 40)
   username?: string;
 
-  @IsString()
+  @IsString({
+    message: "Avatar không hợp lệ",
+  })
+  @IsOptional()
   avatar?: string;
 
   @IsString()
+  @IsOptional()
   @Length(1, 255)
   bio?: string;
 
@@ -42,6 +46,7 @@ export class UserUpdateRequest extends BaseDto {
       message: "Facebook url không hợp lệ",
     },
   )
+  @IsOptional()
   @Contains("facebook.com", { message: "Facebook url không hợp lệ" })
   facebook_url?: string;
 
@@ -54,6 +59,7 @@ export class UserUpdateRequest extends BaseDto {
       message: "Twitter url không hợp lệ",
     },
   )
+  @IsOptional()
   @Contains("twitter.com", { message: "Twitter url không hợp lệ" })
   twitter_url?: string;
 
@@ -66,6 +72,7 @@ export class UserUpdateRequest extends BaseDto {
       message: "Linkedin url không hợp lệ",
     },
   )
+  @IsOptional()
   @Contains("linkedin.com", { message: "Linkedin url không hợp lệ" })
   linkedin_url?: string;
 
@@ -78,9 +85,11 @@ export class UserUpdateRequest extends BaseDto {
       message: "Youtube url không hợp lệ",
     },
   )
+  @IsOptional()
   @Contains("youtube.com", { message: "Youtube url không hợp lệ" })
   youtube_url?: string;
 
   @IsString()
+  @IsOptional()
   title?: string;
 }
