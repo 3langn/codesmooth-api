@@ -121,6 +121,7 @@ export class AdminCourseService {
       p.published_at = new Date();
       p.owner = course.owner;
       p.main_category = course.main_category;
+      p.reading_time = course.reading_time;
 
       p = await this.courseRepository.save(p);
     } else {
