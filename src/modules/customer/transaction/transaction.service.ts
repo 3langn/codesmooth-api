@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { CreateTransactionInput } from "./dto/transaction.dto";
@@ -7,9 +7,11 @@ import { TransactionEntity } from "../../../entities/transaction.entity";
 import { CourseEntity } from "../../../entities/course.entity";
 import { UserEntity } from "../../../entities/user.entity";
 import { TransactionStatus } from "../../../common/enum/transaction";
-
+import * as Imap from "node-imap";
+import { Observable } from "rxjs";
 @Injectable()
-export class TransactionService {
+export class TransactionService implements OnModuleInit {
+  private logger = new Logger(TransactionService.name);
   constructor(
     @InjectRepository(TransactionEntity)
     private readonly transactionRepository: Repository<TransactionEntity>,
@@ -19,6 +21,23 @@ export class TransactionService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectDataSource() private datasource: DataSource,
   ) {}
+
+  private imapConfig = {
+    user: "cvantnhuquynh@gmail.com",
+    password: "jkgviyicbntzowaa",
+    host: "imap.gmail.com",
+    port: 993,
+    tls: true,
+  };
+
+  private imap: Imap;
+
+  onModuleInit() {
+    this.imap = new Imap(this.imapConfig);
+    this.observeNewEmails().subscribe((numNewMsgs) => {
+      console.log("Có thư mới", numNewMsgs);
+    });
+  }
 
   async createTransaction(data: CreateTransactionInput): Promise<TransactionEntity> {
     const transaction = this.transactionRepository.create(data);
@@ -90,5 +109,69 @@ export class TransactionService {
         await this.transactionRepository.save(transaction);
       }
     });
+  }
+
+  public observeNewEmails(): Observable<number> {
+    return new Observable<number>((observer) => {
+      this.imap.once("ready", () => {
+        this.openInbox((err, box) => {
+          if (err) throw err;
+
+          this.imap.on("mail", (numNewMsgs) => {
+            console.log("Có thư mới đến", ["TEXT", "vào tài khoản"]);
+            this.imap.search(
+              ["UNSEEN", ["TEXT", "CD123"], ["FROM", "mbebanking@mbbank.com.vn"]],
+              (searchErr, results) => {
+                if (searchErr) throw searchErr;
+
+                if (results.length === 0) return;
+
+                const fetch = this.imap.fetch(results, { bodies: "" });
+
+                fetch.on("message", (msg, seqno) => {
+                  console.log(`Email #${seqno}`);
+                  msg.on("body", (stream, info) => {
+                    let buffer = "";
+
+                    stream.on("data", (chunk) => {
+                      buffer += chunk.toString("utf8");
+                    });
+
+                    stream.on("end", () => {
+                      console.log("Nội dung email:", buffer);
+                    });
+                  });
+                });
+
+                this.imap.setFlags(results, ["\\Seen"], (flagErr) => {
+                  if (flagErr) throw flagErr;
+                  console.log("Đã đánh dấu email đã đọc.");
+                });
+
+                fetch.once("end", () => {
+                  console.log("Tất cả email đã được xử lý.");
+                });
+              },
+            );
+          });
+        });
+      });
+
+      this.imap.once("error", (err) => {
+        console.log(err);
+        observer.error(err);
+      });
+
+      this.imap.once("end", () => {
+        console.log("Kết nối đã đóng");
+        observer.complete();
+      });
+
+      this.imap.connect();
+    });
+  }
+
+  private openInbox(cb: (err: Error | null, box: Imap.Box) => void) {
+    this.imap.openBox("INBOX", false, cb);
   }
 }

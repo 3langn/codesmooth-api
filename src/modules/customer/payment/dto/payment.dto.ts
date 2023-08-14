@@ -23,3 +23,10 @@ export class CalculateRequestDto {
   @Optional()
   promotion_code: string;
 }
+
+export class GetVietQRInput {
+  @IsNumber(undefined, {
+    message: "course_id phải là số",
+  })
+  course_id: number;
+}

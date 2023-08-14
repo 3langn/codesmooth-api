@@ -4,7 +4,10 @@ import { PaymentMethod } from "../../../../common/enum/payment-method";
 
 export class CreateTransactionInput {
   id: string;
+
   user_id: number;
+
+  instructor_id: number;
 
   type: TransactionType;
 

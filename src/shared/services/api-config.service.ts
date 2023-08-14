@@ -163,6 +163,15 @@ export class ApiConfigService {
     };
   }
 
+  get VietQRConfig() {
+    return {
+      VIETQR_ACCOUNT_NAME: this.getString("VIETQR_ACCOUNT_NAME"),
+      VIETQR_ACCOUNT_NUMBER: this.getString("VIETQR_ACCOUNT_NUMBER"),
+      VIETQR_BANK_CODE: this.getString("VIETQR_BANK_CODE"),
+      VIETQR_TEMPLATE: this.getString("VIETQR_TEMPLATE"),
+    };
+  }
+
   get GoogleConfig() {
     return {
       APP_ID: this.getString("GOOGLE_APP_ID"),

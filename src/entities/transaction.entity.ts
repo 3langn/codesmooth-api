@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
@@ -28,7 +29,17 @@ export class TransactionEntity {
   user_id: number;
 
   @ManyToOne(() => UserEntity, (user) => user.transactions)
+  @JoinColumn({ name: "user_id" })
   user: UserEntity;
+
+  @Column({
+    nullable: true,
+  })
+  instructor_id: number;
+
+  @ManyToOne(() => UserEntity, (user) => user.instructor_transactions)
+  @JoinColumn({ name: "instructor_id" })
+  instructor: UserEntity;
 
   @Column()
   amount: number;

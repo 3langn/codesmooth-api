@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
 import * as moment from "moment";
 import { CourseService } from "../course/course.service";
-import { CalculateRequestDto, CreatePaymentUrlInput } from "./dto/payment.dto";
+import { CalculateRequestDto, CreatePaymentUrlInput, GetVietQRInput } from "./dto/payment.dto";
 import axios from "axios";
 
 import { TransactionService } from "../transaction/transaction.service";
@@ -12,6 +12,8 @@ import { generateTransactionId } from "../../../common/generate-nanoid";
 import { TransactionStatus, TransactionType } from "../../../common/enum/transaction";
 import { sortObject } from "../../../common/utils";
 import { TransactionEntity } from "../../../entities/transaction.entity";
+import { CourseReponseDto } from "../course/dto/course-response.dto";
+import { PaymentMethod } from "../../../common/enum/payment-method";
 
 @Injectable()
 export class PaymentService {
@@ -20,7 +22,13 @@ export class PaymentService {
     private transactionService: TransactionService,
     private courseService: CourseService,
   ) {}
-  async createPaymentUrl(body: CreatePaymentUrlInput, req: any): Promise<string | null> {
+  async createPaymentUrl(
+    body: CreatePaymentUrlInput,
+    req: any,
+  ): Promise<{
+    url: string;
+    payment_method: string;
+  }> {
     const course = await this.courseService.getCourseById(body.course_id, req.user.id);
 
     if (course.is_bought) {
@@ -30,15 +38,55 @@ export class PaymentService {
         statusCode: HttpStatus.BAD_REQUEST,
       });
     }
-    const description =
-      "Thanh toán cho khóa học " + course.name + "- mã khóa học " + body.course_id;
 
     const isFree = course.price === 0;
     const transId = generateTransactionId();
 
+    const description =
+      transId + " Thanh toán cho khóa học " + course.name + "- mã khóa học " + body.course_id;
+
     if (isFree) {
       return null;
     }
+    let r: { signed?: string; url: string };
+    switch (body.payment_method) {
+      case PaymentMethod.VN_PAY:
+        r = this.vnpayPayment(req, transId, description, course);
+        break;
+      case PaymentMethod.VIETQR:
+        r = this.vietQRPayment(description, course);
+        break;
+      default:
+        throw new CustomHttpException({
+          code: StatusCodesList.BadRequest,
+          message: "Phương thức thanh toán không hợp lệ",
+          statusCode: HttpStatus.BAD_REQUEST,
+        });
+    }
+
+    console.log("R", r);
+
+    await this.transactionService.createTransaction({
+      id: transId,
+      user_id: req.user.id,
+      instructor_id: course.owner_id,
+      type: TransactionType.CUSTOMER_PAY,
+      course_id: body.course_id,
+      payment_method: body.payment_method,
+      amount: course.price,
+      course_name: course.name,
+      description: description,
+      status: isFree ? TransactionStatus.SUCCESS : TransactionStatus.PENDING,
+      gen_secure_hash: r.signed,
+    });
+
+    return {
+      url: r.url,
+      payment_method: body.payment_method,
+    };
+  }
+
+  private vnpayPayment(req: any, transId: string, description: string, course: CourseReponseDto) {
     let date = new Date();
     let createDate = moment(date).format("YYYYMMDDHHmmss");
 
@@ -66,7 +114,6 @@ export class PaymentService {
     // if (bankCode !== null && bankCode !== "") {
     //   vnp_Params["vnp_BankCode"] = bankCode;
     // }
-
     vnp_Params = sortObject(vnp_Params);
 
     let querystring = require("qs");
@@ -76,21 +123,7 @@ export class PaymentService {
     let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
     vnp_Params["vnp_SecureHash"] = signed;
     vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
-
-    await this.transactionService.createTransaction({
-      id: transId,
-      user_id: req.user.id,
-      type: TransactionType.CUSTOMER_PAY,
-      course_id: body.course_id,
-      payment_method: body.payment_method,
-      amount: course.price,
-      course_name: course.name,
-      description: description,
-      status: isFree ? TransactionStatus.SUCCESS : TransactionStatus.PENDING,
-      gen_secure_hash: signed,
-    });
-
-    return vnpUrl;
+    return { signed, url: vnpUrl };
   }
 
   async vnpayIpn(req: any) {
@@ -256,6 +289,14 @@ export class PaymentService {
       price: course.price,
       discount: discount,
       total: course.price - discount,
+    };
+  }
+
+  private vietQRPayment(description: string, course: CourseReponseDto) {
+    const vietQRConfig = this.configService.VietQRConfig;
+    const url = `https://img.vietqr.io/image/${vietQRConfig.VIETQR_BANK_CODE}-${vietQRConfig.VIETQR_ACCOUNT_NUMBER}-${vietQRConfig.VIETQR_TEMPLATE}.png?amount=${course.price}&addInfo=${description}&accountName=${vietQRConfig.VIETQR_ACCOUNT_NAME}`;
+    return {
+      url,
     };
   }
 }
