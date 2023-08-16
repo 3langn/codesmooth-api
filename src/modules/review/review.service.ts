@@ -8,8 +8,6 @@ import { CustomHttpException } from "../../common/exception/custom-http.exceptio
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 import { ReviewCourseRequest } from "./review.dto";
 import { PageOptionsDto } from "../../common/dto/page-options.dto";
-import { queryPagination } from "../../common/utils";
-import { log } from "console";
 
 @Injectable()
 export class ReviewService {

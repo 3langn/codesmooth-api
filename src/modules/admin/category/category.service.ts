@@ -7,7 +7,7 @@ import { CreateCategoryDto, UpdateCategoryDto } from "./category.dto";
 import { CategoryEntity } from "../../../entities/category.entity";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
-import { queryPagination } from "../../../common/utils";
+import { queryPaginationTakeSkip } from "../../../common/utils";
 import { PageOptionsDto } from "../../../common/dto/page-options.dto";
 
 @Injectable()
@@ -36,7 +36,7 @@ export class CategoryService {
 
   async listCategories(pageOptionsDto: PageOptionsDto): Promise<[CategoryEntity[], number]> {
     const qb = this.categoryRepository.createQueryBuilder("category");
-    return await queryPagination({
+    return await queryPaginationTakeSkip({
       query: qb,
       o: pageOptionsDto,
     });

@@ -7,7 +7,7 @@ import { CourseEntity } from "../../../entities/course.entity";
 import { CategoryEntity } from "../../../entities/category.entity";
 import { PageOptionsDto } from "../../../common/dto/page-options.dto";
 import { CourseStatus } from "../../../common/enum/course";
-import { queryPagination } from "../../../common/utils";
+import { queryPaginationTakeSkip } from "../../../common/utils";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { ReviewService } from "../../review/review.service";
@@ -40,15 +40,14 @@ export class CourseService {
       .leftJoin("course.owner", "owner")
       .leftJoin("course.reviews", "review")
       .addSelect("AVG(review.rating)", "course_rating")
-      .where("course.status = :status", { status: CourseStatus.Published })
-      .andWhere("course.published_at IS NOT NULL");
+      .where("course.status = :status", { status: CourseStatus.Published });
 
     if (pageOptionsDto.category_id) {
       qb.andWhere("categories.id = :category_id", { category_id: pageOptionsDto.category_id });
     }
 
     qb.groupBy("course.id, categories.id, owner.id");
-    const r = await queryPagination({ query: qb, o: pageOptionsDto });
+    const r = await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
     return r;
   }
 
@@ -74,7 +73,7 @@ export class CourseService {
       .andWhere("students.id = :user_id", { user_id })
       .andWhere("course.published_at IS NOT NULL");
 
-    return await queryPagination({ query: qb, o: pageOptionsDto });
+    return await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
   }
 
   async getCourseById(id: number, user_id?: number): Promise<CourseReponseDto> {
@@ -152,6 +151,6 @@ export class CourseService {
       .where("course.status = :status", { status: CourseStatus.Published })
       .andWhere("owner.id = :instructor_id", { instructor_id });
 
-    return await queryPagination({ query: qb, o: pageOptionsDto });
+    return await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
   }
 }

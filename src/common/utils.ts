@@ -44,6 +44,20 @@ export async function queryPagination<X extends string[], T>({
     .getManyAndCount();
 }
 
+export async function queryPaginationTakeSkip<X extends string[], T>({
+  query,
+  o,
+}: {
+  query: SelectQueryBuilder<T>;
+  o: PageOptionsDto;
+}): Promise<[T[], number]> {
+  return query
+    .take(o.take)
+    .skip(o.skip)
+    .orderBy(`${query.alias}.${o.sort}`, o.order)
+    .getManyAndCount();
+}
+
 // export function getVariableName<TResult>(getVar: () => TResult): string {
 //   const m = /\(\)=>(.*)/.exec(
 //     getVar.toString().replace(/(\r\n|\n|\r|\s)/gm, ''),

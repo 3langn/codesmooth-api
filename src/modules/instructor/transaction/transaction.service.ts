@@ -4,7 +4,7 @@ import { DataSource, Repository } from "typeorm";
 import { TransactionEntity } from "../../../entities/transaction.entity";
 import { CourseEntity } from "../../../entities/course.entity";
 import { PageOptionsDto } from "../../../common/dto/page-options.dto";
-import { queryPagination } from "../../../common/utils";
+import { queryPaginationTakeSkip } from "../../../common/utils";
 import { TransactionStatus } from "../../../common/enum/transaction";
 @Injectable()
 export class TransactionService {
@@ -44,7 +44,7 @@ export class TransactionService {
         status: TransactionStatus.SUCCESS,
       });
 
-    const transactions = await queryPagination({ query: qb, o: pageOptionsDto });
+    const transactions = await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
 
     return transactions;
   }

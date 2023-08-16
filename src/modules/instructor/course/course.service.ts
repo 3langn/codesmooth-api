@@ -7,7 +7,7 @@ import { SaveCourseDto } from "./dto/create-course.dto";
 import { generateId } from "../../../common/generate-nanoid";
 import { UserEntity } from "../../../entities/user.entity";
 import { PageOptionsDto } from "../../../common/dto/page-options.dto";
-import { queryPagination } from "../../../common/utils";
+import { queryPaginationTakeSkip } from "../../../common/utils";
 import { PageDto } from "../../../common/dto/page.dto";
 import { InstructorCourseReponseDto } from "./dto/course-response.dto";
 import { CategoryEntity } from "../../../entities/category.entity";
@@ -119,7 +119,7 @@ export class InstructorCourseService {
       }
     }
 
-    return await queryPagination({ query: qb, o: pageOptionsDto });
+    return await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
   }
 
   async countCourse(user_id: number) {

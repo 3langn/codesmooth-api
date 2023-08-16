@@ -5,7 +5,7 @@ import { ListCourseQueryDto } from "./dto/list-course.dto";
 import { CourseEntity } from "../../../entities/course.entity";
 import { CategoryEntity } from "../../../entities/category.entity";
 import { CourseStatus } from "../../../common/enum/course";
-import { queryPagination } from "../../../common/utils";
+import { queryPaginationTakeSkip } from "../../../common/utils";
 import { generateId } from "../../../common/generate-nanoid";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
@@ -29,9 +29,18 @@ export class AdminCourseService {
   async getCourses(pageOptionsDto: ListCourseQueryDto): Promise<[CourseEntity[], number]> {
     const qb = this.courseRepository
       .createQueryBuilder("course")
-      .select(["course", "categories.id", "categories.name"])
-      .leftJoinAndSelect("course.categories", "categories")
-      .leftJoinAndSelect("course.owner", "owner");
+      .distinct()
+      .select([
+        "course",
+        "categories.id",
+        "categories.name",
+        "owner.id",
+        "owner.email",
+        "owner.username",
+        "owner.avatar",
+      ])
+      .leftJoin("course.categories", "categories")
+      .leftJoin("course.owner", "owner");
 
     if (pageOptionsDto.status) {
       qb.andWhere("course.status = :status", { status: pageOptionsDto.status });
@@ -53,8 +62,7 @@ export class AdminCourseService {
     if (pageOptionsDto.name) {
       qb.andWhere("course.name ILIKE :name", { name: `%${pageOptionsDto.name}%` });
     }
-
-    return await queryPagination({ query: qb, o: pageOptionsDto });
+    return await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
   }
 
   async getCourseById(id: number) {
