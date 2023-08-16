@@ -29,7 +29,6 @@ export class AdminCourseService {
   async getCourses(pageOptionsDto: ListCourseQueryDto): Promise<[CourseEntity[], number]> {
     const qb = this.courseRepository
       .createQueryBuilder("course")
-      .distinct()
       .select([
         "course",
         "categories.id",
