@@ -14,6 +14,7 @@ import { sortObject } from "../../../common/utils";
 import { TransactionEntity } from "../../../entities/transaction.entity";
 import { CourseReponseDto } from "../course/dto/course-response.dto";
 import { PaymentMethod } from "../../../common/enum/payment-method";
+import { SettingsService } from "../settings/settings.service";
 
 @Injectable()
 export class PaymentService {
@@ -21,6 +22,7 @@ export class PaymentService {
     private configService: ApiConfigService,
     private transactionService: TransactionService,
     private courseService: CourseService,
+    private settingService: SettingsService,
   ) {}
   async createPaymentUrl(
     body: CreatePaymentUrlInput,
@@ -54,7 +56,7 @@ export class PaymentService {
         r = this.vnpayPayment(req, transId, description, course);
         break;
       case PaymentMethod.VIETQR:
-        r = this.vietQRPayment(description, course);
+        r = this.vietQRPayment(transId, course);
         break;
       default:
         throw new CustomHttpException({
@@ -64,7 +66,9 @@ export class PaymentService {
         });
     }
 
-    console.log("R", r);
+    const discount = await this.settingService.getDiscountSettings();
+
+    const income = Math.floor(course.price * (1 - discount / 100));
 
     await this.transactionService.createTransaction({
       id: transId,
@@ -78,6 +82,9 @@ export class PaymentService {
       description: description,
       status: isFree ? TransactionStatus.SUCCESS : TransactionStatus.PENDING,
       gen_secure_hash: r.signed,
+      discount,
+      instructor_income: course.price - income,
+      income,
     });
 
     return {
@@ -292,9 +299,9 @@ export class PaymentService {
     };
   }
 
-  private vietQRPayment(description: string, course: CourseReponseDto) {
+  private vietQRPayment(transId: string, course: CourseReponseDto) {
     const vietQRConfig = this.configService.VietQRConfig;
-    const url = `https://img.vietqr.io/image/${vietQRConfig.VIETQR_BANK_CODE}-${vietQRConfig.VIETQR_ACCOUNT_NUMBER}-${vietQRConfig.VIETQR_TEMPLATE}.png?amount=${course.price}&addInfo=${description}&accountName=${vietQRConfig.VIETQR_ACCOUNT_NAME}`;
+    const url = `https://img.vietqr.io/image/${vietQRConfig.VIETQR_BANK_CODE}-${vietQRConfig.VIETQR_ACCOUNT_NUMBER}-${vietQRConfig.VIETQR_TEMPLATE}.png?amount=${course.price}&addInfo=${transId}&accountName=${vietQRConfig.VIETQR_ACCOUNT_NAME}`;
     return {
       url,
     };

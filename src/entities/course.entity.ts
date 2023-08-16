@@ -127,7 +127,7 @@ export class CourseEntity extends BaseEntity {
   @Column({ nullable: true, type: "jsonb" })
   rejected_reason: RejectedReason;
 
-  @Column({ nullable: true })
+  @Column({ default: 0 })
   reading_time: number;
 
   @ManyToMany(() => UserEntity, (user) => user.completedCourses, {

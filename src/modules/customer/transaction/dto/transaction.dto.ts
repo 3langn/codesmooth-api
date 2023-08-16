@@ -19,9 +19,15 @@ export class CreateTransactionInput {
 
   amount: number;
 
+  instructor_income: number;
+
+  income: number;
+
   status?: TransactionStatus;
 
   payment_method: PaymentMethod;
 
   gen_secure_hash: string;
+
+  discount: number;
 }

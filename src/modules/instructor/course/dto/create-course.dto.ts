@@ -33,8 +33,8 @@ export class SaveCourseDto {
       message: "Giá khóa học phải là một số",
     },
   )
-  @Validate(GreaterThanOrEqualSpecific, [0, 15000], {
-    message: "Giá khóa học phải bằng 0 hoặc lớn hơn hoặc bằng 15000",
+  @Validate(GreaterThanOrEqualSpecific, [0, 5000], {
+    message: "Giá khóa học phải bằng 0 hoặc lớn hơn hoặc bằng 5000",
   })
   price: number;
 

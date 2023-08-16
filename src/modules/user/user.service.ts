@@ -35,10 +35,13 @@ export class UserService {
   async findOne(
     findData: FindOptionsWhere<UserEntity>,
     password: boolean = false,
+    settings: boolean = true,
   ): Promise<UserEntity | null> {
     const u = await this.userRepository.findOne({
       where: findData,
-      relations: ["settings"],
+      relations: {
+        settings: settings,
+      },
     });
 
     if (!password) delete u.password;

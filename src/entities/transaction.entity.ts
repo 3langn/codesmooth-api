@@ -7,12 +7,14 @@ import {
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
+  VirtualColumn,
 } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { generateTransactionId } from "../common/generate-nanoid";
 import { TransactionStatus, TransactionType } from "../common/enum/transaction";
 import { UserEntity } from "./user.entity";
 import { PaymentMethod } from "../common/enum/payment-method";
+import { CourseEntity } from "./course.entity";
 
 @Entity("transaction")
 export class TransactionEntity {
@@ -44,6 +46,12 @@ export class TransactionEntity {
   @Column()
   amount: number;
 
+  @Column({ nullable: true })
+  instructor_income: number;
+
+  @Column({ nullable: true })
+  income: number;
+
   @Column({ enum: TransactionType })
   type: TransactionType;
 
@@ -55,6 +63,13 @@ export class TransactionEntity {
 
   @Column()
   course_id: number;
+
+  @Column()
+  discount: number;
+
+  @ManyToOne(() => CourseEntity)
+  @JoinColumn({ name: "course_id" })
+  course: CourseEntity;
 
   @Column()
   course_name: string;

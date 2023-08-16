@@ -8,7 +8,7 @@ let migrations = [__dirname + "/../migrations/*{.ts,.js}"];
 
 const config = {
   entities,
-  synchronize: true, // NOTE: NEVER USE THIS
+  // synchronize: true, // NOTE: NEVER USE THIS
   autoLoadEntities: true, // TODO: remove this on production
   // migrations,
   // keepConnectionAlive: !this.isTest,
@@ -23,7 +23,7 @@ const config = {
   // migrationsRun: true,
   migrations: migrations,
   logging: process.env.ENABLE_ORM_LOGS === "true",
-  // maxQueryExecutionTime: -1,
+  maxQueryExecutionTime: -1,
   cache: true,
 };
 

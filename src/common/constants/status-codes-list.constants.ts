@@ -30,4 +30,5 @@ export const StatusCodesList = {
   EmailIsNotVerified: 1028,
   UserNotFound: 1029,
   TokenNotFound: 1030,
+  DiscountNotFound: 1031,
 } as const;

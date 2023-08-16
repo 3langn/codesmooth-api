@@ -38,8 +38,8 @@ export async function queryPagination<X extends string[], T>({
   o: PageOptionsDto;
 }): Promise<[T[], number]> {
   return query
-    .take(o.take)
-    .skip(o.skip)
+    .limit(o.take)
+    .offset(o.skip)
     .orderBy(`${query.alias}.${o.sort}`, o.order)
     .getManyAndCount();
 }

@@ -205,7 +205,6 @@ export class AdminCourseService {
     await this.sectionRepository.save(newCourseSections);
   }
 
-  // TODO: Reject note for instructor
   async rejectCourse(id: number, rejected_reason: string, user: UserEntity) {
     const course = await this.courseRepository.findOneOrFail({ where: { id } });
     if (course.status !== CourseStatus.Reviewing) {

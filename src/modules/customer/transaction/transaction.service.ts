@@ -9,6 +9,7 @@ import { UserEntity } from "../../../entities/user.entity";
 import { TransactionStatus } from "../../../common/enum/transaction";
 import * as Imap from "node-imap";
 import { Observable } from "rxjs";
+import { LogTransError } from "../../../entities/log_transaction.entity";
 @Injectable()
 export class TransactionService implements OnModuleInit {
   private logger = new Logger(TransactionService.name);
@@ -19,12 +20,14 @@ export class TransactionService implements OnModuleInit {
     private readonly courseRepository: Repository<CourseEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(LogTransError)
+    private readonly logRepository: Repository<LogTransError>,
     @InjectDataSource() private datasource: DataSource,
   ) {}
 
   private imapConfig = {
-    user: "cvantnhuquynh@gmail.com",
-    password: "jkgviyicbntzowaa",
+    user: "3langn@gmail.com",
+    password: "uvjsxzoihsslpffv",
     host: "imap.gmail.com",
     port: 993,
     tls: true,
@@ -48,7 +51,7 @@ export class TransactionService implements OnModuleInit {
     return this.transactionRepository.findOne({ where: { id } });
   }
 
-  async transactionSuccess(id: string, tranNo: string): Promise<TransactionEntity> {
+  async transactionSuccess(id: string, tranNo?: string): Promise<TransactionEntity> {
     const transaction = await this.getTransactionById(id);
     transaction.status = TransactionStatus.SUCCESS;
     transaction.trans_no = tranNo;
@@ -114,45 +117,108 @@ export class TransactionService implements OnModuleInit {
   public observeNewEmails(): Observable<number> {
     return new Observable<number>((observer) => {
       this.imap.once("ready", () => {
-        this.openInbox((err, box) => {
+        this.openInbox(async (err, box) => {
           if (err) throw err;
-
           this.imap.on("mail", (numNewMsgs) => {
-            console.log("Có thư mới đến", ["TEXT", "vào tài khoản"]);
-            this.imap.search(
-              ["UNSEEN", ["TEXT", "CD123"], ["FROM", "mbebanking@mbbank.com.vn"]],
-              (searchErr, results) => {
-                if (searchErr) throw searchErr;
+            this.imap.search(["UNSEEN", ["FROM", "support@timo.vn"]], (searchErr, results) => {
+              if (searchErr) throw searchErr;
 
-                if (results.length === 0) return;
+              if (results.length === 0) return;
 
-                const fetch = this.imap.fetch(results, { bodies: "" });
+              const fetch = this.imap.fetch(results, { bodies: "" });
 
-                fetch.on("message", (msg, seqno) => {
-                  console.log(`Email #${seqno}`);
-                  msg.on("body", (stream, info) => {
-                    let buffer = "";
+              fetch.on("message", (msg, seqno) => {
+                msg.on("body", async (stream, info) => {
+                  let buffer = "";
 
-                    stream.on("data", (chunk) => {
-                      buffer += chunk.toString("utf8");
-                    });
+                  stream.on("data", (chunk) => {
+                    buffer += chunk.toString("utf8");
+                  });
 
-                    stream.on("end", () => {
-                      console.log("Nội dung email:", buffer);
-                    });
+                  stream.on("end", async () => {
+                    console.log("Nội dung email:", buffer);
+                    const regex = /CDs.*?\e/g;
+
+                    const matches = buffer.match(regex);
+                    if (!matches) {
+                      this.logger.error("Không match được mã giao dịch");
+                    }
+                    if (matches) {
+                      const tranId = matches[0];
+
+                      const regexAmountText =
+                        /T=C3=A0i kho=E1=BA=A3n Spend Account v=E1=BB=ABa t=C4=83ng (.*?VND(?:\s|$))/s;
+
+                      const matchesAmountText = buffer.match(regexAmountText);
+                      if (!matchesAmountText) {
+                        return;
+                      }
+
+                      // bỏ xuống dòng
+                      const amount = Number(
+                        matchesAmountText[0]
+                          .replace(/\r?\n|\r/g, "")
+                          .replace(
+                            "T=C3=A0i kho=E1=BA=A3n Spend Account v=E1=BB=ABa t=C4=83ng ",
+                            "",
+                          )
+                          .replace(" VND ", "")
+                          .replace(`=.`, ""),
+                      );
+
+                      if (!amount) return;
+                      const regexContent = /A3:(.*?Timo(?:\s|$))/s;
+
+                      const matchesContent = buffer.match(regexContent);
+
+                      if (!matchesContent) {
+                        this.logger.error("Không tìm thấy nội dung giao dịch");
+                        return;
+                      }
+
+                      const trans = await this.transactionRepository.findOne({
+                        where: {
+                          id: tranId,
+                        },
+                      });
+                      const log = this.logRepository.create({
+                        transfer_amount: amount,
+                        content: matchesContent[0],
+                      });
+
+                      if (!trans) {
+                        log.message = "Không tìm thấy giao dịch";
+                        await this.logRepository.save(log);
+                        return;
+                      }
+
+                      if (trans.amount !== amount) {
+                        log.message = "Số tiền không khớp";
+                        await this.logRepository.save(log);
+                        return;
+                      }
+
+                      if (trans.status !== TransactionStatus.PENDING) {
+                        log.message = "Trạng thái giao dịch không hợp lệ " + trans.status;
+                        await this.logRepository.save(log);
+                        return;
+                      }
+
+                      await this.transactionSuccess(tranId);
+                    }
                   });
                 });
+              });
 
-                this.imap.setFlags(results, ["\\Seen"], (flagErr) => {
-                  if (flagErr) throw flagErr;
-                  console.log("Đã đánh dấu email đã đọc.");
-                });
+              this.imap.setFlags(results, ["\\Seen"], (flagErr) => {
+                if (flagErr) throw flagErr;
+                console.log("Đã đánh dấu email đã đọc.");
+              });
 
-                fetch.once("end", () => {
-                  console.log("Tất cả email đã được xử lý.");
-                });
-              },
-            );
+              fetch.once("end", () => {
+                console.log("Tất cả email đã được xử lý.");
+              });
+            });
           });
         });
       });
