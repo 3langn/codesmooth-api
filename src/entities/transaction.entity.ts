@@ -80,8 +80,11 @@ export class TransactionEntity {
   @Column({ enum: PaymentMethod })
   payment_method: PaymentMethod;
 
-  @Column({ default: "" })
+  @Column({ nullable: true })
   trans_no: string;
+
+  @Column({ nullable: true })
+  bank_time: string;
 
   @Column({ default: "" })
   gen_secure_hash: string;

@@ -35,6 +35,15 @@ export class ContactContent {
   phone: string;
 }
 
+export interface PaymentSuccessContent {
+  username: string;
+  transId: string;
+  time: string;
+  courseId: number;
+  courseName: string;
+  amount: number | string;
+  paymentMethod: string;
+}
 export class EmailDataDto<T = Content> {
   from: string;
 

@@ -11,7 +11,7 @@ import { JwtModule } from "../jwt/jwt.module";
     NestMailerModule.forRootAsync({
       imports: [SharedModule],
       useFactory: async (apiConfigService: ApiConfigService) => {
-        return apiConfigService.mailerConfig;
+        return apiConfigService.mailerNoreplyConfig;
       },
       inject: [ApiConfigService],
     }),

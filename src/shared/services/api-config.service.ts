@@ -122,7 +122,7 @@ export class ApiConfigService {
     return value;
   }
 
-  get mailerConfig(): MailerOptions {
+  get mailerNoreplyConfig(): MailerOptions {
     return {
       transport: {
         host: this.getString("EMAIL_HOST"),

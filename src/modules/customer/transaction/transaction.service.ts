@@ -10,6 +10,7 @@ import { TransactionStatus } from "../../../common/enum/transaction";
 import * as Imap from "node-imap";
 import { Observable } from "rxjs";
 import { LogTransError } from "../../../entities/log_transaction.entity";
+import { MailerService } from "../../mailer/mailer.service";
 @Injectable()
 export class TransactionService implements OnModuleInit {
   private logger = new Logger(TransactionService.name);
@@ -23,6 +24,7 @@ export class TransactionService implements OnModuleInit {
     @InjectRepository(LogTransError)
     private readonly logRepository: Repository<LogTransError>,
     @InjectDataSource() private datasource: DataSource,
+    private mailerService: MailerService,
   ) {}
 
   private imapConfig = {
@@ -51,10 +53,15 @@ export class TransactionService implements OnModuleInit {
     return this.transactionRepository.findOne({ where: { id } });
   }
 
-  async transactionSuccess(id: string, tranNo?: string): Promise<TransactionEntity> {
+  async transactionSuccess(
+    id: string,
+    tranNo?: string,
+    bankTime?: string,
+  ): Promise<TransactionEntity> {
     const transaction = await this.getTransactionById(id);
     transaction.status = TransactionStatus.SUCCESS;
     transaction.trans_no = tranNo;
+    transaction.bank_time = bankTime;
 
     // TODO: Mail to dev if error and rollback then refund
 
@@ -67,11 +74,26 @@ export class TransactionService implements OnModuleInit {
     if (!course.students) course.students = [];
     course.students.push(buyer);
     course.total_enrollment += 1;
-    return await this.datasource.transaction(async (manager) => {
+    const r = await this.datasource.transaction(async (manager) => {
       await manager.save(course);
 
       return manager.save(transaction);
     });
+
+    this.mailerService.sendMailNotiPaymentSuccess(
+      {
+        amount: transaction.amount,
+        courseId: course.id,
+        courseName: course.name,
+        paymentMethod: transaction.payment_method,
+        time: transaction.bank_time,
+        transId: transaction.id,
+        username: buyer.username,
+      },
+      buyer.email,
+    );
+
+    return r;
   }
 
   async transactionFail(
@@ -176,6 +198,10 @@ export class TransactionService implements OnModuleInit {
                         return;
                       }
 
+                      const timebanktrans = buffer.match(/\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}/)[0];
+
+                      console.log("timebanktrans", timebanktrans);
+
                       const trans = await this.transactionRepository.findOne({
                         where: {
                           id: tranId,
@@ -203,8 +229,13 @@ export class TransactionService implements OnModuleInit {
                         await this.logRepository.save(log);
                         return;
                       }
-
-                      await this.transactionSuccess(tranId);
+                      try {
+                        await this.transactionSuccess(tranId, null, timebanktrans);
+                      } catch (error) {
+                        log.message = "Lỗi khi cập nhật giao dịch";
+                        log.content = error.message;
+                        await this.logRepository.save(log);
+                      }
                     }
                   });
                 });

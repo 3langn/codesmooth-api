@@ -1,6 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { MailerService as NestMailer } from "@nestjs-modules/mailer";
-import { ContactContent, Content, EmailMessageDto, ResetPasswordContent } from "./dtos/email.dto";
+import {
+  ContactContent,
+  Content,
+  EmailMessageDto,
+  PaymentSuccessContent,
+  ResetPasswordContent,
+} from "./dtos/email.dto";
 import { ApiConfigService } from "../../shared/services/api-config.service";
 import { TemplateId } from "./enum/template-id";
 import { JwtService } from "../jwt/jwt.service";
@@ -19,7 +25,7 @@ export class MailerService {
     try {
       await this.nestMailerService.sendMail({
         to,
-        from: "CodeDrafts" + "<" + this.configService.mailerConfig.transport.auth.user + ">",
+        from: "CodeDrafts" + "<" + this.configService.mailerNoreplyConfig.transport.auth.user + ">",
         template: TemplateId.EMAIL_VERIFICATION,
         context: {
           token:
@@ -49,7 +55,7 @@ export class MailerService {
         },
         subject: "Cài đặt lại mật khẩu",
         to: to,
-        from: "CodeDrafts" + "<" + this.configService.mailerConfig.transport.auth.user + ">",
+        from: "CodeDrafts" + "<" + this.configService.mailerNoreplyConfig.transport.auth.user + ">",
       })
       .then(() => {
         this.logger.log("Send email reset password successfully");
@@ -63,7 +69,7 @@ export class MailerService {
     try {
       await this.nestMailerService.sendMail({
         to: "contact@codedrafts.com",
-        from: "CodeDrafts" + "<" + this.configService.mailerConfig.transport.auth.user + ">",
+        from: "CodeDrafts" + "<" + this.configService.mailerNoreplyConfig.transport.auth.user + ">",
         template: TemplateId.CONTACT,
         context: content,
         subject,
@@ -72,5 +78,21 @@ export class MailerService {
       this.logger.error(`[EMAIL FAILED] ${content.email} - ${error}`);
     }
     this.logger.log(`[EMAIL] ${content.email} - ${content.name}`);
+  }
+
+  async sendMailNotiPaymentSuccess(content: PaymentSuccessContent, to: string) {
+    content.amount = content.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    try {
+      await this.nestMailerService.sendMail({
+        to,
+        from: "CodeDrafts" + "<" + this.configService.mailerNoreplyConfig.transport.auth.user + ">",
+        template: TemplateId.PAYMENT_SUCCESS,
+        context: content,
+        subject: "Thông báo thanh toán thành công",
+      });
+    } catch (error) {
+      this.logger.error(`[EMAIL PAYMENT FAILED] ${to} - ${error}`);
+    }
+    this.logger.log(`[EMAIL PAYMENT] ${to} - ${content.username}`);
   }
 }
