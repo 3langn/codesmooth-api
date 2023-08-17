@@ -3,7 +3,7 @@ import { SampleModule } from "./sample/sample.module";
 import { InstructorSectionModule } from "./section/section.module";
 import { InstructorLessonModule } from "./lesson/lesson.module";
 import { InstructorCourseModule } from "./course/course.module";
-import { TransactionModule } from "./transaction/transaction.module";
+import { InstructorBalanceModule } from "./balance/balance.module";
 
 @Module({
   imports: [
@@ -11,7 +11,7 @@ import { TransactionModule } from "./transaction/transaction.module";
     InstructorSectionModule,
     SampleModule,
     InstructorLessonModule,
-    TransactionModule,
+    InstructorBalanceModule,
   ],
 })
 export class InstructorModule {}

@@ -3,14 +3,17 @@ import { InjectDataSource, InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { CreateTransactionInput } from "./dto/transaction.dto";
 import { Cron } from "@nestjs/schedule";
-import { TransactionEntity } from "../../../entities/transaction.entity";
-import { CourseEntity } from "../../../entities/course.entity";
-import { UserEntity } from "../../../entities/user.entity";
-import { TransactionStatus } from "../../../common/enum/transaction";
+import { TransactionEntity } from "../../entities/transaction.entity";
+import { CourseEntity } from "../../entities/course.entity";
+import { UserEntity } from "../../entities/user.entity";
+import { TransactionStatus } from "../../common/enum/transaction";
 import * as Imap from "node-imap";
 import { Observable } from "rxjs";
-import { LogTransError } from "../../../entities/log_transaction.entity";
-import { MailerService } from "../../mailer/mailer.service";
+import { LogTransError } from "../../entities/log_transaction.entity";
+import { MailerService } from "../mailer/mailer.service";
+import { BalanceEntity } from "../../entities/balance.entity";
+import { InstructorBalanceEntity } from "../../entities/instructor_balance.entity";
+import { BalanceService } from "../balance/balance.service";
 @Injectable()
 export class TransactionService implements OnModuleInit {
   private logger = new Logger(TransactionService.name);
@@ -25,6 +28,7 @@ export class TransactionService implements OnModuleInit {
     private readonly logRepository: Repository<LogTransError>,
     @InjectDataSource() private datasource: DataSource,
     private mailerService: MailerService,
+    private balanceService: BalanceService,
   ) {}
 
   private imapConfig = {
@@ -58,42 +62,52 @@ export class TransactionService implements OnModuleInit {
     tranNo?: string,
     bankTime?: string,
   ): Promise<TransactionEntity> {
-    const transaction = await this.getTransactionById(id);
-    transaction.status = TransactionStatus.SUCCESS;
-    transaction.trans_no = tranNo;
-    transaction.bank_time = bankTime;
+    try {
+      const transaction = await this.getTransactionById(id);
+      transaction.status = TransactionStatus.SUCCESS;
+      transaction.trans_no = tranNo;
+      transaction.bank_time = bankTime;
 
-    // TODO: Mail to dev if error and rollback then refund
+      // TODO: Mail to dev if error and rollback then refund
 
-    const course = await this.courseRepository.findOne({ where: { id: transaction.course_id } });
-    if (!course) throw new Error("Không tìm thấy khóa học");
+      const co = this.courseRepository.findOne({ where: { id: transaction.course_id } });
+      const bu = this.userRepository.findOne({ where: { id: transaction.user_id } });
 
-    const buyer = await this.userRepository.findOne({ where: { id: transaction.user_id } });
-    if (!buyer) throw new Error("Không tìm thấy người mua");
+      const [course, buyer] = await Promise.all([co, bu]);
+      if (!course) throw new Error("Không tìm thấy khóa học");
+      if (!buyer) throw new Error("Không tìm thấy người mua");
 
-    if (!course.students) course.students = [];
-    course.students.push(buyer);
-    course.total_enrollment += 1;
-    const r = await this.datasource.transaction(async (manager) => {
-      await manager.save(course);
+      if (!course.students) course.students = [];
+      course.students.push(buyer);
+      course.total_enrollment += 1;
+      const r = await this.datasource.transaction(async (manager) => {
+        await manager.save(course);
+        await this.balanceService.transactionSuccess(
+          manager,
+          course.owner_id,
+          transaction,
+          buyer.id,
+        );
+        return manager.save(transaction);
+      });
+      this.mailerService.sendMailNotiPaymentSuccess(
+        {
+          amount: transaction.amount,
+          courseId: course.id,
+          courseName: course.name,
+          paymentMethod: transaction.payment_method,
+          time: transaction.bank_time,
+          transId: transaction.id,
+          username: buyer.username,
+        },
+        buyer.email,
+      );
 
-      return manager.save(transaction);
-    });
-
-    this.mailerService.sendMailNotiPaymentSuccess(
-      {
-        amount: transaction.amount,
-        courseId: course.id,
-        courseName: course.name,
-        paymentMethod: transaction.payment_method,
-        time: transaction.bank_time,
-        transId: transaction.id,
-        username: buyer.username,
-      },
-      buyer.email,
-    );
-
-    return r;
+      return r;
+    } catch (error) {
+      this.transactionFail(id, tranNo, error.message);
+      throw error;
+    }
   }
 
   async transactionFail(
@@ -219,22 +233,26 @@ export class TransactionService implements OnModuleInit {
                       }
 
                       if (trans.amount !== amount) {
-                        log.message = "Số tiền không khớp";
-                        await this.logRepository.save(log);
+                        await this.transactionFail(
+                          tranId,
+                          null,
+                          `Số tiền không khớp. Số tiền cần thanh toán ${trans.amount} - Số tiền thanh toán ${amount} `,
+                        );
                         return;
                       }
 
                       if (trans.status !== TransactionStatus.PENDING) {
-                        log.message = "Trạng thái giao dịch không hợp lệ " + trans.status;
-                        await this.logRepository.save(log);
+                        await this.transactionFail(
+                          tranId,
+                          null,
+                          `Trạng thái không hợp lệ: ${trans.status} `,
+                        );
                         return;
                       }
                       try {
                         await this.transactionSuccess(tranId, null, timebanktrans);
                       } catch (error) {
-                        log.message = "Lỗi khi cập nhật giao dịch";
-                        log.content = error.message;
-                        await this.logRepository.save(log);
+                        this.logger.error(error);
                       }
                     }
                   });

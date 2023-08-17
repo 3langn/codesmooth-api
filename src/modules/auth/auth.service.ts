@@ -30,6 +30,7 @@ import {
   SocialService,
 } from "./social.service";
 import { LoginSocialRequest } from "./dto/LoginPayloadDto";
+import { InstructorBalanceEntity } from "../../entities/instructor_balance.entity";
 
 @Injectable()
 export class AuthService {
@@ -45,6 +46,8 @@ export class AuthService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(UserSettingsEntity)
     private readonly userSettingsRepository: Repository<UserSettingsEntity>,
+    @InjectRepository(InstructorBalanceEntity)
+    private readonly instructorBalanceRepository: Repository<InstructorBalanceEntity>,
     @InjectRepository(TokenEntity)
     private readonly tokenRepository: Repository<TokenEntity>,
     private configService: ApiConfigService,
@@ -148,6 +151,13 @@ export class AuthService {
       {
         isEmailVerified: true,
       },
+    );
+
+    await this.instructorBalanceRepository.save(
+      this.instructorBalanceRepository.create({
+        instructor_id: t.user_id,
+        current_balance: 0,
+      }),
     );
   }
 

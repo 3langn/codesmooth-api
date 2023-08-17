@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
-import { TransactionService } from "./transaction.service";
+import { InstructorBalanceService } from "./balance.service";
 import { Auth, AuthUser } from "../../../decorators";
 import { UserEntity } from "../../../entities/user.entity";
 import { ResponseDefault } from "../../../common/dto/response_default";
@@ -7,14 +7,14 @@ import { PageOptionsDto } from "../../../common/dto/page-options.dto";
 import { PageDto } from "../../../common/dto/page.dto";
 import { PageMetaDto } from "../../../common/dto/page-meta.dto";
 
-@Controller("instructor/transaction")
-export class TransactionController {
-  constructor(private readonly transactionService: TransactionService) {}
+@Controller("instructor/balance")
+export class InstructorBalanceController {
+  constructor(private readonly balanceService: InstructorBalanceService) {}
 
   @Auth()
-  @Get("/")
+  @Get("/list")
   async list(@AuthUser() user: UserEntity, @Query() pageOptionsDto: PageOptionsDto) {
-    const [rs, itemCount] = await this.transactionService.instructorTransactions(
+    const [rs, itemCount] = await this.balanceService.instructorBalanceHistory(
       user.id,
       pageOptionsDto,
     );
@@ -23,9 +23,9 @@ export class TransactionController {
   }
 
   @Auth()
-  @Get("/total-income")
+  @Get("/")
   async totalIncome(@AuthUser() user: UserEntity) {
-    const r = await this.transactionService.totalIncome(user.id);
+    const r = await this.balanceService.getBalance(user.id);
 
     return new ResponseDefault("Thành công", r);
   }

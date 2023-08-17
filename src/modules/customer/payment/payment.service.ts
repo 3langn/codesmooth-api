@@ -4,7 +4,7 @@ import { CourseService } from "../course/course.service";
 import { CalculateRequestDto, CreatePaymentUrlInput, GetVietQRInput } from "./dto/payment.dto";
 import axios from "axios";
 
-import { TransactionService } from "../transaction/transaction.service";
+import { TransactionService } from "../../transaction/transaction.service";
 import { ApiConfigService } from "../../../shared/services/api-config.service";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
@@ -68,7 +68,7 @@ export class PaymentService {
 
     const discount = await this.settingService.getDiscountSettings();
 
-    const income = Math.floor(course.price * (1 - discount / 100));
+    const income = Math.floor((course.price * discount) / 100);
 
     await this.transactionService.createTransaction({
       id: transId,

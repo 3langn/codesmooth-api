@@ -8,6 +8,7 @@ import { UserSettingsEntity } from "./user-settings.entity";
 import { CourseEntity } from "./course.entity";
 import { TransactionEntity } from "./transaction.entity";
 import { LessonEntity } from "./lesson.entity";
+import { InstructorBalanceEntity } from "./instructor_balance.entity";
 
 export type Social = "google" | "facebook" | "github";
 @Entity({ name: "users" })

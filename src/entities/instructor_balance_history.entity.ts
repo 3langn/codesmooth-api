@@ -1,13 +1,16 @@
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
-import { BalanceEntity } from "./balance.entity";
 import { TransactionEntity } from "./transaction.entity";
+import { InstructorBalanceEntity } from "./instructor_balance.entity";
 import { TransactionType } from "../common/enum/transaction";
 import { CourseEntity } from "./course.entity";
 import { UserEntity } from "./user.entity";
 
-@Entity("balance_histories")
-export class BalanceHistoryEntity extends BaseEntity {
+@Entity("instructor_balance_histories")
+export class InstructorBalanceHistoryEntity extends BaseEntity {
+  @Column()
+  instructor_id: number;
+
   @Column()
   current_balance: number;
 
@@ -17,12 +20,12 @@ export class BalanceHistoryEntity extends BaseEntity {
   @Column()
   amount: number;
 
-  @ManyToOne(() => BalanceEntity)
-  @JoinColumn({ name: "balance_id" })
-  balance: BalanceEntity;
-
   @Column({ enum: TransactionType, nullable: true })
   type: TransactionType;
+
+  @ManyToOne(() => InstructorBalanceEntity)
+  @JoinColumn({ name: "balance_id" })
+  balance: InstructorBalanceEntity;
 
   @Column()
   balance_id: number;

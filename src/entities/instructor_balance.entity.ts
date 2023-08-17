@@ -6,6 +6,6 @@ export class InstructorBalanceEntity extends BaseEntity {
   @Column()
   instructor_id: number;
 
-  @Column()
+  @Column({ default: 0 })
   current_balance: number;
 }

@@ -13,10 +13,16 @@ import { UserEntity } from "../../entities/user.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TokenEntity } from "../../entities/token.entity";
 import { FacebookAuthService, GithubAuthService, GoogleAuthService } from "./social.service";
+import { InstructorBalanceEntity } from "../../entities/instructor_balance.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity, UserSettingsEntity, TokenEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      UserSettingsEntity,
+      TokenEntity,
+      InstructorBalanceEntity,
+    ]),
     forwardRef(() => UserModule),
     PassportModule.register({ defaultStrategy: "jwt" }),
     MailerModule,
