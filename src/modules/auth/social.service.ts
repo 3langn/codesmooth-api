@@ -134,15 +134,17 @@ export class GithubAuthService implements SocialService {
       },
     });
 
-    if (r.data.email === null) {
-      throw new CustomHttpException({
-        statusCode: HttpStatus.UNAUTHORIZED,
-        code: StatusCodesList.InvalidCredentials,
-        message: "Bạn phải để public email trên github",
-      });
-    }
+    const e = await axios.get("https://api.github.com/user/emails", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
-    return r.data;
+    const email = e.data.find((e) => e.primary)?.email;
+    return {
+      ...r.data,
+      email,
+    };
   }
 
   async login(token: string, social_user_id?: string) {
