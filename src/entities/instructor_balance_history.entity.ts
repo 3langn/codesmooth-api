@@ -50,4 +50,7 @@ export class InstructorBalanceHistoryEntity extends BaseEntity {
 
   @Column({ nullable: true })
   user_id: number;
+
+  @Column({ default: 30 })
+  discount: number;
 }

@@ -34,9 +34,7 @@ export class TransactionEntity {
   @JoinColumn({ name: "user_id" })
   user: UserEntity;
 
-  @Column({
-    nullable: true,
-  })
+  @Column()
   instructor_id: number;
 
   @ManyToOne(() => UserEntity, (user) => user.instructor_transactions)
@@ -88,4 +86,10 @@ export class TransactionEntity {
 
   @Column({ default: "" })
   gen_secure_hash: string;
+
+  @Column({ nullable: true })
+  previous_balance: number;
+
+  @Column({ nullable: true })
+  current_balance: number;
 }

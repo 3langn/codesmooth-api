@@ -1,10 +1,8 @@
-import { InjectRepository } from "@nestjs/typeorm";
-import { TransactionEntity } from "../../entities/transaction.entity";
-import { EntityManager, Repository } from "typeorm";
+import { EntityManager } from "typeorm";
 import { InstructorBalanceEntity } from "../../entities/instructor_balance.entity";
 import { BalanceEntity } from "../../entities/balance.entity";
 import { InstructorBalanceHistoryEntity } from "../../entities/instructor_balance_history.entity";
-import { BalanceHistoryEntity } from "../../entities/balance_history.entity";
+import { TransactionEntity } from "../../entities/transaction.entity";
 
 export class BalanceService {
   constructor() {}

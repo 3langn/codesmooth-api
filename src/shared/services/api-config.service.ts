@@ -76,6 +76,16 @@ export class ApiConfigService {
     };
   }
 
+  get imapConfig() {
+    return {
+      host: "imap.gmail.com",
+      port: 993,
+      tls: true,
+      user: this.getString("EMAIL_RECEIVE_BANK"),
+      password: this.getString("EMAIL_RECEIVE_BANK_PASSWORD"),
+    };
+  }
+
   get awsS3Config() {
     return {
       bucketRegion: this.getString("AWS_S3_BUCKET_REGION"),

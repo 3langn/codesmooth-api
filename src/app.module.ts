@@ -23,6 +23,7 @@ import { AdminModule } from "./modules/admin/admin.module";
 import { InstructorModule } from "./modules/instructor/instructor.module";
 import { CustomerModule } from "./modules/customer/customer.module";
 import { ReviewModule } from "./modules/review/review.module";
+import { TransactionModule } from "./modules/transaction/transaction.module";
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { ReviewModule } from "./modules/review/review.module";
     OtherModule,
     AdminModule,
     InstructorModule,
+    TransactionModule,
   ],
   // providers: [
   //   {

@@ -10,12 +10,11 @@ import { TransactionStatus } from "../../common/enum/transaction";
 import * as Imap from "node-imap";
 import { Observable } from "rxjs";
 import { LogTransError } from "../../entities/log_transaction.entity";
-import { MailerService } from "../mailer/mailer.service";
-import { BalanceEntity } from "../../entities/balance.entity";
-import { InstructorBalanceEntity } from "../../entities/instructor_balance.entity";
 import { BalanceService } from "../balance/balance.service";
+import { MailerService } from "../mailer/mailer.service";
+import { ApiConfigService } from "../../shared/services/api-config.service";
 @Injectable()
-export class TransactionService implements OnModuleInit {
+export class TransactionService {
   private logger = new Logger(TransactionService.name);
   constructor(
     @InjectRepository(TransactionEntity)
@@ -29,24 +28,15 @@ export class TransactionService implements OnModuleInit {
     @InjectDataSource() private datasource: DataSource,
     private mailerService: MailerService,
     private balanceService: BalanceService,
-  ) {}
-
-  private imapConfig = {
-    user: "3langn@gmail.com",
-    password: "uvjsxzoihsslpffv",
-    host: "imap.gmail.com",
-    port: 993,
-    tls: true,
-  };
-
-  private imap: Imap;
-
-  onModuleInit() {
-    this.imap = new Imap(this.imapConfig);
+    private configService: ApiConfigService,
+  ) {
+    this.imap = new Imap(configService.imapConfig);
     this.observeNewEmails().subscribe((numNewMsgs) => {
       console.log("Có thư mới", numNewMsgs);
     });
   }
+
+  private imap: Imap;
 
   async createTransaction(data: CreateTransactionInput): Promise<TransactionEntity> {
     const transaction = this.transactionRepository.create(data);
@@ -166,6 +156,8 @@ export class TransactionService implements OnModuleInit {
   public observeNewEmails(): Observable<number> {
     return new Observable<number>((observer) => {
       this.imap.once("ready", () => {
+        console.log("Kết nối imap thành công");
+
         this.openInbox(async (err, box) => {
           if (err) throw err;
           this.imap.on("mail", (numNewMsgs) => {
@@ -305,6 +297,7 @@ export class TransactionService implements OnModuleInit {
       });
 
       this.imap.connect();
+      console.log("Đang kết nối đến mail server");
     });
   }
 
