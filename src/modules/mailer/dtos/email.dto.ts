@@ -35,7 +35,7 @@ export class ContactContent {
   phone: string;
 }
 
-export interface PaymentSuccessContent {
+export interface PaymentContent {
   username: string;
   transId: string;
   time: string;

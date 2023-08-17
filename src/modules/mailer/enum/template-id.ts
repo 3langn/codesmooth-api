@@ -3,4 +3,5 @@ export enum TemplateId {
   RESET_PASSWORD = "reset-password",
   CONTACT = "contact",
   PAYMENT_SUCCESS = "payment-success",
+  PAYMENT_FAILED = "payment-failed",
 }

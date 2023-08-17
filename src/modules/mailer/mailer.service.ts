@@ -4,7 +4,7 @@ import {
   ContactContent,
   Content,
   EmailMessageDto,
-  PaymentSuccessContent,
+  PaymentContent,
   ResetPasswordContent,
 } from "./dtos/email.dto";
 import { ApiConfigService } from "../../shared/services/api-config.service";
@@ -80,7 +80,7 @@ export class MailerService {
     this.logger.log(`[EMAIL] ${content.email} - ${content.name}`);
   }
 
-  async sendMailNotiPaymentSuccess(content: PaymentSuccessContent, to: string) {
+  async sendMailNotiPaymentSuccess(content: PaymentContent, to: string) {
     content.amount = content.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     try {
       await this.nestMailerService.sendMail({
@@ -94,5 +94,21 @@ export class MailerService {
       this.logger.error(`[EMAIL PAYMENT FAILED] ${to} - ${error}`);
     }
     this.logger.log(`[EMAIL PAYMENT] ${to} - ${content.username}`);
+  }
+
+  async sendMailNotiPaymentFailed(content: PaymentContent, to: string) {
+    content.amount = content.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    try {
+      await this.nestMailerService.sendMail({
+        to,
+        from: "CodeDrafts" + "<" + this.configService.mailerNoreplyConfig.transport.auth.user + ">",
+        template: TemplateId.PAYMENT_FAILED,
+        context: content,
+        subject: "Thông báo thanh toán thất bại",
+      });
+    } catch (error) {
+      this.logger.error(`[EMAIL FAILED PAYMENT FAILED] ${to} - ${error}`);
+    }
+    this.logger.log(`[EMAIL FAILED PAYMENT] ${to} - ${content.username}`);
   }
 }

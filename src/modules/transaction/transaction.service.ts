@@ -119,6 +119,8 @@ export class TransactionService implements OnModuleInit {
     transaction.status = TransactionStatus.FAILED;
     transaction.trans_no = tranNo;
     transaction.failed_reason = reason_code;
+
+    // await this.mailerService.sendMailNotiPaymentFail()
     return this.transactionRepository.save(transaction);
   }
 
@@ -214,8 +216,6 @@ export class TransactionService implements OnModuleInit {
 
                       const timebanktrans = buffer.match(/\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}/)[0];
 
-                      console.log("timebanktrans", timebanktrans);
-
                       const trans = await this.transactionRepository.findOne({
                         where: {
                           id: tranId,
@@ -223,7 +223,14 @@ export class TransactionService implements OnModuleInit {
                       });
                       const log = this.logRepository.create({
                         transfer_amount: amount,
-                        content: matchesContent[0],
+                        content:
+                          matchesContent[0] +
+                          "TransId : " +
+                          tranId +
+                          " - Amount : " +
+                          amount +
+                          " - Time : " +
+                          timebanktrans,
                       });
 
                       if (!trans) {
@@ -241,14 +248,18 @@ export class TransactionService implements OnModuleInit {
                         return;
                       }
 
-                      if (trans.status !== TransactionStatus.PENDING) {
-                        await this.transactionFail(
-                          tranId,
-                          null,
-                          `Trạng thái không hợp lệ: ${trans.status} `,
-                        );
+                      if (trans.amount !== amount) {
+                        log.message = `Số tiền không khớp. Số tiền cần thanh toán ${trans.amount} - Số tiền thanh toán ${amount} `;
+                        await this.logRepository.save(log);
                         return;
                       }
+
+                      if (trans.status !== TransactionStatus.PENDING) {
+                        log.message = "Trạng thái giao dịch không hợp lệ " + trans.status;
+                        await this.logRepository.save(log);
+                        return;
+                      }
+
                       try {
                         await this.transactionSuccess(tranId, null, timebanktrans);
                       } catch (error) {

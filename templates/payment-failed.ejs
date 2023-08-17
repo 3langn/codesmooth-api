@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Payment Success</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <style>
+      p {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <table style="width: 100%; background-color: #fafafa; padding-bottom: 10px; font-family: 'Lexend Deca';">
+      <tbody>
+        <tr>
+          <td style="text-align: center">
+            <div style="display: inline-block; background-color: #fafafa; padding-top: 4px">
+              <div style="display: flex; height: 52px">
+                <img
+                  src="https://res.cloudinary.com/titus-nguyen/image/upload/v1691052464/code-svgrepo-com_1_1_1_zg2st8.png"
+                  alt=""
+                />
+                <p
+                  style="
+                    font-family: 'Montserrat', sans-serif;
+                    font-size: 20px;
+                    font-weight: bold;
+                    line-height: 52px;
+                    color: black;
+                  "
+                >
+                  CodeDrafts
+                </p>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center">
+            <div
+              style="
+                display: inline-block;
+                width: 512px;
+                max-width: 700px;
+                background-color: white;
+                padding-top: 40px;
+                padding-right: 40px;
+                padding-bottom: 40px;
+                padding-left: 40px;
+                text-align: start;
+              "
+            >
+              <p style="padding-top: 3px; margin-bottom: 20px; font-size: 20px; font-weight: bold; color: black">
+                Chào <%= username %>,
+              </p>
+              <p style="padding-top: 3px; font-size: 18px; color: #4c4e64">
+                Chúng tôi xin thông báo rằng thanh toán của bạn đã thất bại. Vui liên hệ fanpage <a href="https://www.facebook.com/codedrafts">https://www.facebook.com/codedrafts</a> để được hỗ trợ.
+              </p>
+              <br>
+              <p style="padding-top: 3px; font-size: 18px; color: #4c4e64">
+                Dưới đây là các chi tiết liên quan đến giao dịch:
+              </p>
+
+              <table style="padding-top: 20px">
+                <tbody>
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; color: #4c4e64">Mã giao dịch:</p>
+                    </td>
+                    <td>
+                      <p style="font-size: 16px; color: #4c4e64"><%= transId %></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; color: #4c4e64">Ngày giao dịch:</p>
+                    </td>
+                    <td>
+                      <p style="font-size: 16px; color: #4c4e64"><%= time %></p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <tr>
+                      <td>
+                        <p style="font-size: 16px; color: #4c4e64">Mã khóa học:</p>
+                      </td>
+                      <td>
+                        <p style="font-size: 16px; color: #4c4e64"><%= courseId %></p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p style="font-size: 16px; color: #4c4e64">Tên khóa học:</p>
+                      </td>
+                      <td>
+                        <p style="font-size: 16px; color: #4c4e64"><%= courseName %></p>
+                      </td>
+                    </tr>
+                    <td>
+                      <p style="font-size: 16px; color: #4c4e64">Số tiền:</p>
+                    </td>
+                    <td>
+                      <p style="font-size: 16px; color: #4c4e64"><%= amount %>đ</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p style="font-size: 16px; color: #4c4e64">Phương thức thanh toán:</p>
+                    </td>
+                    <td>
+                      <p style="font-size: 16px; color: #4c4e64"><%= paymentMethod %></p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div
+                style="display: inline-block; width: 100%; padding-top: 40px; text-align: center"
+              >
+                <a
+                  style="
+                    display: inline-block;
+                    height: 50px;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                    cursor: pointer;
+                    align-items: center;
+                    border-radius: 5px;
+                    background-color: #1363df;
+                    text-align: center;
+                    color: white;
+                    text-decoration: none;
+                  "
+                  href="https://codedrafts.com/course?selection=all"
+                >
+                  <p style="font-size: 16px; font-weight: bold; line-height: 50px">
+                    Đến trang khóa học của tôi
+                  </p>
+                </a>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center">
+            <div style="display: inline-block; padding-top: 5px; padding-bottom: 5px">
+              <p style="font-size: 14px; color: #4c4e64">Được gửi bởi CodeDrafts</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
