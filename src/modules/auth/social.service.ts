@@ -106,6 +106,8 @@ export class FacebookAuthService implements SocialService {
           username: Fuser.name,
         });
       }
+
+      delete user.social;
       return user;
     } catch (error) {
       this.logger.error(error);
