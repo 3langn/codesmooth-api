@@ -29,6 +29,7 @@ export class TransactionService {
         "transaction.trans_no",
         "transaction.status",
         "transaction.discount",
+        "transaction.type",
         "course.id",
         "course.name",
         "course.thumbnail",

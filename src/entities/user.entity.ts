@@ -58,6 +58,15 @@ export class UserEntity extends BaseEntity {
   @VirtualColumn()
   fullName?: string;
 
+  @Column({ nullable: true })
+  bank_number?: string;
+
+  @Column({ nullable: true })
+  bank_name?: string;
+
+  @Column({ nullable: true })
+  bank_code?: string;
+
   @OneToOne(() => UserSettingsEntity, (userSettings) => userSettings.user)
   settings?: UserSettingsEntity;
 
@@ -67,14 +76,6 @@ export class UserEntity extends BaseEntity {
   // }
 
   toDto(): UserDto {
-    delete this.password;
-    return {
-      ...this,
-      fullName: this.fullName,
-    };
-  }
-
-  toJson(): UserDto {
     delete this.password;
     return {
       ...this,
