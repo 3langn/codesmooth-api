@@ -120,7 +120,18 @@ export class TransactionService implements OnModuleInit {
     transaction.trans_no = tranNo;
     transaction.failed_reason = reason_code;
 
-    // await this.mailerService.sendMailNotiPaymentFail()
+    await this.mailerService.sendMailNotiPaymentFailed(
+      {
+        amount: transaction.amount,
+        courseId: transaction.course_id,
+        courseName: transaction.course_name,
+        paymentMethod: transaction.payment_method,
+        time: transaction.bank_time,
+        transId: transaction.id,
+        username: transaction.user.username,
+      },
+      transaction.user.email,
+    );
     return this.transactionRepository.save(transaction);
   }
 
