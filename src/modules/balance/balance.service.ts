@@ -37,7 +37,6 @@ export class BalanceService {
 
     const [ibalance, abalance] = await Promise.all([ib, ab]);
     const ibhReposity = manager.getRepository(InstructorBalanceHistoryEntity);
-    const bhResposity = manager.getRepository(BalanceHistoryEntity);
 
     const sib = ibhReposity.save(
       ibhReposity.create({
@@ -53,20 +52,7 @@ export class BalanceService {
       }),
     );
 
-    const sbh = bhResposity.save(
-      bhResposity.create({
-        amount: transaction.income,
-        current_balance: ibalance.current_balance + transaction.income,
-        previous_balance: ibalance.current_balance,
-        transaction_id: transaction.id,
-        type: transaction.type,
-        user_id: buyer_id,
-        balance_id: abalance.id,
-        course_id: transaction.course_id,
-      }),
-    );
-
-    await Promise.all([inc, sib, sbh]);
+    await Promise.all([inc, sib]);
   }
 
   private async increaseBalance(
