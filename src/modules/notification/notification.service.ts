@@ -48,10 +48,10 @@ export class NotificationService {
       uSocketId,
       trans.user_id,
       "customer:notification",
-      "Kết quả thanh toán khóa học",
+      "Kết quả thanh toán",
       {
         message: isSuccess
-          ? `Chúc mừng bạn đã mua khóa học ${course.name}. Hãy bắt đầu học ngay nào!`
+          ? `Chúc mừng bạn đã mua khóa học ${course.name} thành công. Hãy bắt đầu học ngay nào!`
           : `Thanh toán thất bại cho khóa học ${course.name}, vui lòng liên hệ chúng tôi để được hỗ trợ`,
       },
       NotificationType.USER_PAYMENT,
@@ -60,7 +60,7 @@ export class NotificationService {
       iSocketId,
       course.owner_id,
       "customer:notification",
-      "Thông báo thanh toán khóa học",
+      "Thông báo thay đổi số dư",
       {
         message: `Bạn vừa nhận được thanh toán từ khóa học ${course.name}`,
         income: trans.instructor_income,
@@ -71,7 +71,7 @@ export class NotificationService {
       aSocketIds,
       null,
       "admin:notification",
-      "Thông báo thanh toán khóa học",
+      "Thông báo thay đổi số dư",
       {
         message: `Bạn vừa nhận được thanh toán từ chiết khấu khóa học ${course.name} - ${course.id}`,
         income: trans.income,
