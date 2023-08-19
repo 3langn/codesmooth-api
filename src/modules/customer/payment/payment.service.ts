@@ -160,14 +160,22 @@ export class PaymentService {
         if (vnpAmount / 100 === transaction.amount) {
           if (transaction.status === TransactionStatus.PENDING) {
             //kiểm tra tình trạng giao dịch trước khi cập nhật tình trạng thanh toán
+
             if (rspCode == "00") {
-              await this.transactionService.transactionSuccess(transactionId, vnp_TransactionNo);
+              await this.transactionService.transactionSuccess(transaction, vnp_TransactionNo);
               return { RspCode: "00", Message: "Success" };
             } else {
+              const c = await this.courseService.getById(transaction.course_id);
+              // now to 16/08/2023 16:05 string
+
+              const bankTime = moment(vnp_Params["vnp_PayDate"], "YYYYMMDDHHmmss").format(
+                "DD/MM/YYYY HH:mm",
+              );
               await this.transactionService.transactionFail(
-                transactionId,
-                vnp_TransactionNo,
-                rspCode,
+                transaction,
+                c,
+                "Thanh toán thất bại: " + rspCode,
+                bankTime,
               );
               return { RspCode: "00", Message: "Success" };
             }

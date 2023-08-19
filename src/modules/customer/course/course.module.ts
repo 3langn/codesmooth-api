@@ -5,11 +5,13 @@ import { CourseService } from "./course.service";
 import { CourseEntity } from "../../../entities/course.entity";
 import { CategoryEntity } from "../../../entities/category.entity";
 import { ReviewModule } from "../../review/review.module";
+import { RedisCacheModule } from "../../redis/redis.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([CourseEntity, CategoryEntity]),
     forwardRef(() => ReviewModule),
+    RedisCacheModule,
   ],
   controllers: [CourseController],
   providers: [CourseService],

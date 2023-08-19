@@ -24,6 +24,8 @@ import { InstructorModule } from "./modules/instructor/instructor.module";
 import { CustomerModule } from "./modules/customer/customer.module";
 import { ReviewModule } from "./modules/review/review.module";
 import { TransactionModule } from "./modules/transaction/transaction.module";
+import { SocketModule } from "./modules/socket/socket.module";
+import { NotificationModule } from "./modules/notification/notification.module";
 
 @Module({
   imports: [
@@ -66,6 +68,8 @@ import { TransactionModule } from "./modules/transaction/transaction.module";
     AdminModule,
     InstructorModule,
     TransactionModule,
+    SocketModule,
+    NotificationModule
   ],
   // providers: [
   //   {

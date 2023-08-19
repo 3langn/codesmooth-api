@@ -86,6 +86,14 @@ export class ApiConfigService {
     };
   }
 
+  get RedisConfig() {
+    return {
+      host: this.getString("REDIS_HOST"),
+      port: this.getNumber("REDIS_PORT"),
+      password: this.getString("REDIS_PASSWORD"),
+    };
+  }
+
   get awsS3Config() {
     return {
       bucketRegion: this.getString("AWS_S3_BUCKET_REGION"),

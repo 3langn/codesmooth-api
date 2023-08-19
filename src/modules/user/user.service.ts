@@ -21,6 +21,7 @@ import { PageMetaDto } from "../../common/dto/page-meta.dto";
 import { CustomHttpException } from "../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 import { generateHash } from "../../common/utils";
+import { RedisClientType } from "redis";
 
 @Injectable()
 export class UserService {
@@ -30,7 +31,38 @@ export class UserService {
     private userSettingRepository: Repository<UserSettingsEntity>,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>, // private validatorService: ValidatorService,
+    @Inject("CacheService") private cacheManager: RedisClientType,
   ) {}
+
+  async findOneById(id: number, password: boolean = false): Promise<UserEntity | null> {
+    const uc = await this.cacheManager.get("user:" + id.toString());
+
+    if (uc) {
+      return plainToClass(UserEntity, JSON.parse(uc));
+    }
+
+    const u = await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!u) {
+      throw new CustomHttpException({
+        code: StatusCodesList.UserNotFound,
+        message: "Không tìm thấy người dùng",
+        statusCode: HttpStatus.NOT_FOUND,
+      });
+    }
+
+    await this.cacheManager.SET("user:" + id.toString(), JSON.stringify(u), {
+      EX: 60 * 60 * 24 * 7,
+    });
+
+    if (!password) delete u.password;
+
+    return u;
+  }
 
   async findOne(
     findData: FindOptionsWhere<UserEntity>,

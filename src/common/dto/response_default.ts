@@ -3,7 +3,7 @@ export class ResponseDefault {
   data: any;
 
   constructor(message?: string, data?: any) {
-    this.message = message ? message : "Success";
+    this.message = message ? message : "Thành công";
     this.data = data ? data : null;
   }
 }

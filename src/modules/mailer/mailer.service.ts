@@ -10,6 +10,9 @@ import {
 import { ApiConfigService } from "../../shared/services/api-config.service";
 import { TemplateId } from "./enum/template-id";
 import { JwtService } from "../jwt/jwt.service";
+import { TransactionEntity } from "../../entities/transaction.entity";
+import { UserEntity } from "../../entities/user.entity";
+import { CourseEntity } from "../../entities/course.entity";
 
 @Injectable()
 export class MailerService {
@@ -80,20 +83,33 @@ export class MailerService {
     this.logger.log(`[EMAIL] ${content.email} - ${content.name}`);
   }
 
-  async sendMailNotiPaymentSuccess(content: PaymentContent, to: string) {
-    content.amount = content.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  async sendMailNotiPaymentSuccess(
+    course: CourseEntity,
+    buyer: UserEntity,
+    transaction: TransactionEntity,
+  ) {
+    const amount = transaction.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const context: PaymentContent = {
+      amount,
+      courseId: course.id,
+      courseName: course.name,
+      paymentMethod: transaction.payment_method,
+      time: transaction.bank_time,
+      username: buyer.username,
+      transId: transaction.id,
+    };
     try {
       await this.nestMailerService.sendMail({
-        to,
+        to: buyer.email,
         from: "CodeDrafts" + "<" + this.configService.mailerNoreplyConfig.transport.auth.user + ">",
         template: TemplateId.PAYMENT_SUCCESS,
-        context: content,
+        context,
         subject: "Thông báo thanh toán thành công",
       });
     } catch (error) {
-      this.logger.error(`[EMAIL PAYMENT FAILED] ${to} - ${error}`);
+      this.logger.error(`[EMAIL PAYMENT FAILED] ${buyer.email} - ${error}`);
     }
-    this.logger.log(`[EMAIL PAYMENT] ${to} - ${content.username}`);
+    this.logger.log(`[EMAIL PAYMENT] ${buyer.email} - ${buyer.username}`);
   }
 
   async sendMailNotiPaymentFailed(content: PaymentContent, to: string) {

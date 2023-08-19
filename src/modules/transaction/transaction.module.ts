@@ -9,6 +9,7 @@ import { LogTransError } from "../../entities/log_transaction.entity";
 import { InstructorBalanceEntity } from "../../entities/instructor_balance.entity";
 import { MailerModule } from "../mailer/mailer.module";
 import { BalanceModule } from "../balance/balance.module";
+import { NotificationModule } from "../notification/notification.module";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BalanceModule } from "../balance/balance.module";
       InstructorBalanceEntity,
     ]),
     MailerModule,
+    NotificationModule,
     BalanceModule,
   ],
   providers: [TransactionService],

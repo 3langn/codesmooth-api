@@ -11,6 +11,7 @@ import { queryPaginationTakeSkip } from "../../../common/utils";
 import { CustomHttpException } from "../../../common/exception/custom-http.exception";
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { ReviewService } from "../../review/review.service";
+import { RedisClientType } from "redis";
 
 @Injectable()
 export class CourseService {
@@ -20,9 +21,25 @@ export class CourseService {
     @Inject(forwardRef(() => ReviewService))
     private readonly reviewService: ReviewService,
     @InjectDataSource() private readonly datasource: DataSource,
+    @Inject("CacheService") private cacheManager: RedisClientType,
   ) {}
 
+  async getCoursesFromCache(pageOptionsDto: PageOptionsDto): Promise<[CourseEntity[], number]> {
+    const cache = await this.cacheManager.GET("course:" + JSON.stringify(pageOptionsDto));
+
+    if (!cache) {
+      return null;
+    }
+    return JSON.parse(cache) as [CourseEntity[], number];
+  }
+
   async getCourses(pageOptionsDto: PageOptionsDto): Promise<[CourseEntity[], number]> {
+    const cache = await this.getCoursesFromCache(pageOptionsDto);
+
+    if (cache) {
+      return cache;
+    }
+
     const qb = this.courseRepository
       .createQueryBuilder("course")
       .select([
@@ -48,6 +65,13 @@ export class CourseService {
 
     qb.groupBy("course.id, categories.id, owner.id");
     const r = await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
+
+    await this.cacheManager.SETEX(
+      "course:" + JSON.stringify(pageOptionsDto),
+      60 * 60,
+      JSON.stringify(r),
+    );
+
     return r;
   }
 
@@ -152,5 +176,9 @@ export class CourseService {
       .andWhere("owner.id = :instructor_id", { instructor_id });
 
     return await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
+  }
+
+  async getById(id: number): Promise<CourseEntity> {
+    return await this.courseRepository.findOne({ where: { id } });
   }
 }
