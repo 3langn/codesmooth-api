@@ -112,8 +112,14 @@ export class NotificationService {
     return queryPagination({ query: q, o });
   }
 
-  async read(userId: number, ids: string[]) {
-    await this.notificationRepo.update({ id: In(ids), user_id: userId }, { read: true });
+  async read(user: UserEntity, ids: string[]) {
+    await this.notificationRepo.update(
+      {
+        id: In(ids),
+        user_id: user.role === UserRole.ADMINSTRATOR ? In([user.id, null]) : user.id,
+      },
+      { read: true },
+    );
 
     return new ResponseDefault();
   }
