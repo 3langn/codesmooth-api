@@ -99,7 +99,7 @@ export class UserUpdateRequest extends BaseDto {
 
   @IsOptional()
   @IsString()
-  bank_name?: string;
+  bank_owner_name?: string;
 
   @IsOptional()
   @IsString()

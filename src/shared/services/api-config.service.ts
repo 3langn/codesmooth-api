@@ -88,6 +88,7 @@ export class ApiConfigService {
 
   get RedisConfig() {
     return {
+      enabled: this.getBoolean("REDIS_ENABLED"),
       host: this.getString("REDIS_HOST"),
       port: this.getNumber("REDIS_PORT"),
       password: this.getString("REDIS_PASSWORD"),

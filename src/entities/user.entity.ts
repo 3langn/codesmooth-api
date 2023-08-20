@@ -63,7 +63,7 @@ export class UserEntity extends BaseEntity {
   bank_number?: string;
 
   @Column({ nullable: true })
-  bank_name?: string;
+  bank_owner_name?: string;
 
   @Column({ nullable: true })
   bank_code?: string;

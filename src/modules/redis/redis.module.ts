@@ -7,6 +7,9 @@ import { ApiConfigService } from "../../shared/services/api-config.service";
       provide: "CacheService",
       inject: [ApiConfigService],
       useFactory: async (configService: ApiConfigService) => {
+        if (configService.RedisConfig.enabled === false) {
+          return null;
+        }
         const redisClient = Redis.createClient({
           url: `redis://default:${configService.RedisConfig.password}@${configService.RedisConfig.host}:${configService.RedisConfig.port}`,
           pingInterval: 1000,

@@ -151,4 +151,7 @@ export class CourseEntity extends BaseEntity {
 
   @Column({ nullable: true, select: false })
   rating: number;
+
+  @Column({ nullable: true, select: false })
+  rating_count: number;
 }

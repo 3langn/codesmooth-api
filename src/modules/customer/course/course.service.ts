@@ -57,6 +57,7 @@ export class CourseService {
       .leftJoin("course.owner", "owner")
       .leftJoin("course.reviews", "review")
       .addSelect("AVG(review.rating)", "course_rating")
+      .addSelect("COUNT(review.id)", "course_rating_count")
       .where("course.status = :status", { status: CourseStatus.Published });
 
     if (pageOptionsDto.category_id) {
