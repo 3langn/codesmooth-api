@@ -14,7 +14,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { TokenEntity } from "../../entities/token.entity";
 import { FacebookAuthService, GithubAuthService, GoogleAuthService } from "./social.service";
 import { InstructorBalanceEntity } from "../../entities/instructor_balance.entity";
-import { RedisCacheModule } from "../redis/redis.module";
+import { CacheModule } from "../cache/cache.module";
 
 @Module({
   imports: [

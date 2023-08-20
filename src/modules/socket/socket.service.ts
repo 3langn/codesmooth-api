@@ -1,10 +1,10 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { RedisClientType } from "redis";
 import { Server } from "socket.io";
+import { CacheService } from "../cache/cache.service";
 @Injectable()
 export class SocketService {
   public socket: Server = null;
-  constructor(@Inject("CacheService") private cacheManager: RedisClientType) {}
+  constructor(private cacheManager: CacheService) {}
   get getSocket() {
     return this.socket;
   }
@@ -14,17 +14,17 @@ export class SocketService {
   }
 
   async setSocketId(userId: number, socketId: string) {
-    await this.cacheManager.setEx("socket:" + userId, 60 * 60 * 24, socketId);
+    await this.cacheManager.set("socket:" + userId, socketId, 60 * 60 * 24);
   }
 
   async setAdminSocketId(socketId: string) {
-    await this.cacheManager.lPush("admin_socket", socketId);
+    await this.cacheManager.setList("admin_socket", socketId);
   }
 
   async getAdminSocketIds() {
-    return this.cacheManager.lRange("admin_socket", 0, -1);
+    return this.cacheManager.getList("admin_socket");
   }
   async deleteSocketId(userId: number) {
-    await this.cacheManager.DEL("socket:" + userId);
+    await this.cacheManager.delete("socket:" + userId);
   }
 }

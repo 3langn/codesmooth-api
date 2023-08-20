@@ -12,6 +12,7 @@ import { CustomHttpException } from "../../../common/exception/custom-http.excep
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { ReviewService } from "../../review/review.service";
 import { RedisClientType } from "redis";
+import { CacheService } from "../../cache/cache.service";
 
 @Injectable()
 export class CourseService {
@@ -21,24 +22,28 @@ export class CourseService {
     @Inject(forwardRef(() => ReviewService))
     private readonly reviewService: ReviewService,
     @InjectDataSource() private readonly datasource: DataSource,
-    @Inject("CacheService") private cacheManager: RedisClientType,
+    private cacheManager: CacheService,
   ) {}
 
   async getCoursesFromCache(pageOptionsDto: PageOptionsDto): Promise<[CourseEntity[], number]> {
-    const cache = await this.cacheManager.GET("course:" + JSON.stringify(pageOptionsDto));
+    const cache = (await this.cacheManager.getList(
+      "customer-course:" + JSON.stringify(pageOptionsDto),
+    )) as string[];
 
-    if (!cache) {
+    if (cache.length === 0) {
       return null;
     }
-    return JSON.parse(cache) as [CourseEntity[], number];
+    const total = parseInt(cache.pop());
+
+    return [cache.map((c) => JSON.parse(c)) as CourseEntity[], total];
   }
 
   async getCourses(pageOptionsDto: PageOptionsDto): Promise<[CourseEntity[], number]> {
-    const cache = await this.getCoursesFromCache(pageOptionsDto);
+    // const cache = await this.getCoursesFromCache(pageOptionsDto);
 
-    if (cache) {
-      return cache;
-    }
+    // if (cache) {
+    //   return cache;
+    // }
 
     const qb = this.courseRepository
       .createQueryBuilder("course")
@@ -67,11 +72,11 @@ export class CourseService {
     qb.groupBy("course.id, categories.id, owner.id");
     const r = await queryPaginationTakeSkip({ query: qb, o: pageOptionsDto });
 
-    await this.cacheManager.SETEX(
-      "course:" + JSON.stringify(pageOptionsDto),
-      60 * 60,
-      JSON.stringify(r),
-    );
+    // await this.cacheManager.setList(
+    //   "customer-course:" + JSON.stringify(pageOptionsDto),
+    //   r[0].map((x) => JSON.stringify(x)).concat(r[1].toString()),
+    //   60 * 60 * 24 * 7,
+    // );
 
     return r;
   }

@@ -22,6 +22,7 @@ import { CustomHttpException } from "../../common/exception/custom-http.exceptio
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 import { generateHash } from "../../common/utils";
 import { RedisClientType } from "redis";
+import { CacheService } from "../cache/cache.service";
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,7 @@ export class UserService {
     private userSettingRepository: Repository<UserSettingsEntity>,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>, // private validatorService: ValidatorService,
-    @Inject("CacheService") private cacheManager: RedisClientType,
+    private cacheManager: CacheService,
   ) {}
 
   async findOneById(id: number, password: boolean = false): Promise<UserEntity | null> {
@@ -62,9 +63,7 @@ export class UserService {
   }
 
   private async cacheUser(id: number, u: UserEntity) {
-    await this.cacheManager.SET("user:" + id.toString(), JSON.stringify(u), {
-      EX: 60 * 60 * 24 * 7,
-    });
+    await this.cacheManager.set("user:" + id.toString(), JSON.stringify(u), 60 * 60 * 24 * 7);
   }
 
   async findOne(
@@ -224,7 +223,7 @@ export class UserService {
         ...updateUserDto,
       });
 
-      this.cacheManager.del("user:" + userId.toString());
+      this.cacheManager.delete("user:" + userId.toString());
     } catch (error) {
       throw new CustomHttpException({
         code: StatusCodesList.UserNotFound,

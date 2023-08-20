@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import * as Redis from "redis";
 import { ApiConfigService } from "../../shared/services/api-config.service";
+import { CacheService } from "./cache.service";
 @Module({
   providers: [
     {
@@ -29,7 +30,8 @@ import { ApiConfigService } from "../../shared/services/api-config.service";
         return redisClient;
       },
     },
+    CacheService,
   ],
-  exports: ["CacheService"],
+  exports: [CacheService],
 })
-export class RedisCacheModule {}
+export class CacheModule {}

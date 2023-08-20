@@ -8,6 +8,7 @@ import { LessonEntity } from "../../../entities/lesson.entity";
 import { SectionEntity } from "../../../entities/section.entity";
 import { InstructorSectionModule } from "../section/section.module";
 import { ReviewEntity } from "../../../entities/review.entity";
+import { CacheModule } from "../../cache/cache.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ReviewEntity } from "../../../entities/review.entity";
       ReviewEntity,
     ]),
     forwardRef(() => InstructorSectionModule),
+    CacheModule,
   ],
   controllers: [InstructorCourseController],
   providers: [InstructorCourseService],
