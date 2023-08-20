@@ -54,14 +54,17 @@ export class UserService {
         statusCode: HttpStatus.NOT_FOUND,
       });
     }
+    if (!password) delete u.password;
 
+    await this.cacheUser(id, u);
+
+    return u;
+  }
+
+  private async cacheUser(id: number, u: UserEntity) {
     await this.cacheManager.SET("user:" + id.toString(), JSON.stringify(u), {
       EX: 60 * 60 * 24 * 7,
     });
-
-    if (!password) delete u.password;
-
-    return u;
   }
 
   async findOne(
@@ -220,6 +223,8 @@ export class UserService {
       const updatedUser = await this.userRepository.update(userId, {
         ...updateUserDto,
       });
+
+      this.cacheManager.del("user:" + userId.toString());
     } catch (error) {
       throw new CustomHttpException({
         code: StatusCodesList.UserNotFound,
