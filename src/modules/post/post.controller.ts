@@ -20,10 +20,16 @@ export class PostController {
     return new ResponseDefault(null, rs);
   }
 
-  @Auth()
   @Get()
-  async getPost(@AuthUser() user: UserEntity, @Query() req: PageOptionsDto) {
-    const [data, itemCount] = await this.postService.getPosts(req, user.id);
+  async getPost(@Query() req: PageOptionsDto) {
+    const [data, itemCount] = await this.postService.getPosts(req);
+    return new PageDto(data, new PageMetaDto({ itemCount, ...req }));
+  }
+
+  @Auth()
+  @Get("/my-posts")
+  async getMyPost(@AuthUser() user: UserEntity, @Query() req: PageOptionsDto) {
+    const [data, itemCount] = await this.postService.getMyPosts(req, user.id);
     return new PageDto(data, new PageMetaDto({ itemCount, ...req }));
   }
 

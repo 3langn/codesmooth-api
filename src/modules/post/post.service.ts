@@ -108,7 +108,19 @@ export class PostService {
     return total_read_time;
   }
 
-  async getPosts(req: PageOptionsDto, user_id: number) {
+  async getPosts(req: PageOptionsDto) {
+    const qb = this.postRepo.createQueryBuilder("post");
+    qb.select(["post", "tags", "author.id", "author.username", "author.avatar", "author.title"])
+      .leftJoin("post.tags", "tags")
+      .leftJoin("post.author", "author");
+
+    return queryPagination({
+      query: qb,
+      o: req,
+    });
+  }
+
+  async getMyPosts(req: PageOptionsDto, user_id: number) {
     const qb = this.postRepo.createQueryBuilder("post");
     qb.select(["post", "tags", "author.id", "author.username", "author.avatar", "author.title"])
       .leftJoin("post.tags", "tags")

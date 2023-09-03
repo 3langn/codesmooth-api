@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from "typeorm";
+import { Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne } from "typeorm";
 import { BaseEntity } from "../common/abstract.entity";
 import { UserEntity } from "./user.entity";
 import { IsEnum, IsNotEmpty } from "class-validator";
@@ -41,6 +41,7 @@ export class PostEntity extends BaseEntity {
   @Column()
   summary: string;
 
+  @Index("slug_index")
   @Column({ unique: true })
   slug: string;
 
