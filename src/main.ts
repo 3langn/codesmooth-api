@@ -15,12 +15,13 @@ import { ApiConfigService } from "./shared/services/api-config.service";
 import { HTTPLogger } from "./common/interceptor/logger";
 import { CustomHttpException } from "./common/exception/custom-http.exception";
 import { StatusCodesList } from "./common/constants/status-codes-list.constants";
+import { NestExpressApplication } from "@nestjs/platform-express";
 
 async function bootstrap() {
   // initializeTransactionalContext();
   // patchTypeORMRepositoryWithBaseRepository();
   // all domains have vnpayment.vn as origin
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors();
   app.use(helmet());
   app.setGlobalPrefix("/api");
@@ -31,6 +32,8 @@ async function bootstrap() {
       max: 10000,
     }),
   );
+  // trust proxy
+  app.set("trust proxy", 1);
 
   app.use(compression());
 

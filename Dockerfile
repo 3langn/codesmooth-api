@@ -12,7 +12,7 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 
 RUN apt install -y nodejs 
 
-RUN apt install golang-go -y
+# RUN apt install golang-go -y
 
 
 WORKDIR /app
