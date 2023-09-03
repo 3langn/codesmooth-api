@@ -26,6 +26,8 @@ import { ReviewModule } from "./modules/review/review.module";
 import { TransactionModule } from "./modules/transaction/transaction.module";
 import { SocketModule } from "./modules/socket/socket.module";
 import { NotificationModule } from "./modules/notification/notification.module";
+import { TagModule } from "./modules/tag/tag.module";
+import { PostModule } from "./modules/post/post.module";
 
 @Module({
   imports: [
@@ -69,7 +71,9 @@ import { NotificationModule } from "./modules/notification/notification.module";
     InstructorModule,
     TransactionModule,
     SocketModule,
-    NotificationModule
+    TagModule,
+    PostModule,
+    NotificationModule,
   ],
   // providers: [
   //   {

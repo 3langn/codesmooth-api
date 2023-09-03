@@ -3,7 +3,9 @@ import { BaseEntity } from "../common/abstract.entity";
 export enum NotificationType {
   INFO = "info",
   USER_PAYMENT = "payment",
+  USER_PAYMENT_FAILED = "payment_failed",
   INCOME = "income",
+  WITHDRAW = "withdraw",
 }
 
 export type InfoBody = {

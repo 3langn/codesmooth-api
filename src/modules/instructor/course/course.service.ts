@@ -17,6 +17,7 @@ import { CustomHttpException } from "../../../common/exception/custom-http.excep
 import { StatusCodesList } from "../../../common/constants/status-codes-list.constants";
 import { SectionService } from "../section/section.service";
 import { ReviewEntity } from "../../../entities/review.entity";
+import { CacheService } from "../../cache/cache.service";
 
 @Injectable()
 export class InstructorCourseService {
@@ -31,6 +32,7 @@ export class InstructorCourseService {
     private sectionService: SectionService,
     @InjectRepository(ReviewEntity)
     private reviewRepository: Repository<ReviewEntity>,
+    private cacheManager: CacheService,
   ) {}
 
   async createCourse(data: SaveCourseDto, user_id: number) {
@@ -80,6 +82,7 @@ export class InstructorCourseService {
       course[key] = update[key];
     }
     await this.courseRepository.save(course);
+
     return course;
   }
 

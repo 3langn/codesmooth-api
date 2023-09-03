@@ -6,6 +6,7 @@ import { AdminCourseModule } from "./course/course.module";
 import { AdminSettingsModule } from "./setting/setting.module";
 import { AdminTransactionModule } from "./transaction/transaction.module";
 import { AdminBalanceModule } from "./balance/balance.module";
+import { TagModule } from "./tag/tag.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AdminBalanceModule } from "./balance/balance.module";
     AdminCourseModule,
     AdminTransactionModule,
     AdminBalanceModule,
+    TagModule,
   ],
 })
 export class AdminModule {}

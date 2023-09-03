@@ -49,4 +49,8 @@ export class PageOptionsDto {
 
   @NumberFieldOptional()
   category_id?: number;
+
+  constructor(partial: Partial<PageOptionsDto>) {
+    Object.assign(this, partial);
+  }
 }
