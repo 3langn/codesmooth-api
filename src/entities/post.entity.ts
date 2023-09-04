@@ -3,11 +3,12 @@ import { BaseEntity } from "../common/abstract.entity";
 import { UserEntity } from "./user.entity";
 import { IsEnum, IsNotEmpty } from "class-validator";
 import { TagEntity } from "./tag.entity";
+import { SeriesEntity } from "./series.entity";
 
 export enum PostComponentType {
-  TEXT = "text",
-  CODE = "code",
-  IMAGE = "image",
+  TEXT = "TEXT",
+  CODE = "CODE",
+  IMAGE = "IMAGE",
 }
 
 export class PostComponent {
@@ -73,4 +74,16 @@ export class PostEntity extends BaseEntity {
 
   @Column({ default: 0 })
   reading_time: number;
+
+  @ManyToOne(() => SeriesEntity, (series) => series.posts, {
+    onDelete: "SET NULL",
+  })
+  @JoinColumn({ name: "series_id" })
+  series: SeriesEntity;
+
+  @Column({ nullable: true })
+  series_id: number;
+
+  @Column({ nullable: true })
+  series_order: number;
 }

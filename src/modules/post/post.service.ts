@@ -8,6 +8,8 @@ import { CustomHttpException } from "../../common/exception/custom-http.exceptio
 import { StatusCodesList } from "../../common/constants/status-codes-list.constants";
 import { PageOptionsDto } from "../../common/dto/page-options.dto";
 import { queryPagination } from "../../common/utils";
+import { GetPostsCanAddToSeriesQuery } from "./series.dto";
+import { SeriesService } from "./series.service";
 
 @Injectable()
 export class PostService {
@@ -15,6 +17,39 @@ export class PostService {
     @InjectRepository(PostEntity) private postRepo: Repository<PostEntity>,
     @InjectRepository(TagEntity) private tagRepo: Repository<TagEntity>,
   ) {}
+
+  async getPostsCanAddToSeries(req: GetPostsCanAddToSeriesQuery, user_id: number) {
+    const p1 = this.postRepo
+      .createQueryBuilder("post")
+      .select(["post.id", "post.title", "post.slug"])
+      .where("post.author_id = :user_id", { user_id })
+      .orWhere("post.author_id = :user_id", { user_id })
+      .andWhere("post.series_id IS NULL")
+      .orderBy("post.created_at", "DESC")
+      .getMany();
+
+    const p2 = this.postRepo.find({
+      select: ["id", "title", "slug"],
+      where: { series_id: req.series_id },
+    });
+
+    const [postCanAddList, postInSeriesList] = await Promise.all([p1, p2]);
+
+    return {
+      post_can_add_to_series: postCanAddList,
+      post_in_series: postInSeriesList,
+    };
+  }
+
+  async viewPost(id: number) {
+    this.postRepo.increment({ id }, "views", 1);
+  }
+
+  async findPostsByIds(ids: number[]) {
+    return await this.postRepo.find({
+      where: { id: In(ids) },
+    });
+  }
 
   async getPostBySlug(slug: string) {
     const post = await this.postRepo
@@ -31,10 +66,17 @@ export class PostService {
         "author.twitter_url",
         "author.linkedin_url",
         "author.youtube_url",
+        "series",
+        "series_posts.id",
+        "series_posts.title",
+        "series_posts.slug",
       ])
       .leftJoinAndSelect("post.tags", "tags")
+      .leftJoinAndSelect("post.series", "series")
       .leftJoin("post.author", "author")
+      .leftJoin("series.posts", "series_posts")
       .where("post.slug = :slug", { slug })
+      .orderBy("series_posts.series_order", "ASC")
       .getOne();
     if (!post) {
       throw new CustomHttpException({
